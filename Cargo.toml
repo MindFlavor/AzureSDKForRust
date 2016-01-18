@@ -6,6 +6,9 @@ readme = "README.md"
 authors = ["Francesco Cogno <francesco.cogno@outlook.com>"]
 license = "Apache-2.0"
 repository = "https://github.com/MindFlavor/AzureSDKForRust"
+documentation = "http://mindflavor.github.io/AzureSDKForRust/azure_sdk_for_rust/index.html"
+
+http://mindflavor.github.io/AzureSDKForRust/azure_sdk_for_rust/index.html
 
 [[bin]]
 name = "main"
