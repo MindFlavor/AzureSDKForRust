@@ -4,7 +4,7 @@ version = "0.1.2"
 description = "Rust wrappers around Microsoft Azure REST APIs"
 readme = "README.md"
 authors = ["Francesco Cogno <francesco.cogno@outlook.com>"]
-license = "Apache v.2"
+license = "Apache-2.0"
 repository = "https://github.com/MindFlavor/AzureSDKForRust"
 
 [[bin]]
