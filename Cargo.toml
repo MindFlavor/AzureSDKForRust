@@ -23,9 +23,8 @@ uuid = "^0.1"
 
 # clippy="*"
 
+url = "0.5.2"
+
 [dependencies.hyper]
 version = "^0.7"
 default-features = true
-
-[dependencies.url]
-git = "https://github.com/servo/rust-url"
