@@ -1,4 +1,14 @@
 git# Change Log
+
+## [0.1.3](https://github.com/MindFlavor/AzureSDKForRust/releases/tag/0.0.7) (yet-to-publish)
+
+**Implemented features:**
+
+**Refactoring:**
+* Corrected  ```azure::core::errors::AzureError``` to include the ``std::io::Error`` and ```xml::BuilderError``` instead of their ```to_string()``` result.
+
+**Bugfixes:**
+
 ## [0.1.2](https://github.com/MindFlavor/AzureSDKForRust/releases/tag/0.0.7) (2016-01-18)
 
 **Bugfixes:**

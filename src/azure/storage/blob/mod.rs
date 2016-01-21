@@ -38,8 +38,7 @@ use azure::core::ETag;
 
 use std::io::Read;
 
-use azure::core::errors::{TraversingError, AzureError, check_status, new_from_ioerror_string,
-                          new_from_xmlerror_string};
+use azure::core::errors::{TraversingError, AzureError, check_status};
 use azure::core::parsing::FromStringOptional;
 
 use azure::core::range::Range;
@@ -347,18 +346,12 @@ impl Blob {
         try!(check_status(&mut resp, StatusCode::Ok));
 
         let mut resp_s = String::new();
-        match resp.read_to_string(&mut resp_s) {
-            Ok(_) => (),
-            Err(err) => return Err(new_from_ioerror_string(err.to_string())),
-        };
+        try!(resp.read_to_string(&mut resp_s));
 
         println!("resp_s == {:?}\n\n", resp_s);
 
         let sp = &resp_s;
-        let elem: Element = match sp.parse() {
-            Ok(res) => res,
-            Err(err) => return Err(new_from_xmlerror_string(err.to_string())),
-        };
+        let elem: Element = try!(sp.parse());
 
         let next_marker = match try!(cast_optional::<String>(&elem, &["NextMarker"])) {
             Some(ref nm) if nm == "" => None,

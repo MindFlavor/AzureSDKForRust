@@ -1,7 +1,8 @@
 use hyper;
 use hyper::status::StatusCode;
 use chrono;
-// use std::io;
+use std::io::Error as IOError;
+use xml::BuilderError as XMLError;
 use std::io::Read;
 use std::num;
 // use xml;
@@ -11,8 +12,8 @@ use azure::core::range::ParseError;
 #[derive(Debug)]
 pub enum AzureError {
     HyperError(hyper::error::Error),
-    IOError(String),
-    XMLError(String),
+    IOError(IOError),
+    XMLError(XMLError),
     UnexpectedResult((StatusCode, StatusCode, String)),
     HeaderNotFound(String),
     ResponseParsingError(TraversingError),
@@ -59,6 +60,18 @@ impl From<ParsingError> for AzureError {
     }
 }
 
+impl From<XMLError> for AzureError {
+    fn from(xmle: XMLError) -> AzureError {
+        AzureError::XMLError(xmle)
+    }
+}
+
+impl From<IOError> for AzureError {
+    fn from(ioe: IOError) -> AzureError {
+        AzureError::IOError(ioe)
+    }
+}
+
 impl From<chrono::format::ParseError> for AzureError {
     fn from(pe: chrono::format::ParseError) -> AzureError {
         AzureError::ResponseParsingError(TraversingError::DateTimeParseError(pe))
@@ -95,25 +108,13 @@ impl From<ParsingError> for TraversingError {
     }
 }
 
-
-pub fn new_from_xmlerror_string(s: String) -> AzureError {
-    AzureError::XMLError(s)
-}
-
-pub fn new_from_ioerror_string(s: String) -> AzureError {
-    AzureError::IOError(s)
-}
-
 #[inline]
 pub fn check_status(resp: &mut hyper::client::response::Response,
                     s: StatusCode)
                     -> Result<(), AzureError> {
     if resp.status != s {
         let mut resp_s = String::new();
-        match resp.read_to_string(&mut resp_s) {
-            Ok(_) => (),
-            Err(err) => return Err(new_from_ioerror_string(err.to_string())),
-        };
+        try!(resp.read_to_string(&mut resp_s));
 
         return Err(AzureError::UnexpectedResult((resp.status, s, resp_s)));
     }
