@@ -9,12 +9,29 @@ use std::num;
 use azure::core::enumerations::ParsingError;
 use azure::core::range::ParseError;
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct UnexpectedHTTPResult {
+    expected: StatusCode,
+    received: StatusCode,
+    body: String,
+}
+
+impl UnexpectedHTTPResult {
+    pub fn new(expected: StatusCode, received: StatusCode, body: &str) -> UnexpectedHTTPResult {
+        UnexpectedHTTPResult {
+            expected: expected,
+            received: received,
+            body: body.to_owned(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum AzureError {
     HyperError(hyper::error::Error),
     IOError(IOError),
     XMLError(XMLError),
-    UnexpectedResult((StatusCode, StatusCode, String)),
+    UnexpectedHTTPResult(UnexpectedHTTPResult),
     HeaderNotFound(String),
     ResponseParsingError(TraversingError),
     ParseIntError(num::ParseIntError),
@@ -116,7 +133,9 @@ pub fn check_status(resp: &mut hyper::client::response::Response,
         let mut resp_s = String::new();
         try!(resp.read_to_string(&mut resp_s));
 
-        return Err(AzureError::UnexpectedResult((resp.status, s, resp_s)));
+        return Err(AzureError::UnexpectedHTTPResult(UnexpectedHTTPResult::new(s,
+                                                                              resp.status,
+                                                                              &resp_s)));
     }
 
     Ok(())

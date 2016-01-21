@@ -6,6 +6,7 @@ git# Change Log
 
 **Refactoring:**
 * Corrected  ```azure::core::errors::AzureError``` to include the ``std::io::Error`` and ```xml::BuilderError``` instead of their ```to_string()``` result.
+* Changed ```UnexpectedResult``` enum of ```azure::core::errors::AzureError``` to ```UnexpectedHTTPResult``` which holds an instance of  ```azure::core::errors::UnexpectedHTTPResult``` instead of a tuple for better field description.
 
 **Bugfixes:**
 

@@ -156,7 +156,7 @@ impl Container {
         // println!("response == \n\n{:?}\n\n", resp_s);
 
         let sp = &resp_s;
-        let elem: Element = try!(sp.parse()); 
+        let elem: Element = try!(sp.parse());
 
         let mut v = Vec::new();
 
