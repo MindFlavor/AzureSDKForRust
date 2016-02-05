@@ -1,3 +1,6 @@
+// #![feature(plugin)]
+// #![plugin(clippy)]
+
 #[macro_use]
 extern crate hyper;
 extern crate chrono;

@@ -24,7 +24,7 @@ uuid = "*"
 time = "*"
 url = "*"
 
-clippy="*"
+# clippy="*"
 
 [dependencies.hyper]
 version = "*"
