@@ -108,7 +108,9 @@ fn main() {
 
 ## State of the art
 Right now very few methods have been implemented but the key framework is in place (authentication, enumerations, parsing and so on). If you want to contribute please do!
+Methods are added daily so please check the [CHANGELOG.md](AzureSDKForRust/CHANGELOG.md) for updates on the progress.
 Also note that the project is in early stages so the APIs are bound to change at any moment. I will strive to keep things steady but since I'm new to Rust I'm sure I'll have to correct some serious mistake before too long :smile:.
+I generally build for the latest nightly and leave to Travis to check the retrocompatibility.
 
 ## Contributing
 If you want to contribute please do! No formality required! :wink:
@@ -134,6 +136,13 @@ If you want to contribute please do! No formality required! :wink:
 |Clear blob page|[https://msdn.microsoft.com/en-us/library/azure/dd179451.aspx](https://msdn.microsoft.com/en-us/library/azure/dd179451.aspx)|
 |Put block|[https://msdn.microsoft.com/en-us/library/azure/dd135726.aspx](https://msdn.microsoft.com/en-us/library/azure/dd135726.aspx)|
 |Lease blob|[https://msdn.microsoft.com/library/azure/ee691972.aspx](https://msdn.microsoft.com/library/azure/ee691972.aspx)|
+
+#### Event Hubs
+
+|Method | URL |
+| ----  | --- |
+|Send Event|[https://msdn.microsoft.com/en-us/library/azure/dn790664.aspx](https://msdn.microsoft.com/en-us/library/azure/dn790664.aspx)|
+
 
 ## License
 This project is published under [The MIT License (MIT)](LICENSE).

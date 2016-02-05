@@ -19,9 +19,12 @@ use crypto::mac::Mac;
 use url::Url;
 use std::io::Read;
 
+mod client;
+pub use self::client::Client;
+
 header! { (Authorization, "Authorization") => [String] }
 
-pub fn submit_event(namespace: &str,
+fn submit_event(namespace: &str,
                     event_hub: &str,
                     policy_name: &str,
                     key: &str,
@@ -48,7 +51,6 @@ pub fn submit_event(namespace: &str,
     headers.set(Authorization(sas));
     headers.set(ContentLength(event_body.1));
 
-
     let body = hyper::client::Body::SizedBody(event_body.0, event_body.1);
 
     // Post the request along with the headers and the body.
@@ -67,7 +69,7 @@ pub fn submit_event(namespace: &str,
     Ok(())
 }
 
-pub fn generate_signature(policy_name: &str, hmac_key: &str, url: &str, ttl: Duration) -> String {
+fn generate_signature(policy_name: &str, hmac_key: &str, url: &str, ttl: Duration) -> String {
     let expiry = chrono::UTC::now().add(ttl).timestamp();
     debug!("expiry == {:?}", expiry);
 
