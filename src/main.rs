@@ -11,6 +11,7 @@ extern crate rustc_serialize as serialize;
 extern crate xml;
 #[macro_use]
 extern crate mime;
+extern crate time;
 
 #[macro_use]
 extern crate log;

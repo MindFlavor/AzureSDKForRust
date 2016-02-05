@@ -6,6 +6,7 @@ use xml::BuilderError as XMLError;
 use std::io::Read;
 use std::num;
 // use xml;
+use url::ParseError as URLParseError;
 use azure::core::enumerations::ParsingError;
 use azure::core::range::ParseError;
 
@@ -39,6 +40,7 @@ pub enum AzureError {
     GenericError,
     ParsingError(ParsingError),
     InputParametersError(String),
+    URLParseError(URLParseError),
 }
 
 #[derive(Debug)]
@@ -51,6 +53,12 @@ pub enum TraversingError {
     ParseIntError(num::ParseIntError),
     GenericParseError(String),
     ParsingError(ParsingError),
+}
+
+impl From<URLParseError> for AzureError {
+    fn from(upe: URLParseError) -> AzureError {
+        AzureError::URLParseError(upe)
+    }
 }
 
 impl From<ParseError> for AzureError {

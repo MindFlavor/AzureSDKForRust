@@ -13,19 +13,19 @@ name = "main"
 doc = false
 
 [dependencies]
-chrono = "^0.2"
-rust-crypto = "^0.2"
-rustc-serialize = "^0.3"
-RustyXML = "^0.1"
-mime = "^0.1"
-log = "0.3"
-env_logger = "0.3"
-uuid = "^0.1"
+chrono = "*"
+rust-crypto = "*"
+rustc-serialize = "*"
+RustyXML = "*"
+mime = "*"
+log = "*"
+env_logger = "*"
+uuid = "*"
+time = "*"
+url = "*"
 
-# clippy="*"
-
-url = "0.5.2"
+clippy="*"
 
 [dependencies.hyper]
-version = "^0.7"
+version = "*"
 default-features = true
