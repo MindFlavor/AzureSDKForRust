@@ -1,4 +1,4 @@
-## [0.1.3](https://github.com/MindFlavor/AzureSDKForRust/releases/tag/0.1.3) (yet-to-publish)
+## [0.1.3](https://github.com/MindFlavor/AzureSDKForRust/releases/tag/0.1.3) (2016-02-05)
 
 **Implemented features:**
 * Added Event Hub Send Event REST API implementation (as for [https://msdn.microsoft.com/en-us/library/azure/dn790664.aspx](https://msdn.microsoft.com/en-us/library/azure/dn790664.aspx)).
