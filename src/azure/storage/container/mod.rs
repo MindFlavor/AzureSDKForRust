@@ -29,10 +29,9 @@ use azure::core::parsing::FromStringOptional;
 header! { (XMSBlobPublicAccess, "x-ms-blob-public-access") => [PublicAccess] }
 
 create_enum!(PublicAccess,
-                            (None,          "none"),
-                            (Container,     "container"),
-                            (Blob,          "blob")
-);
+             (None, "none"),
+             (Container, "container"),
+             (Blob, "blob"));
 
 
 #[derive(Debug)]

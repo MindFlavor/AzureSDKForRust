@@ -24,13 +24,13 @@ pub use self::client::Client;
 
 header! { (Authorization, "Authorization") => [String] }
 
-fn submit_event(namespace: &str,
-                    event_hub: &str,
-                    policy_name: &str,
-                    key: &str,
-                    event_body: (&mut Read, u64),
-                    duration: Duration)
-                    -> Result<(), AzureError> {
+fn send_event(namespace: &str,
+              event_hub: &str,
+              policy_name: &str,
+              hmac: &mut Hmac<Sha256>,
+              event_body: (&mut Read, u64),
+              duration: Duration)
+              -> Result<(), AzureError> {
 
     // prepare the url to call
     let url = format!("https://{}.servicebus.windows.net/{}/messages",
@@ -42,7 +42,7 @@ fn submit_event(namespace: &str,
     // create content
 
     // generate sas signature based on key name, key value, url and duration.
-    let sas = generate_signature(&policy_name, &key, &url.to_string(), duration);
+    let sas = generate_signature(&policy_name, hmac, &url.to_string(), duration);
     debug!("sas == {}", sas);
 
     // add required headers (in this case just the Authorization and Content-Length).
@@ -62,14 +62,21 @@ fn submit_event(namespace: &str,
         debug!("response status unexpected, returning Err");
         let mut resp_s = String::new();
         try!(response.read_to_string(&mut resp_s));
-        return Err(AzureError::UnexpectedHTTPResult(UnexpectedHTTPResult::new(StatusCode::Created, response.status, &resp_s)));
+        return Err(AzureError::UnexpectedHTTPResult(UnexpectedHTTPResult::new(
+            StatusCode::Created,
+            response.status,
+            &resp_s)));
     }
 
     debug!("response status ok, returning Ok");
     Ok(())
 }
 
-fn generate_signature(policy_name: &str, hmac_key: &str, url: &str, ttl: Duration) -> String {
+fn generate_signature(policy_name: &str,
+                      hmac: &mut Hmac<Sha256>,
+                      url: &str,
+                      ttl: Duration)
+                      -> String {
     let expiry = chrono::UTC::now().add(ttl).timestamp();
     debug!("expiry == {:?}", expiry);
 
@@ -79,9 +86,7 @@ fn generate_signature(policy_name: &str, hmac_key: &str, url: &str, ttl: Duratio
     let str_to_sign = format!("{}\n{}", url_encoded, expiry);
     debug!("str_to_sign == {:?}", str_to_sign);
 
-    let mut v_hmac_key: Vec<u8> = Vec::new();
-    v_hmac_key.extend(hmac_key.as_bytes());
-    let mut hmac = Hmac::new(Sha256::new(), &v_hmac_key);
+    hmac.reset();
     hmac.input(str_to_sign.as_bytes());
     let sig = hmac.result().code().to_base64(STANDARD);
     let sig = utf8_percent_encode(&sig, FORM_URLENCODED_ENCODE_SET);

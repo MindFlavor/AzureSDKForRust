@@ -56,22 +56,17 @@ use serialize::base64::{STANDARD, ToBase64};
 use uuid::Uuid;
 
 create_enum!(BlobType,
-                            (BlockBlob,        "BlockBlob"),
-                            (PageBlob,         "PageBlob"),
-                            (AppendBlob,       "AppendBlob")
-);
+             (BlockBlob, "BlockBlob"),
+             (PageBlob, "PageBlob"),
+             (AppendBlob, "AppendBlob"));
 
 create_enum!(CopyStatus,
-                            (Pending,          "pending"),
-                            (Success,          "success"),
-                            (Aborted,          "aborted"),
-                            (Failed,           "failed")
-);
+             (Pending, "pending"),
+             (Success, "success"),
+             (Aborted, "aborted"),
+             (Failed, "failed"));
 
-create_enum!(PageWriteType,
-                            (Update,            "update"),
-                            (Clear,             "clear")
-);
+create_enum!(PageWriteType, (Update, "update"), (Clear, "clear"));
 
 header! { (XMSBlobContentLength, "x-ms-blob-content-length") => [u64] }
 header! { (XMSBlobSequenceNumber, "x-ms-blob-sequence-number") => [u64] }
@@ -262,7 +257,8 @@ impl Blob {
         };
         println!("lease_duration == {:?}", lease_duration);
 
-        // TODO: get the remaining headers (https://msdn.microsoft.com/en-us/library/azure/dd179440.aspx)
+        // TODO: get the remaining headers
+        // (https://msdn.microsoft.com/en-us/library/azure/dd179440.aspx)
 
         Ok(Blob {
             name: blob_name.to_owned(),
