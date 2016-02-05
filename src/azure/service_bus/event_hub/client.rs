@@ -41,7 +41,7 @@ impl Client {
     }
 }
 
-
+#[cfg(test)]
 mod test {
     #[allow(unused_imports)]
     use super::Client;
@@ -49,5 +49,20 @@ mod test {
     #[test]
     pub fn client_ctor() {
         Client::new("namespace", "event_hub", "policy", "key");
+    }
+
+    #[test]
+    pub fn client_enc() {
+        use crypto::mac::Mac;
+        use serialize::base64::{STANDARD, ToBase64};
+
+        let str_to_sign = "This must be secret!";
+
+        let mut c = Client::new("namespace", "event_hub", "policy", "key");
+
+        c.hmac.input(str_to_sign.as_bytes());
+        let sig = c.hmac.result().code().to_base64(STANDARD);
+
+        assert_eq!(sig, "2UNXaoPpeJBAhh6qxmTqXyNzTpOflGO6IhxegeUQBcU=");
     }
 }
