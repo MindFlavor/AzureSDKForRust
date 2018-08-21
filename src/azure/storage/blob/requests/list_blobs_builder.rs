@@ -10,8 +10,7 @@ use azure::storage::blob::responses::ListBlobsResponse;
 use azure::storage::blob::Blob;
 use azure::storage::client::Client;
 use futures::future::done;
-use futures::{future, Future, stream, Stream};
-use futures::prelude::*;
+use futures::{stream, Future, Stream};
 use hyper::{Method, StatusCode};
 use std::marker::PhantomData;
 
@@ -120,7 +119,7 @@ where
     ContainerNameSet: ToAssign,
 {
     #[inline]
-    fn next_marker(&self) -> Option<&'a str> {
+    fn next_marker(&self) -> Option<&str> {
         self.next_marker
     }
 }
@@ -522,6 +521,17 @@ enum State {
     End,
 }
 
+impl<'a> NextMarkerOption<'a> for State {
+    #[inline]
+    fn next_marker(&self) -> Option<&str> {
+        match self {
+            &State::Start(ref token) => token.as_ref().map(String::as_str),
+            &State::Next(ref token) => Some(token),
+            &State::End => None,
+        }
+    }
+}
+
 impl<'a> ListBlobBuilder<'a, Yes> {
     #[inline]
     pub fn finalize(self) -> impl Stream<Item = Blob, Error = AzureError> {
@@ -540,9 +550,6 @@ impl<'a> ListBlobBuilder<'a, Yes> {
         if let Some(mr) = MaxResultsOption::to_uri_parameter(&self) {
             uri = format!("{}&{}", uri, mr);
         }
-        if let Some(mr) = NextMarkerOption::to_uri_parameter(&self) {
-            uri = format!("{}&{}", uri, mr);
-        }
         if let Some(mr) = TimeoutOption::to_uri_parameter(&self) {
             uri = format!("{}&{}", uri, mr);
         }
@@ -553,16 +560,19 @@ impl<'a> ListBlobBuilder<'a, Yes> {
             uri = format!("{}&{}", uri, mr);
         }
 
-        let start_token = State::Start(NextMarkerOption::to_uri_parameter(&self));
+        let start_token = State::Start(self.next_marker.map(|token| token.to_owned()));
         let client = self.client().clone();
 
         stream::unfold(start_token, move |cont_token| {
             let uri = match cont_token {
-                State::Start(Some(mr)) => format!("{}&{}", uri, mr),
-                State::Start(None) => uri.clone(),
-                State::Next(mr) => format!("{}&{}", uri, mr),
                 State::End => return None,
+                token => if let Some(mr) = NextMarkerOption::to_uri_parameter(&token) {
+                    format!("{}&{}", uri, mr)
+                } else {
+                    uri.clone()
+                },
             };
+            trace!("uri: {}", uri);
             let req = client.perform_request(&uri, Method::GET, |_| {}, None);
             Some(
                 done(req)
@@ -572,11 +582,7 @@ impl<'a> ListBlobBuilder<'a, Yes> {
                         move |future_response| {
                             check_status_extract_headers_and_body_as_string(future_response, StatusCode::OK).and_then(
                                 move |(headers, body_as_str)| {
-                                    done(ListBlobsResponse::from_response(
-                                        &container_name,
-                                        &headers,
-                                        &body_as_str,
-                                    ))
+                                    done(ListBlobsResponse::from_response(&container_name, &headers, &body_as_str))
                                 },
                             )
                         }
