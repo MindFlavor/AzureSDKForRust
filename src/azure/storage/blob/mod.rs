@@ -1,42 +1,28 @@
 mod lease_blob_options;
 pub use self::lease_blob_options::{LeaseBlobOptions, LEASE_BLOB_OPTIONS_DEFAULT};
-
 mod blob_block_type;
 mod blob_stream;
 pub use self::blob_block_type::BlobBlockType;
-
 mod block_list_type;
 pub use self::block_list_type::BlockListType;
-
 mod blob_block_with_size;
 pub use self::blob_block_with_size::BlobBlockWithSize;
-
 mod block_with_size_list;
 pub use self::block_with_size_list::BlockWithSizeList;
-
-use azure::storage::IntoAzurePath;
-
 mod block_list;
 pub use self::block_list::BlockList;
-
 pub mod requests;
 pub mod responses;
-
-mod get_block_list_response;
-pub use self::get_block_list_response::GetBlockListResponse;
-
 use azure::core::headers::{
     BLOB_SEQUENCE_NUMBER, BLOB_TYPE, CLIENT_REQUEST_ID, CONTENT_MD5, COPY_COMPLETION_TIME, COPY_ID, COPY_PROGRESS, COPY_SOURCE,
     COPY_STATUS, COPY_STATUS_DESCRIPTION, CREATION_TIME, LEASE_ACTION, LEASE_BREAK_PERIOD, LEASE_DURATION, LEASE_ID, LEASE_STATE,
-    LEASE_STATUS, PROPOSED_LEASE_ID, REQUEST_ID, SERVER_ENCRYPTED,
+    LEASE_STATUS, PROPOSED_LEASE_ID, SERVER_ENCRYPTED,
 };
-use base64;
 use chrono::{DateTime, Utc};
 use futures::{future::*, prelude::*};
-use hyper::{self, header, Method, StatusCode};
-use md5;
+use hyper::{header, Method, StatusCode};
 use std::collections::HashMap;
-use std::{borrow::Borrow, fmt, str::FromStr};
+use std::{fmt, str::FromStr};
 use uuid::Uuid;
 use xml::Element;
 use xml::Xml::ElementNode;
@@ -86,7 +72,7 @@ pub struct Blob {
     pub content_disposition: Option<String>,
     pub x_ms_blob_sequence_number: Option<u64>,
     pub blob_type: BlobType,
-    pub access_tier: String,
+    pub access_tier: Option<String>,
     pub lease_status: Option<LeaseStatus>,
     pub lease_state: LeaseState,
     pub lease_duration: Option<LeaseDuration>,
@@ -124,7 +110,7 @@ impl Blob {
         let x_ms_blob_sequence_number = cast_optional::<u64>(elem, &["Properties", "x-ms-blob-sequence-number"])?;
 
         let blob_type = cast_must::<BlobType>(elem, &["Properties", "BlobType"])?;
-        let access_tier = cast_must::<String>(elem, &["Properties", "AccessTier"])?;
+        let access_tier = cast_optional::<String>(elem, &["Properties", "AccessTier"])?;
 
         let lease_status = cast_optional::<LeaseStatus>(elem, &["Properties", "LeaseStatus"])?;
         let lease_state = cast_must::<LeaseState>(elem, &["Properties", "LeaseState"])?;
@@ -140,13 +126,11 @@ impl Blob {
         let server_encrypted = cast_must::<bool>(elem, &["Properties", "ServerEncrypted"])?;
         let incremental_copy = cast_optional::<bool>(elem, &["Properties", "IncrementalCopy"])?;
 
-        // this seems to be either true or absent. We handle absent as false.
-        // This is undocumented and can be wrong/change.
+        // this seems to be either true or absent. We handle absent with None.
+        // Previously we returned false in case of absent value but that was
+        // misleading.
         // TOCHECK
-        let access_tier_inferred = match cast_optional::<bool>(elem, &["Properties", "AccessTierInferred"])? {
-            Some(value) => value,
-            None => false,
-        };
+        let access_tier_inferred = cast_optional::<bool>(elem, &["Properties", "AccessTierInferred"])?;
 
         let access_tier_change_time = cast_optional::<DateTime<Utc>>(elem, &["Properties", "AccessTierChangeTime"])?;
         let deleted_time = cast_optional::<DateTime<Utc>>(elem, &["Properties", "DeletedTime"])?;
@@ -205,7 +189,7 @@ impl Blob {
             copy_status_description,
             incremental_copy,
             server_encrypted,
-            access_tier_inferred: Some(access_tier_inferred),
+            access_tier_inferred: access_tier_inferred,
             access_tier_change_time,
             deleted_time,
             remaining_retention_days,
@@ -329,7 +313,7 @@ impl Blob {
             content_disposition,
             x_ms_blob_sequence_number,
             blob_type,
-            access_tier: "Unknown".to_owned(), // TODO: Maybe use Option?
+            access_tier: None,
             lease_status,
             lease_state,
             lease_duration,
@@ -442,183 +426,6 @@ impl Blob {
             .and_then(move |future_response| check_status_extract_body(future_response, StatusCode::ACCEPTED))
             .and_then(|_| ok(()))
     }
-}
-
-fn put_block_list_prepare_request<P, T>(
-    c: &Client,
-    path: &P,
-    timeout: Option<u64>,
-    lease_id: Option<&LeaseId>,
-    block_ids: &BlockList<T>,
-) -> Result<hyper::client::ResponseFuture, AzureError>
-where
-    P: IntoAzurePath,
-    T: Borrow<str>,
-{
-    let container_name = path.container_name()?;
-    let blob_name = path.blob_name()?;
-
-    let mut uri = format!(
-        "https://{}.blob.core.windows.net/{}/{}?comp=blocklist",
-        c.account(),
-        container_name,
-        blob_name,
-    );
-
-    if let Some(ref timeout) = timeout {
-        uri = format!("{}&timeout={}", uri, timeout);
-    }
-
-    // create the blocklist XML
-    let xml = block_ids.to_xml();
-    let xml_bytes = xml.as_bytes();
-
-    // calculate the xml MD5. This can be made optional
-    // in a future version.
-    let md5 = {
-        let hash = md5::compute(xml_bytes);
-        debug!("md5 hash: {:02X}", hash);
-        base64::encode(&*hash)
-    };
-
-    // now create the request
-    c.perform_request(
-        &uri,
-        Method::PUT,
-        move |ref mut request| {
-            request.header_formatted(header::CONTENT_LENGTH, xml_bytes.len());
-            request.header_formatted(CONTENT_MD5, md5);
-            if let Some(lease_id) = lease_id {
-                request.header_formatted(LEASE_ID, *lease_id);
-            }
-        },
-        Some(xml_bytes),
-    )
-}
-
-pub fn put_block_list<P, T>(
-    c: &Client,
-    path: &P,
-    timeout: Option<u64>,
-    lease_id: Option<&LeaseId>,
-    block_ids: &BlockList<T>,
-) -> impl Future<Item = (), Error = AzureError>
-where
-    P: IntoAzurePath,
-    T: Borrow<str>,
-{
-    done(put_block_list_prepare_request(c, path, timeout, lease_id, block_ids))
-        .from_err()
-        .and_then(move |future_response| check_status_extract_body(future_response, StatusCode::CREATED))
-        .and_then(|_| ok(()))
-}
-
-fn get_block_list_create_request<P>(
-    c: &Client,
-    path: &P,
-    bl: &BlockListType,
-    timeout: Option<u64>,
-    lease_id: Option<&LeaseId>,
-    request_id: Option<String>,
-    snapshot: Option<&DateTime<Utc>>,
-) -> Result<hyper::client::ResponseFuture, AzureError>
-where
-    P: IntoAzurePath,
-{
-    let container_name = path.container_name()?;
-    let blob_name = path.blob_name()?;
-
-    let mut uri = format!(
-        "https://{}.blob.core.windows.net/{}/{}?comp=blocklist&blocklisttype={}",
-        c.account(),
-        container_name,
-        blob_name,
-        match bl {
-            BlockListType::Committed => "committed",
-            BlockListType::Uncommitted => "uncommitted",
-            BlockListType::All => "all",
-        }
-    );
-
-    if let Some(ref timeout) = timeout {
-        uri = format!("{}&timeout={}", uri, timeout);
-    }
-
-    if let Some(snapshot) = snapshot {
-        uri = format!("{}&snapshot={}", uri, snapshot.to_rfc2822());
-    }
-
-    c.perform_request(
-        &uri,
-        Method::GET,
-        move |ref mut request| {
-            if let Some(lease_id) = lease_id {
-                request.header_formatted(LEASE_ID, lease_id);
-            };
-            if let Some(request_id) = request_id {
-                request.header_bytes(CLIENT_REQUEST_ID, request_id);
-            };
-        },
-        None,
-    )
-}
-
-pub fn get_block_list<P>(
-    c: &Client,
-    path: &P,
-    bl: &BlockListType,
-    timeout: Option<u64>,
-    lease_id: Option<&LeaseId>,
-    request_id: Option<String>,
-    snapshot: Option<&DateTime<Utc>>,
-) -> impl Future<Item = GetBlockListResponse, Error = AzureError>
-where
-    P: IntoAzurePath,
-{
-    done(get_block_list_create_request(c, path, bl, timeout, lease_id, request_id, snapshot))
-        .from_err()
-        .and_then(move |future_response| check_status_extract_headers_and_body(future_response, StatusCode::OK))
-        .and_then(move |(headers, body)| {
-            done(match String::from_utf8(body.to_owned()) {
-                Ok(body) => Ok((headers, body)),
-                Err(err) => Err(AzureError::FromUtf8Error(err)),
-            })
-        }).and_then(move |(headers, body)| {
-            debug!("response headers == {:?}", headers);
-
-            // extract headers
-            let etag = headers.get_as_string(header::ETAG);
-            debug!("etag == {:?}", etag);
-
-            let content_type = headers.get_as_string(header::CONTENT_TYPE).unwrap();
-            debug!("content_type == {:?}", content_type);
-
-            let request_id = Uuid::parse_str(headers.get_as_str(REQUEST_ID).unwrap()).unwrap();
-
-            debug!("request_id == {}", request_id);
-
-            let last_modified = headers
-                .get_as_str(header::LAST_MODIFIED)
-                .map(|s| DateTime::parse_from_rfc2822(s).unwrap());
-
-            let date = headers.get_as_str(header::DATE).unwrap();
-            debug!("date == {}", date);
-            let date = DateTime::parse_from_rfc2822(&date).unwrap();
-
-            debug!("body == {:?}", body);
-
-            done(match BlockWithSizeList::try_from(&body[3..] as &str) {
-                Ok(block_list) => Ok(GetBlockListResponse {
-                    block_list,
-                    last_modified,
-                    etag,
-                    content_type: content_type.clone(),
-                    request_id,
-                    date,
-                }),
-                Err(error) => Err(AzureError::SerdeXMLDeserializationError(error)),
-            })
-        })
 }
 
 #[inline]

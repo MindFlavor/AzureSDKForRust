@@ -1,5 +1,5 @@
 {
-	"name": "PutBlockBuilder",
+	"name": "GetBlockListBuilder",
 	"extra_types": [ "'a" ],
 	"extra_wheres": [],
 	"inline": true,
@@ -28,20 +28,13 @@
 			"trait_set": "BlobNameSupport<'a>"
 		},
 		{
-			"name": "body",
-			"field_type": "&'a [u8]",
-			"builder_type": "BodySet",
+			"name": "block_list_type",
+			"field_type": "BlockListType",
+			"builder_type": "BlobListTypeSet",
 			"optional": false,
-			"trait_get": "BodyRequired<'a>",
-			"trait_set": "BodySupport<'a>"
-		},
-		{
-			"name": "block_id",
-			"field_type": "&'a [u8]",
-			"builder_type": "BlockIdSet",
-			"optional": false,
-			"trait_get": "BlockIdRequired<'a>",
-			"trait_set": "BlockIdSupport<'a>"
+			"initializer": "BlockListType::Committed",
+			"trait_get": "BlockListTypeRequired",
+			"trait_set": "BlockListTypeSupport"
 		},
 		{
 			"name": "timeout",
@@ -49,13 +42,6 @@
 			"optional": true,
 			"trait_get": "TimeoutOption",
 			"trait_set": "TimeoutSupport"
-		},
-		{
-			"name": "content_md5",
-			"field_type": "&'a [u8]",
-			"optional": true,
-			"trait_get": "ContentMD5Option<'a>",
-			"trait_set": "ContentMD5Support<'a>"
 		},
 		{
 			"name": "lease_id",

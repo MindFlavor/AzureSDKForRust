@@ -1,5 +1,5 @@
 {
-	"name": "PutBlockBuilder",
+	"name": "AcquireBlobLeaseBuilder",
 	"extra_types": [ "'a" ],
 	"extra_wheres": [],
 	"inline": true,
@@ -28,20 +28,20 @@
 			"trait_set": "BlobNameSupport<'a>"
 		},
 		{
-			"name": "body",
-			"field_type": "&'a [u8]",
-			"builder_type": "BodySet",
+			"name": "lease_duration",
+			"field_type": "i8",
+			"builder_type": "LeaseDurationSet",
 			"optional": false,
-			"trait_get": "BodyRequired<'a>",
-			"trait_set": "BodySupport<'a>"
+			"initializer": "-1",
+			"trait_get": "LeaseDurationRequired",
+			"trait_set": "LeaseDurationSupport"
 		},
 		{
-			"name": "block_id",
-			"field_type": "&'a [u8]",
-			"builder_type": "BlockIdSet",
-			"optional": false,
-			"trait_get": "BlockIdRequired<'a>",
-			"trait_set": "BlockIdSupport<'a>"
+			"name": "proposed_lease_id",
+			"field_type": "&'a LeaseId",
+			"optional": true,
+			"trait_get": "ProposedLeaseIdOption<'a>",
+			"trait_set": "ProposedLeaseIdSupport<'a>"
 		},
 		{
 			"name": "timeout",
@@ -49,20 +49,6 @@
 			"optional": true,
 			"trait_get": "TimeoutOption",
 			"trait_set": "TimeoutSupport"
-		},
-		{
-			"name": "content_md5",
-			"field_type": "&'a [u8]",
-			"optional": true,
-			"trait_get": "ContentMD5Option<'a>",
-			"trait_set": "ContentMD5Support<'a>"
-		},
-		{
-			"name": "lease_id",
-			"field_type": "&'a LeaseId",
-			"optional": true,
-			"trait_get": "LeaseIdOption<'a>",
-			"trait_set": "LeaseIdSupport<'a>"
 		},
 		{
 			"name": "client_request_id",

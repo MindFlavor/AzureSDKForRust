@@ -19,7 +19,12 @@ pub trait Blob {
     fn update_page<'a>(&'a self) -> blob::requests::UpdatePageBuilder<'a, No, No, No, No>;
     fn clear_page<'a>(&'a self) -> blob::requests::ClearPageBuilder<'a, No, No, No>;
     fn put_block<'a>(&'a self) -> blob::requests::PutBlockBuilder<'a, No, No, No, No>;
-    fn put_block_list<'a, T: Borrow<str> + 'a>(&'a self) -> blob::requests::PutBlockListBuilder<'a, T, No, No, No>;
+    fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, No, No, No>;
+    fn put_block_list<'a, T: Borrow<[u8]> + 'a>(&'a self) -> blob::requests::PutBlockListBuilder<'a, T, No, No, No>;
+    fn acquire_blob_lease<'a>(&'a self) -> blob::requests::AcquireBlobLeaseBuilder<'a, No, No, No>;
+    fn renew_blob_lease<'a>(&'a self) -> blob::requests::RenewBlobLeaseBuilder<'a, No, No, No>;
+    fn change_blob_lease<'a>(&'a self) -> blob::requests::ChangeBlobLeaseBuilder<'a, No, No, No, No>;
+    fn release_blob_lease<'a>(&'a self) -> blob::requests::ReleaseBlobLeaseBuilder<'a, No, No, No>;
 }
 
 pub trait Container {
@@ -75,8 +80,28 @@ impl Blob for Client {
         blob::requests::PutBlockBuilder::new(self)
     }
 
-    fn put_block_list<'a, T: Borrow<str> + 'a>(&'a self) -> blob::requests::PutBlockListBuilder<'a, T, No, No, No> {
+    fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, No, No, No> {
+        blob::requests::GetBlockListBuilder::new(self)
+    }
+
+    fn put_block_list<'a, T: Borrow<[u8]> + 'a>(&'a self) -> blob::requests::PutBlockListBuilder<'a, T, No, No, No> {
         blob::requests::PutBlockListBuilder::new(self)
+    }
+
+    fn acquire_blob_lease<'a>(&'a self) -> blob::requests::AcquireBlobLeaseBuilder<'a, No, No, No> {
+        blob::requests::AcquireBlobLeaseBuilder::new(self)
+    }
+
+    fn renew_blob_lease<'a>(&'a self) -> blob::requests::RenewBlobLeaseBuilder<'a, No, No, No> {
+        blob::requests::RenewBlobLeaseBuilder::new(self)
+    }
+
+    fn change_blob_lease<'a>(&'a self) -> blob::requests::ChangeBlobLeaseBuilder<'a, No, No, No, No> {
+        blob::requests::ChangeBlobLeaseBuilder::new(self)
+    }
+
+    fn release_blob_lease<'a>(&'a self) -> blob::requests::ReleaseBlobLeaseBuilder<'a, No, No, No> {
+        blob::requests::ReleaseBlobLeaseBuilder::new(self)
     }
 }
 

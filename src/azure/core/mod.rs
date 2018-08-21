@@ -18,7 +18,7 @@ use base64::encode;
 pub mod modify_conditions;
 use self::modify_conditions::{IfMatchCondition, IfSinceCondition, SequenceNumberCondition};
 pub mod range;
-use azure::storage::blob::BlockList;
+use azure::storage::blob::{BlockList, BlockListType};
 use std::borrow::Borrow;
 use url::percent_encoding;
 pub mod headers;
@@ -203,13 +203,26 @@ pub trait AccessTierOption<'a> {
     }
 }
 
+pub trait BlockListTypeSupport {
+    type O;
+    fn with_block_list_type(self, block_list_type: BlockListType) -> Self::O;
+}
+
+pub trait BlockListTypeRequired {
+    fn block_list_type(&self) -> BlockListType;
+
+    fn to_uri_parameter(&self) -> String {
+        format!("blocklisttype={}", self.block_list_type().to_str())
+    }
+}
+
 pub trait BlockIdSupport<'a> {
     type O;
-    fn with_block_id(self, block_id: &'a str) -> Self::O;
+    fn with_block_id(self, block_id: &'a [u8]) -> Self::O;
 }
 
 pub trait BlockIdRequired<'a> {
-    fn block_id(&self) -> &'a str;
+    fn block_id(&self) -> &'a [u8];
 
     fn to_uri_parameter(&self) -> String {
         format!("blockid={}", base64::encode(self.block_id()))
@@ -493,7 +506,7 @@ pub trait ContentLengthRequired {
 
 pub trait BlockListSupport<'a, T>
 where
-    T: Borrow<str>,
+    T: Borrow<[u8]>,
 {
     type O;
     fn with_block_list(self, &'a BlockList<T>) -> Self::O;
@@ -501,7 +514,7 @@ where
 
 pub trait BlockListRequired<'a, T>
 where
-    T: Borrow<str> + 'a,
+    T: Borrow<[u8]> + 'a,
 {
     fn block_list(&self) -> &'a BlockList<T>;
 
@@ -678,6 +691,13 @@ pub trait BlobNameRequired<'a> {
     fn blob_name(&self) -> &'a str;
 }
 
+pub(crate) fn lease_id_from_headers(headers: &HeaderMap) -> Result<LeaseId, AzureError> {
+    let lease_id = headers
+        .get_as_str(LEASE_ID)
+        .ok_or_else(|| AzureError::HeaderNotFound(LEASE_ID.to_owned()))?;
+    Ok(Uuid::parse_str(lease_id)?)
+}
+
 pub(crate) fn request_id_from_headers(headers: &HeaderMap) -> Result<RequestId, AzureError> {
     let request_id = headers
         .get_as_str(REQUEST_ID)
@@ -703,6 +723,14 @@ pub(crate) fn content_md5_from_headers(headers: &HeaderMap) -> Result<[u8; 16], 
     Ok(content_md5)
 }
 
+pub(crate) fn last_modified_from_headers_optional(headers: &HeaderMap) -> Result<Option<DateTime<Utc>>, AzureError> {
+    if headers.contains_key(LAST_MODIFIED) {
+        Ok(Some(last_modified_from_headers(headers)?))
+    } else {
+        Ok(None)
+    }
+}
+
 pub(crate) fn last_modified_from_headers(headers: &HeaderMap) -> Result<DateTime<Utc>, AzureError> {
     let last_modified = headers
         .get(LAST_MODIFIED)
@@ -725,6 +753,14 @@ pub(crate) fn date_from_headers(headers: &HeaderMap) -> Result<DateTime<Utc>, Az
 
     trace!("date == {:?}", date);
     Ok(date)
+}
+
+pub(crate) fn etag_from_headers_optional(headers: &HeaderMap) -> Result<Option<String>, AzureError> {
+    if headers.contains_key(ETAG) {
+        Ok(Some(etag_from_headers(headers)?))
+    } else {
+        Ok(None)
+    }
 }
 
 pub(crate) fn etag_from_headers(headers: &HeaderMap) -> Result<String, AzureError> {
