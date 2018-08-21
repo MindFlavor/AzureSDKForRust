@@ -516,6 +516,12 @@ impl<'a, ContainerNameSet> ListBlobBuilder<'a, ContainerNameSet> where Container
 // :(
 impl<'a> IncludeListOptions for ListBlobBuilder<'a, Yes> {}
 
+enum State {
+    Start(Option<String>),
+    Next(String),
+    End,
+}
+
 impl<'a> ListBlobBuilder<'a, Yes> {
     #[inline]
     pub fn finalize(self) -> impl Stream<Item = Blob, Error = AzureError> {
@@ -547,13 +553,15 @@ impl<'a> ListBlobBuilder<'a, Yes> {
             uri = format!("{}&{}", uri, mr);
         }
 
-        let start_token = NextMarkerOption::to_uri_parameter(&self);
+        let start_token = State::Start(NextMarkerOption::to_uri_parameter(&self));
         let client = self.client().clone();
 
         stream::unfold(start_token, move |cont_token| {
             let uri = match cont_token {
-                Some(mr) => format!("{}&{}", uri, mr),
-                None => uri.clone(),
+                State::Start(Some(mr)) => format!("{}&{}", uri, mr),
+                State::Start(None) => uri.clone(),
+                State::Next(mr) => format!("{}&{}", uri, mr),
+                State::End => return None,
             };
             let req = client.perform_request(&uri, Method::GET, |_| {}, None);
             Some(
@@ -575,7 +583,10 @@ impl<'a> ListBlobBuilder<'a, Yes> {
                     }).map(|resp| {
                         (
                             stream::iter_ok(resp.incomplete_vector.vector),
-                            resp.incomplete_vector.token, /*().map(|s| s.to_owned())*/
+                            match resp.incomplete_vector.token {
+                                Some(token) => State::Next(token),
+                                None => State::End,
+                            },
                         )
                     }),
             )
