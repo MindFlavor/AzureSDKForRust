@@ -7,8 +7,10 @@ use azure::core::{
     PrefixSupport, TimeoutOption, TimeoutSupport, ToAssign, Yes,
 };
 use azure::storage::blob::responses::ListBlobsResponse;
+use azure::storage::blob::Blob;
 use azure::storage::client::Client;
 use futures::future::done;
+use futures::{future, Future, stream, Stream};
 use futures::prelude::*;
 use hyper::{Method, StatusCode};
 use std::marker::PhantomData;
@@ -516,7 +518,7 @@ impl<'a> IncludeListOptions for ListBlobBuilder<'a, Yes> {}
 
 impl<'a> ListBlobBuilder<'a, Yes> {
     #[inline]
-    pub fn finalize(self) -> impl Future<Item = ListBlobsResponse, Error = AzureError> {
+    pub fn finalize(self) -> impl Stream<Item = Blob, Error = AzureError> {
         // we create a copy to move into the future's closure.
         // We need to do this since the closure only accepts
         // 'static lifetimes.
@@ -545,11 +547,38 @@ impl<'a> ListBlobBuilder<'a, Yes> {
             uri = format!("{}&{}", uri, mr);
         }
 
-        let req = self.client().perform_request(&uri, Method::GET, |_| {}, None);
+        let start_token = NextMarkerOption::to_uri_parameter(&self);
+        let client = self.client().clone();
 
-        done(req).from_err().and_then(move |future_response| {
-            check_status_extract_headers_and_body_as_string(future_response, StatusCode::OK)
-                .and_then(move |(headers, body_as_str)| done(ListBlobsResponse::from_response(&container_name, &headers, &body_as_str)))
-        })
+        stream::unfold(start_token, move |cont_token| {
+            let uri = match cont_token {
+                Some(mr) => format!("{}&{}", uri, mr),
+                None => uri.clone(),
+            };
+            let req = client.perform_request(&uri, Method::GET, |_| {}, None);
+            Some(
+                done(req)
+                    .from_err()
+                    .and_then({
+                        let container_name = container_name.clone();
+                        move |future_response| {
+                            check_status_extract_headers_and_body_as_string(future_response, StatusCode::OK).and_then(
+                                move |(headers, body_as_str)| {
+                                    done(ListBlobsResponse::from_response(
+                                        &container_name,
+                                        &headers,
+                                        &body_as_str,
+                                    ))
+                                },
+                            )
+                        }
+                    }).map(|resp| {
+                        (
+                            stream::iter_ok(resp.incomplete_vector.vector),
+                            resp.incomplete_vector.token, /*().map(|s| s.to_owned())*/
+                        )
+                    }),
+            )
+        }).flatten()
     }
 }
