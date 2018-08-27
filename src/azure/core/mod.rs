@@ -254,7 +254,7 @@ pub trait NextMarkerSupport<'a> {
 }
 
 pub trait NextMarkerOption<'a> {
-    fn next_marker(&self) -> Option<&'a str>;
+    fn next_marker(&self) -> Option<&str>;
 
     fn to_uri_parameter(&self) -> Option<String> {
         if let Some(ref nm) = self.next_marker() {

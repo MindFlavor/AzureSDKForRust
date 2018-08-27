@@ -115,9 +115,9 @@ impl<'a> ListBuilder<'a> {
                     done(request_id_from_headers(&headers)).map(|request_id| ListContainersResponse {
                         incomplete_vector,
                         request_id,
+                        })
                     })
                 })
-            })
         })
     }
 }
@@ -167,7 +167,7 @@ impl<'a> TimeoutSupport for ListBuilder<'a> {
 }
 
 impl<'a> NextMarkerOption<'a> for ListBuilder<'a> {
-    fn next_marker(&self) -> Option<&'a str> {
+    fn next_marker(&self) -> Option<&str> {
         match self.next_marker {
             Some(nm) => Some(nm),
             None => None,
