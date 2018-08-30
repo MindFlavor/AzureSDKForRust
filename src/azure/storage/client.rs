@@ -43,7 +43,7 @@ pub trait Container {
     fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, No>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Client {
     account: String,
     key: String,

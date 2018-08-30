@@ -7,9 +7,10 @@ use azure::core::{
     PrefixSupport, TimeoutOption, TimeoutSupport, ToAssign, Yes,
 };
 use azure::storage::blob::responses::ListBlobsResponse;
+use azure::storage::blob::Blob;
 use azure::storage::client::Client;
 use futures::future::done;
-use futures::prelude::*;
+use futures::{stream, Future, Stream};
 use hyper::{Method, StatusCode};
 use std::marker::PhantomData;
 
@@ -118,7 +119,7 @@ where
     ContainerNameSet: ToAssign,
 {
     #[inline]
-    fn next_marker(&self) -> Option<&'a str> {
+    fn next_marker(&self) -> Option<&str> {
         self.next_marker
     }
 }
@@ -514,9 +515,26 @@ impl<'a, ContainerNameSet> ListBlobBuilder<'a, ContainerNameSet> where Container
 // :(
 impl<'a> IncludeListOptions for ListBlobBuilder<'a, Yes> {}
 
+enum State {
+    Start(Option<String>),
+    Next(String),
+    End,
+}
+
+impl<'a> NextMarkerOption<'a> for State {
+    #[inline]
+    fn next_marker(&self) -> Option<&str> {
+        match self {
+            &State::Start(ref token) => token.as_ref().map(String::as_str),
+            &State::Next(ref token) => Some(token),
+            &State::End => None,
+        }
+    }
+}
+
 impl<'a> ListBlobBuilder<'a, Yes> {
     #[inline]
-    pub fn finalize(self) -> impl Future<Item = ListBlobsResponse, Error = AzureError> {
+    pub fn finalize(self) -> impl Stream<Item = Blob, Error = AzureError> {
         // we create a copy to move into the future's closure.
         // We need to do this since the closure only accepts
         // 'static lifetimes.
@@ -532,9 +550,6 @@ impl<'a> ListBlobBuilder<'a, Yes> {
         if let Some(mr) = MaxResultsOption::to_uri_parameter(&self) {
             uri = format!("{}&{}", uri, mr);
         }
-        if let Some(mr) = NextMarkerOption::to_uri_parameter(&self) {
-            uri = format!("{}&{}", uri, mr);
-        }
         if let Some(mr) = TimeoutOption::to_uri_parameter(&self) {
             uri = format!("{}&{}", uri, mr);
         }
@@ -545,11 +560,42 @@ impl<'a> ListBlobBuilder<'a, Yes> {
             uri = format!("{}&{}", uri, mr);
         }
 
-        let req = self.client().perform_request(&uri, Method::GET, |_| {}, None);
+        let start_token = State::Start(self.next_marker.map(|token| token.to_owned()));
+        let client = self.client().clone();
 
-        done(req).from_err().and_then(move |future_response| {
-            check_status_extract_headers_and_body_as_string(future_response, StatusCode::OK)
-                .and_then(move |(headers, body_as_str)| done(ListBlobsResponse::from_response(&container_name, &headers, &body_as_str)))
-        })
+        stream::unfold(start_token, move |cont_token| {
+            let uri = match cont_token {
+                State::End => return None,
+                token => if let Some(mr) = NextMarkerOption::to_uri_parameter(&token) {
+                    format!("{}&{}", uri, mr)
+                } else {
+                    uri.clone()
+                },
+            };
+            trace!("uri: {}", uri);
+            let req = client.perform_request(&uri, Method::GET, |_| {}, None);
+            Some(
+                done(req)
+                    .from_err()
+                    .and_then({
+                        let container_name = container_name.clone();
+                        move |future_response| {
+                            check_status_extract_headers_and_body_as_string(future_response, StatusCode::OK).and_then(
+                                move |(headers, body_as_str)| {
+                                    done(ListBlobsResponse::from_response(&container_name, &headers, &body_as_str))
+                                },
+                            )
+                        }
+                    }).map(|resp| {
+                        (
+                            stream::iter_ok(resp.incomplete_vector.vector),
+                            match resp.incomplete_vector.token {
+                                Some(token) => State::Next(token),
+                                None => State::End,
+                            },
+                        )
+                    }),
+            )
+        }).flatten()
     }
 }
