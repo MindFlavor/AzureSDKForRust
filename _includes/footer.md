@@ -1,7 +1,6 @@
 <br> 
 Design based on 
 [SinglePaged theme](https://github.com/t413/SinglePaged)
-&mdash;
 
 <a href="https://twitter.com/MindFlavor"><span class="fa-stack fa-lg">
 <i class="fa fa-circle fa-stack-2x"></i>

@@ -1,8 +1,8 @@
 ---
 title: "Disclaimer"
-bg: azure  #defined in _config.yml, can use html color like '#0fbfcf'
+bg: orange  #defined in _config.yml, can use html color like '#0fbfcf'
 fg: lightgray
-color: white   #text color
+color: white    #text color
 fa-icon: lightbulb-o
 ---
 
