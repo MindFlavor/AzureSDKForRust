@@ -1,0 +1,19 @@
+/docs     https://docs.argonjs.io/ 301
+/docs/*   https://docs.argonjs.io/:splat 301
+
+/samples   https://samples.argonjs.io/index.html 301
+/samples/*   https://samples.argonjs.io/:splat 301
+
+/argon-aframe/*   https://aframe.argonjs.io/:splat 301
+/argon-aframe     https://aframe.argonjs.io/index.html 301
+
+/argon-app/*   https://app.argonjs.io/:splat 301
+/argon-app     https://app.argonjs.io/index.html 301
+
+/design-tools/*   http://design-tools.argonjs.io/:splat 301
+/design-tools     http://design-tools.argonjs.io/index.html 301
+
+/argon     http://api.argonjs.io/ 301
+/argon/*   http://api.argonjs.io/:splat 301
+/api     http://api.argonjs.io/ 301
+/api/*   http://api.argonjs.io/:splat 301

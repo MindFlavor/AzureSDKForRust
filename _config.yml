@@ -1,1 +1,47 @@
-theme: jekyll-theme-hacker
+---
+
+port: 4000
+host: 0.0.0.0
+safe: false
+
+
+### site serving configuration ###
+include: [_redirects]
+exclude: [CNAME, README.md, .gitignore, Gemfile, Gemfile.lock]
+permalink: /:title ## disables post output
+timezone: null
+lsi: false
+markdown: kramdown
+
+
+### content configuration ###
+title:       "Azure SDK for Rust"
+version:     "0.10.0"
+keywords:    "Microsoft,Azure,CosmosDB,SDK,Rust,Storage,REST"
+description: "An idiomatic Rust SDK for Microsoft Azure storage and CosmosDB"
+source_link: "https://github.com/MindFlavor/AzureSDKForRust"
+favicon:     "favicon.ico"
+
+### template colors, used site-wide via css ###
+colors:
+  azure:     '#007FFF'
+  black:     '#111111'
+  white:     '#f8f8f8'
+  blue:      '#49a7e9'
+  green:     '#9bcf2f'
+  purple:    '#c869bf'
+  orange:    '#fab125'
+  turquoise: '#0fbfcf'
+  gtgold:    '#eeb211'
+  gtnavy:    '#00254c'
+  gtmetallic: '#f5d376'
+  buzzgold:   '#eeb211'
+  buzzgold60: '#f5d376'
+  gtblue:     '#00254c'
+  gtblue80:   '#335170'
+  black85:    '#262626'
+  darkgray:   '#545454'
+  mediumgray: '#808080'
+  lightgray:  '#e5e5e5'
+  gtlinkblue: '#004f9f'
+  gtlinkhover: '#1879db'
