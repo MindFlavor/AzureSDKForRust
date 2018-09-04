@@ -1,6 +1,6 @@
 ---
 title: "Collaborate"
-bg: azure  #defined in _config.yml, can use html color like '#0fbfcf'
+bg: gtblue  #defined in _config.yml, can use html color like '#0fbfcf'
 fg: white
 color: white   #text color
 fa-icon: github
