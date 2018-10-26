@@ -33,7 +33,7 @@ fn code() -> Result<(), Box<std::error::Error>> {
         .expect("please specify container name as first command line parameter");
 
     let mut reactor = Core::new()?;
-    let client = Client::new(&account, &master_key)?;
+    let client = Client::new(Account::Azure { account, key: master_key })?;
 
     let string = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
 

@@ -32,7 +32,7 @@ fn code() -> Result<(), Box<Error>> {
 
     let mut core = Core::new()?;
 
-    let client = Client::new(&account, &master_key)?;
+    let client = Client::new(Account::Azure { account, key: master_key })?;
 
     // create container
     let future = client

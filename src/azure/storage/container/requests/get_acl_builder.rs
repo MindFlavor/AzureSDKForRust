@@ -73,8 +73,8 @@ where
 impl<'a> GetACLBuilder<'a, Yes> {
     pub fn finalize(self) -> impl Future<Item = GetACLResponse, Error = AzureError> {
         let mut uri = format!(
-            "https://{}.blob.core.windows.net/{}?restype=container&comp=acl",
-            self.client().account(),
+            "{}/{}?restype=container&comp=acl",
+            self.client().uri_builder().blob_uri(),
             self.container_name()
         );
 

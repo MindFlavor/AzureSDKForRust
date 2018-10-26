@@ -13,7 +13,7 @@ extern crate uuid;
 use azure_sdk_for_rust::core::errors::AzureError;
 use azure_sdk_for_rust::core::{ContainerNameSupport, LeaseBreakPeriodSupport, LeaseDurationSupport, LeaseIdSupport};
 use azure_sdk_for_rust::storage::{
-    client::Client,
+    client::{Account, Client},
     container::{PublicAccess, PublicAccessSupport},
 };
 use tokio_core::reactor::Core;
@@ -100,5 +100,5 @@ fn initialize() -> Result<(Client, Core), AzureError> {
     let master_key = std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
     let core = Core::new()?;
 
-    Ok((Client::new(&account, &master_key)?, core))
+    Ok((Client::new(Account::Azure { account, key: master_key })?, core))
 }

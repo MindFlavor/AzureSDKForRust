@@ -29,7 +29,7 @@ fn code() -> Result<(), Box<Error>> {
         .expect("please specify container name as command line parameter");
 
     let mut core = Core::new()?;
-    let client = Client::new(&account, &master_key)?;
+    let client = Client::new(Account::Azure { account, key: master_key })?;
 
     let future = client
         .list_blobs()

@@ -6,10 +6,6 @@ use hyper::{self, Method};
 use hyper_tls;
 use std::borrow::Borrow;
 
-// Can be variant for different cloud environment
-const SERVICE_SUFFIX_BLOB: &str = ".blob.core.windows.net";
-const SERVICE_SUFFIX_TABLE: &str = ".table.core.windows.net";
-
 pub trait Blob {
     fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, No>;
     fn get_blob<'a>(&'a self) -> blob::requests::GetBlobBuilder<'a, No, No>;
@@ -46,9 +42,59 @@ pub trait Container {
 }
 
 #[derive(Debug, Clone)]
+pub enum Account {
+    Azure {
+        account: String,
+        key: String,
+    },
+    Development,
+}
+
+#[derive(Debug, Clone)]
+pub struct UriBuilder {
+    account: Account,
+    blob_uri: String,
+    table_uri: String,
+}
+
+impl UriBuilder {
+    pub fn new(account: Account) -> Self {
+        let (blob_uri, table_uri) = match &account {
+            Account::Azure { account, .. } => (
+                format!("https://{}.blob.core.windows.net", account),
+                format!("https://{}.table.core.windows.net", account),
+            ),
+            Account::Development => (
+                "http://127.0.0.1:10000/devstoreaccount1".to_string(),
+                "http://127.0.0.1:10002/devstoreaccount1".to_string(),
+            ),
+        };
+        Self {
+            account,
+            blob_uri,
+            table_uri,
+        }
+    }
+
+    pub fn blob_uri(&self) -> &String {
+        &self.blob_uri
+    }
+
+    pub fn table_uri(&self) -> &String {
+        &self.table_uri
+    }
+
+    pub fn key(&self) -> &str {
+        match &self.account {
+            Account::Azure { key, .. } => key,
+            Account::Development => "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Client {
-    account: String,
-    key: String,
+    uri_builder: UriBuilder,
     hc: hyper::Client<hyper_tls::HttpsConnector<hyper::client::HttpConnector>>,
 }
 
@@ -173,24 +219,19 @@ impl Container for Client {
 }
 
 impl Client {
-    pub fn new(account: &str, key: &str) -> Result<Client, AzureError> {
+    pub fn new(account: Account) -> Result<Client, AzureError> {
         use hyper;
 
         let client = hyper::Client::builder().build(hyper_tls::HttpsConnector::new(4)?);
 
         Ok(Client {
-            account: account.to_owned(),
-            key: key.to_owned(),
+            uri_builder: UriBuilder::new(account),
             hc: client,
         })
     }
 
-    pub fn account(&self) -> &str {
-        &self.account
-    }
-
-    pub fn key(&self) -> &str {
-        &self.key
+    pub fn uri_builder(&self) -> &UriBuilder {
+        &self.uri_builder
     }
 
     pub(crate) fn perform_request<F>(
@@ -203,7 +244,7 @@ impl Client {
     where
         F: FnOnce(&mut ::http::request::Builder),
     {
-        perform_request(&self.hc, uri, method, &self.key, headers_func, request_body, ServiceType::Blob)
+        perform_request(&self.hc, uri, method, self.uri_builder.key(), headers_func, request_body, ServiceType::Blob)
     }
 
     pub(crate) fn perform_table_request<F>(
@@ -221,7 +262,7 @@ impl Client {
             &self.hc,
             (self.get_uri_prefix(ServiceType::Table) + segment).as_str(),
             method,
-            &self.key,
+            self.uri_builder.key(),
             headers_func,
             request_str,
             ServiceType::Table,
@@ -230,12 +271,9 @@ impl Client {
 
     /// Uri scheme + authority e.g. http://myaccount.table.core.windows.net/
     pub(crate) fn get_uri_prefix(&self, service_type: ServiceType) -> String {
-        "https://".to_owned()
-            + self.account()
-            + match service_type {
-                ServiceType::Blob => SERVICE_SUFFIX_BLOB,
-                ServiceType::Table => SERVICE_SUFFIX_TABLE,
-            }
-            + "/"
+        match service_type {
+            ServiceType::Blob => format!("{}/", self.uri_builder.blob_uri()),
+            ServiceType::Table => format!("{}/", self.uri_builder.table_uri()),
+        }
     }
 }

@@ -147,8 +147,8 @@ impl<'a> DeleteBuilder<'a, No> {
 impl<'a> DeleteBuilder<'a, Yes> {
     pub fn finalize(self) -> impl Future<Item = (), Error = AzureError> {
         let mut uri = format!(
-            "https://{}.blob.core.windows.net/{}?restype=container",
-            self.client().account(),
+            "{}/{}?restype=container",
+            self.client().uri_builder().blob_uri(),
             self.container_name()
         );
 
@@ -174,11 +174,12 @@ impl<'a> DeleteBuilder<'a, Yes> {
 
 #[cfg(test)]
 mod test {
+    use azure::storage::client::Account;
     use super::*;
 
     #[test]
     fn alloc() {
-        let client = Client::new("a", "b").unwrap();
+        let client = Client::new(Account::Azure { account: "a".to_string(), key: "b".to_string() }).unwrap();
         let del = DeleteBuilder::new(&client).with_container_name("ciccio");
         println!("container_name == {}", del.container_name());
         // this would fail as Client was not set

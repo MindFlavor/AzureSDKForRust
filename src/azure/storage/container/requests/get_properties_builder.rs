@@ -73,8 +73,8 @@ where
 impl<'a> GetPropertiesBuilder<'a, Yes> {
     pub fn finalize(self) -> impl Future<Item = GetPropertiesResponse, Error = AzureError> {
         let mut uri = format!(
-            "https://{}.blob.core.windows.net/{}?restype=container",
-            self.client().account(),
+            "{}/{}?restype=container",
+            self.client().uri_builder().blob_uri(),
             self.container_name()
         );
 

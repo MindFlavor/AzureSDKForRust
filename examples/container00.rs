@@ -26,7 +26,7 @@ fn code() -> Result<(), Box<Error>> {
 
     let mut core = Core::new()?;
 
-    let client = Client::new(&account, &master_key)?;
+    let client = Client::new(Account::Azure { account, key: master_key })?;
 
     let future = {
         use azure_sdk_for_rust::storage::client::Container;

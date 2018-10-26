@@ -29,7 +29,7 @@ fn code() -> Result<(), Box<std::error::Error>> {
     let master_key = std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
     let mut reactor = Core::new()?;
-    let client = Client::new(&account, &master_key)?;
+    let client = Client::new(Account::Azure { account, key: master_key })?;
 
     if reactor
         .run(client.list_containers().finalize())?

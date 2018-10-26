@@ -179,8 +179,8 @@ where
 impl<'a> ReleaseLeaseBuilder<'a, Yes, Yes> {
     pub fn finalize(self) -> impl Future<Item = ReleaseLeaseResponse, Error = AzureError> {
         let mut uri = format!(
-            "https://{}.blob.core.windows.net/{}?comp=lease&restype=container",
-            self.client().account(),
+            "{}/{}?comp=lease&restype=container",
+            self.client().uri_builder().blob_uri(),
             self.container_name()
         );
 

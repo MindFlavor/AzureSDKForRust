@@ -17,4 +17,4 @@ pub use azure::core::{
 };
 pub use azure::storage::container::PublicAccessSupport;
 
-pub use azure::storage::client::{Blob as BlobTrait, Client, Container as ContainerTrait};
+pub use azure::storage::client::{Blob as BlobTrait, Account, Client, Container as ContainerTrait};

@@ -147,7 +147,10 @@ fn get_account(u: &url::Url) -> String {
             let first_dot = dm.find('.').unwrap();
             String::from(&dm[0..first_dot])
         }
-        _ => panic!("only Domains are supported in canonicalized_resource"),
+        // TODO find a proper way to determine we are connecting to the
+        // development server.
+        _ => "devstoreaccount1".to_string(),
+        //_ => panic!("only Domains are supported in canonicalized_resource"),
     }
 }
 
