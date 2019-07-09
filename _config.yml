@@ -16,7 +16,7 @@ markdown: kramdown
 
 ### content configuration ###
 title:       "Azure SDK for Rust"
-version:     "0.10.0"
+version:     "0.20.0"
 keywords:    "Microsoft,Azure,CosmosDB,SDK,Rust,Storage,REST"
 description: "An idiomatic Rust SDK for Microsoft Azure storage and CosmosDB"
 source_link: "https://github.com/MindFlavor/AzureSDKForRust"
