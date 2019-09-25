@@ -123,18 +123,18 @@ impl TableService {
             .and_then(move |future_response| check_status_extract_headers_and_body(future_response, StatusCode::OK))
             .and_then(move |(headers, body)| done({
                 serde_json::from_slice::<EntityCollection<T>>(&body)
-                .map(|ec| {
+                .map(|mut ec| {
                     ec.continuation = None;
                     ec
                 })
              }).from_err())
     }
 
-    pub fn stream_query_entities<T: DeserializeOwned>(
-        &self,
-        table_name: &str,
-        query: Option<&str>,
-    ) ->  impl Stream<Item = T, Error = AzureError> {
+    pub fn stream_query_entities<'a, T: DeserializeOwned + 'a>(
+        &'a self,
+        table_name: &'a str,
+        query: Option<&'a str>,
+    ) ->  impl Stream<Item = T, Error = AzureError> + 'a {
 
         stream::unfold(ContinuationState::Start, move |cont_state| {
             let cont = match cont_state {
