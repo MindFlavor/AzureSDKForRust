@@ -1,8 +1,8 @@
 use azure_sdk_storage_core::client::Client;
 use azure_sdk_storage_table::table::TableService;
-use futures::future::*;
 use std::error::Error;
 use tokio_core::reactor::Core;
+use futures::stream::Stream;
 
 fn main() {
     code().unwrap();
@@ -30,14 +30,14 @@ fn code() -> Result<(), Box<dyn Error>> {
     let create_table = to_table_service.create_table(&table_name);
     core.run(create_table)?;
 
-    let copy_entities = table_service.query_entities(&table_name, None).and_then(move |entities: Vec<serde_json::Value>| {
-        println!("copying {} entities to table {}", entities.len(), &table_name);
-        let inserts = entities.into_iter().map(move |entity| {
+    let mut count = 0;
+    let inserts = table_service.stream_query_entities(&table_name, None)
+        .for_each(|entity: serde_json::Value| {
+            count += 1;
             to_table_service.insert_entity(&table_name, &entity)
         });
-        join_all(inserts)
-    });
-    core.run(copy_entities)?;
+    core.run(inserts)?;
+    println!("copied {} entities to table {}", count, &table_name);
 
     Ok(())
 }
