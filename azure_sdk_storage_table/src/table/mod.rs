@@ -15,6 +15,7 @@ use serde::Serialize;
 use serde_json;
 use futures::Stream;
 use futures::stream;
+use http::HeaderMap;
 
 const TABLE_TABLES: &str = "TABLES";
 
@@ -124,7 +125,7 @@ impl TableService {
             .and_then(move |(headers, body)| done({
                 serde_json::from_slice::<EntityCollection<T>>(&body)
                 .map(|mut ec| {
-                    ec.continuation = None;
+                    ec.continuation = continuation_from_headers(&headers);
                     ec
                 })
              }).from_err())
@@ -264,6 +265,20 @@ impl TableService {
         };
 
         self.client.perform_table_request(segment, method, headers_func, request_vec)
+    }
+}
+
+const HEADER_NEXTPARTITIONKEY: &'static str = "x-ms-continuation-NextPartitionKey";
+const HEADER_NEXTROWKEY: &'static str = "x-ms-continuation-NextRowKey";
+
+fn continuation_from_headers(headers: &HeaderMap) -> Option<Continuation> {
+    if headers.contains_key(HEADER_NEXTPARTITIONKEY) && headers.contains_key(HEADER_NEXTROWKEY){
+        Some(Continuation {
+            next_partition_key: headers[HEADER_NEXTPARTITIONKEY].to_str().unwrap().to_string(),
+            next_row_key: headers[HEADER_NEXTROWKEY].to_str().unwrap().to_string(),
+        })
+    } else {
+        None
     }
 }
 
