@@ -103,13 +103,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("\nStreaming");
     let mut chunk = 0;
     while let Some(value) = stream.next().await {
-        let mut value = value?;
+        let mut _value = value?;
         println!("received {:?} bytes", value.len());
         println!("received {}", std::str::from_utf8(&value)?);
 
         for i in 0..512 {
             assert_eq!(
-                value[i],
+                _value[i],
                 match chunk {
                     0 | 1 => 71,
                     2 => 72,

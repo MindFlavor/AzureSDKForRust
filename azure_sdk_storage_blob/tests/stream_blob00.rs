@@ -59,7 +59,7 @@ async fn code() -> Result<(), Box<dyn std::error::Error>> {
         // http overhead will be less but it also means you will have to wait for more
         // time before receiving anything. In this example we use an awkward value
         // just to make the test worthwile.
-        let slice_range = 0..(string.len() - dropped_suffix_len) as usize;
+        let slice_range = 0..(string.len() - dropped_suffix_len);
         let expected_string = &string[slice_range.clone()];
         let range: Range = slice_range.into();
 
