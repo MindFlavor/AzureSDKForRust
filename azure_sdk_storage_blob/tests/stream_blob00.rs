@@ -52,15 +52,16 @@ async fn code() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{}/{} blob created!", container_name, file_name);
 
-    for dropped_suffix_len in &[3usize, 1] {
+    for dropped_suffix_len in &[3usize, 2, 1, 0] {
         // this is how you stream data from azure blob. Notice that you have
         // to specify the range requested. Also make sure to specify how big
         // a chunk is going to be. Bigger chunks are of course more efficient as the
         // http overhead will be less but it also means you will have to wait for more
         // time before receiving anything. In this example we use an awkward value
         // just to make the test worthwile.
-        // Note: Range is inclusive unlike Range from std
-        let range = Range::new(0, (string.len() - dropped_suffix_len) as u64);
+        let slice_range = 0..(string.len() - dropped_suffix_len) as usize;
+        let expected_string = &string[slice_range.clone()];
+        let range: Range = slice_range.into();
 
         let chunk_size: usize = 4;
 
@@ -91,16 +92,12 @@ async fn code() -> Result<(), Box<dyn std::error::Error>> {
             String::from_utf8(rlock.to_vec())?
         };
 
-        println!("{} {}", dropped_suffix_len, returned_string);
-
-        let end_index = std::cmp::min(string.len() - 1, string.len() - dropped_suffix_len);
-
-        assert!(
-            string[..=end_index] == returned_string,
-            "string = {}, returned_string = {}",
-            string,
-            returned_string
+        println!(
+            "dropped_suffix_len == {} returned_string == {}",
+            dropped_suffix_len, returned_string
         );
+
+        assert_eq!(expected_string, returned_string);
     }
 
     client

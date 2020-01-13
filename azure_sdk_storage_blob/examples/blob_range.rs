@@ -121,5 +121,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         chunk = chunk + 1;
     }
 
+    for dropped_suffix_len in &[3usize, 1] {
+        println!("dropped_suffix_len == {}", dropped_suffix_len);
+    }
+
     Ok(())
 }

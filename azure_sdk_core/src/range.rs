@@ -48,6 +48,24 @@ impl From<std::ops::Range<u64>> for Range {
     }
 }
 
+impl From<std::ops::Range<i32>> for Range {
+    fn from(r: std::ops::Range<i32>) -> Self {
+        Self {
+            start: r.start as u64,
+            end: r.end as u64,
+        }
+    }
+}
+
+impl From<std::ops::Range<usize>> for Range {
+    fn from(r: std::ops::Range<usize>) -> Self {
+        Self {
+            start: r.start as u64,
+            end: r.end as u64,
+        }
+    }
+}
+
 impl From<ParseIntError> for ParseError {
     fn from(pie: ParseIntError) -> ParseError {
         ParseError::ParseIntError(pie)
