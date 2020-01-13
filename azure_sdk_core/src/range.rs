@@ -39,6 +39,15 @@ impl<'a> From<&'a BA512Range> for Range {
     }
 }
 
+impl From<std::ops::Range<u64>> for Range {
+    fn from(r: std::ops::Range<u64>) -> Self {
+        Self {
+            start: r.start,
+            end: r.end,
+        }
+    }
+}
+
 impl From<ParseIntError> for ParseError {
     fn from(pie: ParseIntError) -> ParseError {
         ParseError::ParseIntError(pie)
@@ -54,7 +63,7 @@ impl FromStr for Range {
         }
 
         let cp_start = v[0].parse::<u64>()?;
-        let cp_end = v[1].parse::<u64>()?;
+        let cp_end = v[1].parse::<u64>()? + 1;
 
         Ok(Range {
             start: cp_start,
@@ -65,7 +74,7 @@ impl FromStr for Range {
 
 impl fmt::Display for Range {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "bytes={}-{}", self.start, self.end)
+        write!(f, "bytes={}-{}", self.start, self.end - 1)
     }
 }
 

@@ -54,7 +54,8 @@ impl<'a> BlobStreamBuilder<'a, No, No, No> {
     }
 }
 
-impl<'a, ContainerNameSet, BlobNameSet, RangeSet> BlobStreamBuilder<'a, ContainerNameSet, BlobNameSet, RangeSet>
+impl<'a, ContainerNameSet, BlobNameSet, RangeSet>
+    BlobStreamBuilder<'a, ContainerNameSet, BlobNameSet, RangeSet>
 where
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
@@ -397,7 +398,7 @@ impl<'a> BlobStreamBuilder<'a, Yes, Yes, Yes> {
         let snapshot = self.snapshot.to_owned();
         let timeout = self.timeout.to_owned();
         let lease_id = self.lease_id.cloned();
-        let increment = self.increment - 1;
+        let increment = self.increment;
 
         futures::stream::unfold(Some(range), move |remaining| {
             let client = client.clone();
@@ -441,7 +442,7 @@ impl<'a> BlobStreamBuilder<'a, Yes, Yes, Yes> {
                 Some((
                     Ok(response.data),
                     if remaining.end > range.end {
-                        Some(Range::new(range.end + 1, remaining.end))
+                        Some(Range::new(range.end, remaining.end))
                     } else {
                         None
                     },
