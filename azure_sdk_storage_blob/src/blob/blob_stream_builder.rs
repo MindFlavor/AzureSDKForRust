@@ -75,7 +75,7 @@ where
             timeout: self.timeout,
             lease_id: self.lease_id,
             client_request_id: self.client_request_id,
-            increment: increment,
+            increment,
         }
     }
 }
@@ -391,9 +391,9 @@ impl<'a> BlobStreamBuilder<'a, Yes, Yes, Yes> {
     #[inline]
     pub fn finalize(self) -> impl Stream<Item = Result<Vec<u8>, AzureError>> + 'a {
         let client = self.client().clone();
-        let container_name = self.container_name().clone();
+        let container_name = self.container_name();
         let client_request_id = self.client_request_id.map(|v| v.to_owned());
-        let blob_name = self.blob_name().clone();
+        let blob_name = self.blob_name();
         let range = self.range().to_owned();
         let snapshot = self.snapshot.to_owned();
         let timeout = self.timeout.to_owned();
