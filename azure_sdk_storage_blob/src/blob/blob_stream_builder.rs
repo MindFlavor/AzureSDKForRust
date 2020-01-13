@@ -31,7 +31,7 @@ where
     range: Option<&'a Range>,
     lease_id: Option<&'a LeaseId>,
     client_request_id: Option<&'a str>,
-    increment: u64,
+    chunk_size: u64,
 }
 
 impl<'a> BlobStreamBuilder<'a, No, No, No> {
@@ -49,7 +49,7 @@ impl<'a> BlobStreamBuilder<'a, No, No, No> {
             timeout: None,
             lease_id: None,
             client_request_id: None,
-            increment: 1024 * 1024,
+            chunk_size: 1024 * 1024,
         }
     }
 }
@@ -62,7 +62,7 @@ where
     RangeSet: ToAssign,
 {
     #[inline]
-    pub fn with_chunk_size(self, increment: u64) -> Self {
+    pub fn with_chunk_size(self, chunk_size: u64) -> Self {
         BlobStreamBuilder {
             client: self.client,
             p_container_name: PhantomData {},
@@ -75,8 +75,13 @@ where
             timeout: self.timeout,
             lease_id: self.lease_id,
             client_request_id: self.client_request_id,
-            increment,
+            chunk_size,
         }
+    }
+
+    #[inline]
+    pub fn chunk_size(&self) -> u64 {
+        self.chunk_size
     }
 }
 
@@ -204,7 +209,7 @@ where
             timeout: self.timeout,
             lease_id: self.lease_id,
             client_request_id: self.client_request_id,
-            increment: self.increment,
+            chunk_size: self.chunk_size,
         }
     }
 }
@@ -232,7 +237,7 @@ where
             timeout: self.timeout,
             lease_id: self.lease_id,
             client_request_id: self.client_request_id,
-            increment: self.increment,
+            chunk_size: self.chunk_size,
         }
     }
 }
@@ -260,7 +265,7 @@ where
             timeout: self.timeout,
             lease_id: self.lease_id,
             client_request_id: self.client_request_id,
-            increment: self.increment,
+            chunk_size: self.chunk_size,
         }
     }
 }
@@ -288,7 +293,7 @@ where
             range: self.range,
             lease_id: self.lease_id,
             client_request_id: self.client_request_id,
-            increment: self.increment,
+            chunk_size: self.chunk_size,
         }
     }
 }
@@ -316,7 +321,7 @@ where
             range: self.range,
             lease_id: self.lease_id,
             client_request_id: self.client_request_id,
-            increment: self.increment,
+            chunk_size: self.chunk_size,
         }
     }
 }
@@ -344,7 +349,7 @@ where
             range: self.range,
             lease_id: Some(lease_id),
             client_request_id: self.client_request_id,
-            increment: self.increment,
+            chunk_size: self.chunk_size,
         }
     }
 }
@@ -372,7 +377,7 @@ where
             range: self.range,
             lease_id: self.lease_id,
             client_request_id: Some(client_request_id),
-            increment: self.increment,
+            chunk_size: self.chunk_size,
         }
     }
 }
@@ -398,7 +403,7 @@ impl<'a> BlobStreamBuilder<'a, Yes, Yes, Yes> {
         let snapshot = self.snapshot.to_owned();
         let timeout = self.timeout.to_owned();
         let lease_id = self.lease_id.cloned();
-        let increment = self.increment;
+        let chunk_size = self.chunk_size;
 
         futures::stream::unfold(Some(range), move |remaining| {
             let client = client.clone();
@@ -410,10 +415,10 @@ impl<'a> BlobStreamBuilder<'a, Yes, Yes, Yes> {
                     None => return None,
                 };
 
-                let range = if remaining.start + increment > remaining.end {
+                let range = if remaining.start + chunk_size > remaining.end {
                     Range::new(remaining.start, remaining.end)
                 } else {
-                    Range::new(remaining.start, remaining.start + increment)
+                    Range::new(remaining.start, remaining.start + chunk_size)
                 };
 
                 let mut req = GetBlobBuilder::new(&client)
