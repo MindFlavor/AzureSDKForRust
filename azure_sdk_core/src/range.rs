@@ -105,7 +105,7 @@ mod test {
         let range = "1000/2000".parse::<Range>().unwrap();
 
         assert_eq!(range.start, 1000);
-        assert_eq!(range.end, 2000);
+        assert_eq!(range.end, 2001);
     }
 
     #[test]
@@ -124,7 +124,7 @@ mod test {
     fn test_range_display() {
         let range = Range {
             start: 100,
-            end: 500,
+            end: 501,
         };
 
         let txt = format!("{}", range);
