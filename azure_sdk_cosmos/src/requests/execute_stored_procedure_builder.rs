@@ -216,17 +216,6 @@ where
             .stored_procedure_client()
             .prepare_request(hyper::Method::POST);
 
-        //let mut req = self.stored_procedure_client.main_client().prepare_request(
-        //    &format!(
-        //        "dbs/{}/colls/{}/sprocs/{}",
-        //        self.stored_procedure_client.database_name().name(),
-        //        self.stored_procedure_client.collection_name().name(),
-        //        self.stored_procedure_client.stored_procedure_name()
-        //    ),
-        //    hyper::Method::POST,
-        //    ResourceType::StoredProcedures,
-        //);
-
         req.header(http::header::CONTENT_TYPE, "application/json");
 
         let body = ParametersOption::generate_body(self);

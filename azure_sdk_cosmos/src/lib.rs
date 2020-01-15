@@ -295,6 +295,15 @@ pub trait PartitionKeysOption<'a> {
     }
 }
 
+pub trait StoredProcedureBodyRequired<'a> {
+    fn body(&self) -> &'a str;
+}
+
+pub trait StoredProcedureBodySupport<'a> {
+    type O;
+    fn with_body(self, partition_keys: &'a str) -> Self::O;
+}
+
 pub trait ExpirySecondsOption {
     fn expiry_seconds(&self) -> u64;
 
@@ -582,6 +591,7 @@ where
     fn database_name(&self) -> &'a dyn DatabaseName;
     fn collection_name(&self) -> &'a dyn CollectionName;
     fn stored_procedure_name(&self) -> &'a dyn StoredProcedureName;
+    fn create_stored_procedure(&self) -> requests::CreateStoredProcedureBuilder<'_, CUB, No>;
     fn execute_stored_procedure(&self) -> requests::ExecuteStoredProcedureBuilder<'_, '_, CUB>;
 }
 
