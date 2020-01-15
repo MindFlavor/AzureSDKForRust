@@ -22,6 +22,7 @@ mod list_users_response;
 mod query_documents_response;
 mod replace_document_response;
 mod replace_permission_response;
+mod replace_stored_procedure_response;
 pub use self::create_collection_response::CreateCollectionResponse;
 pub use self::create_database_response::CreateDatabaseResponse;
 pub use self::create_document_response::CreateDocumentResponse;
@@ -50,3 +51,4 @@ pub use self::query_documents_response::{
 };
 pub use self::replace_document_response::ReplaceDocumentResponse;
 pub use self::replace_permission_response::ReplacePermissionResponse;
+pub use self::replace_stored_procedure_response::ReplaceStoredProcedureResponse;

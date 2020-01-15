@@ -216,6 +216,12 @@ where
             .stored_procedure_client()
             .prepare_request(hyper::Method::POST);
 
+        // add trait headers
+        UserAgentOption::add_header(self, &mut req);
+        ActivityIdOption::add_header(self, &mut req);
+        ConsistencyLevelOption::add_header(self, &mut req);
+        AllowTentativeWritesOption::add_header(self, &mut req);
+
         req.header(http::header::CONTENT_TYPE, "application/json");
 
         let body = ParametersOption::generate_body(self);

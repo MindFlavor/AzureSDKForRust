@@ -592,6 +592,7 @@ where
     fn collection_name(&self) -> &'a dyn CollectionName;
     fn stored_procedure_name(&self) -> &'a dyn StoredProcedureName;
     fn create_stored_procedure(&self) -> requests::CreateStoredProcedureBuilder<'_, CUB, No>;
+    fn replace_stored_procedure(&self) -> requests::ReplaceStoredProcedureBuilder<'_, CUB, No>;
     fn execute_stored_procedure(&self) -> requests::ExecuteStoredProcedureBuilder<'_, '_, CUB>;
 }
 

@@ -11,7 +11,7 @@ use std::convert::TryInto;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct CreateStoredProcedureBuilder<'a, CUB, BodySet>
+pub struct ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
@@ -24,15 +24,15 @@ where
     consistency_level: Option<ConsistencyLevel<'a>>,
 }
 
-impl<'a, CUB> CreateStoredProcedureBuilder<'a, CUB, No>
+impl<'a, CUB> ReplaceStoredProcedureBuilder<'a, CUB, No>
 where
     CUB: CosmosUriBuilder,
 {
     #[inline]
     pub(crate) fn new(
         stored_procedure_client: &'a StoredProcedureClient<'a, CUB>,
-    ) -> CreateStoredProcedureBuilder<'a, CUB, No> {
-        CreateStoredProcedureBuilder {
+    ) -> ReplaceStoredProcedureBuilder<'a, CUB, No> {
+        ReplaceStoredProcedureBuilder {
             stored_procedure_client,
             p_body: PhantomData {},
             body: None,
@@ -44,7 +44,7 @@ where
 }
 
 impl<'a, CUB, BodySet> StoredProcedureClientRequired<'a, CUB>
-    for CreateStoredProcedureBuilder<'a, CUB, BodySet>
+    for ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
@@ -58,7 +58,7 @@ where
 //get mandatory no traits methods
 
 //set mandatory no traits methods
-impl<'a, CUB> StoredProcedureBodyRequired<'a> for CreateStoredProcedureBuilder<'a, CUB, Yes>
+impl<'a, CUB> StoredProcedureBodyRequired<'a> for ReplaceStoredProcedureBuilder<'a, CUB, Yes>
 where
     CUB: CosmosUriBuilder,
 {
@@ -68,7 +68,7 @@ where
     }
 }
 
-impl<'a, CUB, BodySet> UserAgentOption<'a> for CreateStoredProcedureBuilder<'a, CUB, BodySet>
+impl<'a, CUB, BodySet> UserAgentOption<'a> for ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
@@ -79,7 +79,7 @@ where
     }
 }
 
-impl<'a, CUB, BodySet> ActivityIdOption<'a> for CreateStoredProcedureBuilder<'a, CUB, BodySet>
+impl<'a, CUB, BodySet> ActivityIdOption<'a> for ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
@@ -90,7 +90,8 @@ where
     }
 }
 
-impl<'a, CUB, BodySet> ConsistencyLevelOption<'a> for CreateStoredProcedureBuilder<'a, CUB, BodySet>
+impl<'a, CUB, BodySet> ConsistencyLevelOption<'a>
+    for ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
@@ -101,15 +102,15 @@ where
     }
 }
 
-impl<'a, CUB> StoredProcedureBodySupport<'a> for CreateStoredProcedureBuilder<'a, CUB, No>
+impl<'a, CUB> StoredProcedureBodySupport<'a> for ReplaceStoredProcedureBuilder<'a, CUB, No>
 where
     CUB: CosmosUriBuilder,
 {
-    type O = CreateStoredProcedureBuilder<'a, CUB, Yes>;
+    type O = ReplaceStoredProcedureBuilder<'a, CUB, Yes>;
 
     #[inline]
     fn with_body(self, body: &'a str) -> Self::O {
-        CreateStoredProcedureBuilder {
+        ReplaceStoredProcedureBuilder {
             stored_procedure_client: self.stored_procedure_client,
             p_body: PhantomData {},
             body: Some(body),
@@ -120,16 +121,16 @@ where
     }
 }
 
-impl<'a, CUB, BodySet> UserAgentSupport<'a> for CreateStoredProcedureBuilder<'a, CUB, BodySet>
+impl<'a, CUB, BodySet> UserAgentSupport<'a> for ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateStoredProcedureBuilder<'a, CUB, BodySet>;
+    type O = ReplaceStoredProcedureBuilder<'a, CUB, BodySet>;
 
     #[inline]
     fn with_user_agent(self, user_agent: &'a str) -> Self::O {
-        CreateStoredProcedureBuilder {
+        ReplaceStoredProcedureBuilder {
             stored_procedure_client: self.stored_procedure_client,
             p_body: PhantomData {},
             body: self.body,
@@ -140,16 +141,16 @@ where
     }
 }
 
-impl<'a, CUB, BodySet> ActivityIdSupport<'a> for CreateStoredProcedureBuilder<'a, CUB, BodySet>
+impl<'a, CUB, BodySet> ActivityIdSupport<'a> for ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateStoredProcedureBuilder<'a, CUB, BodySet>;
+    type O = ReplaceStoredProcedureBuilder<'a, CUB, BodySet>;
 
     #[inline]
     fn with_activity_id(self, activity_id: &'a str) -> Self::O {
-        CreateStoredProcedureBuilder {
+        ReplaceStoredProcedureBuilder {
             stored_procedure_client: self.stored_procedure_client,
             p_body: PhantomData {},
             body: self.body,
@@ -161,16 +162,16 @@ where
 }
 
 impl<'a, CUB, BodySet> ConsistencyLevelSupport<'a>
-    for CreateStoredProcedureBuilder<'a, CUB, BodySet>
+    for ReplaceStoredProcedureBuilder<'a, CUB, BodySet>
 where
     BodySet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateStoredProcedureBuilder<'a, CUB, BodySet>;
+    type O = ReplaceStoredProcedureBuilder<'a, CUB, BodySet>;
 
     #[inline]
     fn with_consistency_level(self, consistency_level: ConsistencyLevel<'a>) -> Self::O {
-        CreateStoredProcedureBuilder {
+        ReplaceStoredProcedureBuilder {
             stored_procedure_client: self.stored_procedure_client,
             p_body: PhantomData {},
             body: self.body,
@@ -182,20 +183,21 @@ where
 }
 
 // methods callable only when every mandatory field has been filled
-impl<'a, CUB> CreateStoredProcedureBuilder<'a, CUB, Yes>
+impl<'a, CUB> ReplaceStoredProcedureBuilder<'a, CUB, Yes>
 where
     CUB: CosmosUriBuilder,
 {
     pub async fn execute(&self) -> Result<CreateStoredProcedureResponse, AzureError> {
-        trace!("CreateStoredProcedureBuilder::execute called");
+        trace!("ReplaceStoredProcedureBuilder::execute called");
 
         let mut req = self.stored_procedure_client.main_client().prepare_request(
             &format!(
-                "dbs/{}/colls/{}/sprocs",
+                "dbs/{}/colls/{}/sprocs/{}",
                 self.stored_procedure_client.database_name().name(),
                 self.stored_procedure_client.collection_name().name(),
+                self.stored_procedure_client.stored_procedure_name().name(),
             ),
-            hyper::Method::POST,
+            hyper::Method::PUT,
             ResourceType::StoredProcedures,
         );
 
@@ -223,7 +225,7 @@ where
             self.stored_procedure_client()
                 .hyper_client()
                 .request(request),
-            StatusCode::CREATED,
+            StatusCode::OK,
         )
         .await?;
 
