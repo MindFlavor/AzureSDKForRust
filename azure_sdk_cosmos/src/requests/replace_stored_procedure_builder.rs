@@ -1,6 +1,6 @@
 use crate::clients::{CosmosUriBuilder, ResourceType};
 use crate::prelude::*;
-use crate::responses::CreateStoredProcedureResponse;
+use crate::responses::ReplaceStoredProcedureResponse;
 use crate::StoredProcedureClient;
 use crate::StoredProcedureClientRequired;
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
@@ -187,7 +187,7 @@ impl<'a, CUB> ReplaceStoredProcedureBuilder<'a, CUB, Yes>
 where
     CUB: CosmosUriBuilder,
 {
-    pub async fn execute(&self) -> Result<CreateStoredProcedureResponse, AzureError> {
+    pub async fn execute(&self) -> Result<ReplaceStoredProcedureResponse, AzureError> {
         trace!("ReplaceStoredProcedureBuilder::execute called");
 
         let mut req = self.stored_procedure_client.main_client().prepare_request(

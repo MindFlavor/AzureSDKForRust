@@ -19,6 +19,7 @@ mod list_collections_builder;
 mod list_databases_builder;
 mod list_documents_builder;
 mod list_permissions_builder;
+mod list_stored_procedures_builder;
 mod list_users_builder;
 mod query_documents_builder;
 mod replace_collection_builder;
@@ -47,6 +48,7 @@ pub use self::list_collections_builder::ListCollectionsBuilder;
 pub use self::list_databases_builder::ListDatabasesBuilder;
 pub use self::list_documents_builder::ListDocumentsBuilder;
 pub use self::list_permissions_builder::ListPermissionsBuilder;
+pub use self::list_stored_procedures_builder::ListStoredProceduresBuilder;
 pub use self::list_users_builder::ListUsersBuilder;
 pub use self::query_documents_builder::QueryDocumentsBuilder;
 pub use self::replace_collection_builder::ReplaceCollectionBuilder;
@@ -56,6 +58,7 @@ pub use self::replace_stored_procedure_builder::ReplaceStoredProcedureBuilder;
 pub use self::replace_user_builder::ReplaceUserBuilder;
 use crate::headers::*;
 use azure_sdk_core::errors::AzureError;
+use chrono::{DateTime, Utc};
 use http::HeaderMap;
 
 pub(crate) fn request_charge_from_headers(headers: &HeaderMap) -> Result<f64, AzureError> {
@@ -104,4 +107,18 @@ pub(crate) fn alt_content_path_from_headers(headers: &HeaderMap) -> Result<&str,
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_ALT_CONTENT_PATH.to_owned()))?
         .to_str()?;
     Ok(s)
+}
+
+pub(crate) fn last_state_change_from_headers(
+    headers: &HeaderMap,
+) -> Result<DateTime<Utc>, AzureError> {
+    let last_modified = headers
+        .get(HEADER_MS_LAST_STATE_CHANGE_UTC)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_MS_LAST_STATE_CHANGE_UTC.to_owned()))?
+        .to_str()?;
+
+    let last_modified = DateTime::parse_from_rfc2822(last_modified)?;
+    let last_modified = DateTime::from_utc(last_modified.naive_utc(), Utc);
+
+    Ok(last_modified)
 }

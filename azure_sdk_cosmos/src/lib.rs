@@ -556,6 +556,7 @@ where
         &'c self,
         stored_procedure_name: &'c dyn StoredProcedureName,
     ) -> StoredProcedureClient<'c, CUB>;
+    fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB>;
     fn with_document<'c>(&'c self, document_name: &'c dyn DocumentName) -> DocumentClient<'c, CUB>;
 }
 

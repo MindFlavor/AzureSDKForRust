@@ -18,6 +18,7 @@ mod list_collections_response;
 mod list_databases_response;
 mod list_documents_response;
 mod list_permissions_response;
+mod list_stored_procedures_response;
 mod list_users_response;
 mod query_documents_response;
 mod replace_document_response;
@@ -45,6 +46,7 @@ pub use self::list_documents_response::{
     ListDocumentsResponse, ListDocumentsResponseAttributes, ListDocumentsResponseEntities,
 };
 pub use self::list_permissions_response::ListPermissionsResponse;
+pub use self::list_stored_procedures_response::ListStoredProceduresResponse;
 pub use self::list_users_response::ListUsersResponse;
 pub use self::query_documents_response::{
     QueryDocumentsResponse, QueryDocumentsResponseAdditonalHeaders, QueryResponseMeta, QueryResult,
