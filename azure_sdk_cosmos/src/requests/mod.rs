@@ -59,9 +59,11 @@ pub use self::replace_permission_builder::ReplacePermissionBuilder;
 pub use self::replace_stored_procedure_builder::ReplaceStoredProcedureBuilder;
 pub use self::replace_user_builder::ReplaceUserBuilder;
 use crate::headers::*;
+use crate::ResourceQuota;
 use azure_sdk_core::errors::AzureError;
 use chrono::{DateTime, Utc};
 use http::HeaderMap;
+use std::convert::TryInto;
 
 pub(crate) fn request_charge_from_headers(headers: &HeaderMap) -> Result<f64, AzureError> {
     Ok(headers
@@ -111,12 +113,58 @@ pub(crate) fn alt_content_path_from_headers(headers: &HeaderMap) -> Result<&str,
     Ok(s)
 }
 
+pub(crate) fn resource_quota_from_headers(
+    headers: &HeaderMap,
+) -> Result<ResourceQuota, AzureError> {
+    let s = headers
+        .get(HEADER_RESOURCE_QUOTA)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_RESOURCE_QUOTA.to_owned()))?
+        .to_str()?;
+    Ok(s.try_into()?)
+}
+
+pub(crate) fn resource_usage_from_headers(
+    headers: &HeaderMap,
+) -> Result<ResourceQuota, AzureError> {
+    let s = headers
+        .get(HEADER_RESOURCE_USAGE)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_RESOURCE_USAGE.to_owned()))?
+        .to_str()?;
+    Ok(s.try_into()?)
+}
+
+pub(crate) fn quorum_hacked_lsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_QUORUM_ACKED_LSN)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_QUORUM_ACKED_LSN.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn current_write_quorum_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_CURRENT_WRITE_QUORUM)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_CURRENT_WRITE_QUORUM.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn current_replica_set_size_from_headers(
+    headers: &HeaderMap,
+) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_CURRENT_REPLICA_SET_SIZE)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_CURRENT_REPLICA_SET_SIZE.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
 pub(crate) fn last_state_change_from_headers(
     headers: &HeaderMap,
 ) -> Result<DateTime<Utc>, AzureError> {
     let last_modified = headers
-        .get(HEADER_MS_LAST_STATE_CHANGE_UTC)
-        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_MS_LAST_STATE_CHANGE_UTC.to_owned()))?
+        .get(HEADER_LAST_STATE_CHANGE_UTC)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_LAST_STATE_CHANGE_UTC.to_owned()))?
         .to_str()?;
     debug!("last_modified == {:#}", last_modified);
 

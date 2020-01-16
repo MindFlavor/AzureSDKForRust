@@ -1,6 +1,7 @@
 use crate::stored_procedure::StoredProcedure;
 use crate::{
     activity_id_from_headers, last_state_change_from_headers, request_charge_from_headers,
+    resource_quota_from_headers, resource_usage_from_headers, ResourceQuota,
 };
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::session_token_from_headers;
@@ -14,6 +15,8 @@ pub struct ListStoredProceduresResponse {
     pub activity_id: uuid::Uuid,
     pub session_token: String,
     pub last_change: DateTime<Utc>,
+    pub resource_quota: ResourceQuota,
+    pub resource_usage: ResourceQuota,
 }
 
 impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListStoredProceduresResponse {
@@ -36,6 +39,8 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListStoredProceduresResponse
             activity_id: activity_id_from_headers(headers)?,
             session_token: session_token_from_headers(headers)?,
             last_change: last_state_change_from_headers(headers)?,
+            resource_quota: resource_quota_from_headers(headers)?,
+            resource_usage: resource_usage_from_headers(headers)?,
         })
     }
 }

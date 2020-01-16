@@ -54,6 +54,22 @@ impl std::convert::TryFrom<&str> for ResourceQuota {
                 documents_size: str::parse(item_or_error(s, &tokens, "documentsSize=")?)?,
                 collection_size: str::parse(item_or_error(s, &tokens, "collectionSize=")?)?,
             }))
+        } else if s.starts_with("users=") {
+            Ok(ResourceQuota::Users(str::parse(
+                &s["users=".len()..s.len() - 1],
+            )?))
+        } else if s.starts_with("permissions=") {
+            Ok(ResourceQuota::Permissions(str::parse(
+                &s["permissions=".len()..s.len() - 1],
+            )?))
+        } else if s.starts_with("triggers=") {
+            Ok(ResourceQuota::Triggers(str::parse(
+                &s["triggers=".len()..s.len() - 1],
+            )?))
+        } else if s.starts_with("functions=") {
+            Ok(ResourceQuota::Functions(str::parse(
+                &s["functions=".len()..s.len() - 1],
+            )?))
         } else {
             Err(TokenParsingError::UnsupportedStartingString { s: s.to_owned() }.into())
         }
@@ -102,5 +118,17 @@ mod tests {
         assert_eq!(document_resource_quota.document_size, 0);
         assert_eq!(document_resource_quota.documents_size, 2);
         assert_eq!(document_resource_quota.collection_size, 3);
+
+        let resource_quota: ResourceQuota = "users=500000;".try_into().unwrap();
+        assert_eq!(resource_quota, ResourceQuota::Users(500000));
+
+        let resource_quota: ResourceQuota = "permissions=2000000;".try_into().unwrap();
+        assert_eq!(resource_quota, ResourceQuota::Permissions(2000000));
+
+        let resource_quota: ResourceQuota = "triggers=25;".try_into().unwrap();
+        assert_eq!(resource_quota, ResourceQuota::Triggers(25));
+
+        let resource_quota: ResourceQuota = "functions=26;".try_into().unwrap();
+        assert_eq!(resource_quota, ResourceQuota::Functions(26));
     }
 }

@@ -25,7 +25,7 @@ pub mod prelude;
 mod query;
 mod requests;
 mod resource;
-pub mod resource_quota;
+mod resource_quota;
 pub mod responses;
 pub mod stored_procedure;
 mod to_json_vector;
@@ -45,6 +45,7 @@ pub use self::permission_token::PermissionToken;
 pub use self::query::{Param, ParamDef, Query};
 pub use self::requests::*;
 pub use self::resource::Resource;
+pub use self::resource_quota::ResourceQuota;
 use crate::clients::{
     Client, CollectionClient, CosmosUriBuilder, DatabaseClient, DocumentClient, PermissionClient,
     StoredProcedureClient, UserClient,
