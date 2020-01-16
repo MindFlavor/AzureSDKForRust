@@ -1,8 +1,9 @@
 use crate::clients::{Client, CosmosUriBuilder, ResourceType};
 use crate::responses::ListDatabasesResponse;
 use crate::ClientRequired;
-use azure_sdk_core::errors::{check_status_extract_body, AzureError};
+use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use hyper::StatusCode;
+use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
 pub struct ListDatabasesBuilder<'a, CUB>
@@ -44,8 +45,9 @@ where
             .body(hyper::Body::empty())?;
 
         let future_response = self.client.hyper_client().request(request);
-        let body = check_status_extract_body(future_response, StatusCode::OK).await?;
-        let res = serde_json::from_str::<ListDatabasesResponse>(&body)?;
-        Ok(res)
+        let (headers, body) =
+            check_status_extract_headers_and_body(future_response, StatusCode::OK).await?;
+
+        Ok((&headers, &body as &[u8]).try_into()?)
     }
 }
