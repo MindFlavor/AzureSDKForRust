@@ -3,7 +3,6 @@ use crate::{
     activity_id_from_headers, last_state_change_from_headers, request_charge_from_headers,
 };
 use azure_sdk_core::errors::AzureError;
-use azure_sdk_core::etag_from_headers;
 use azure_sdk_core::session_token_from_headers;
 use chrono::{DateTime, Utc};
 use http::HeaderMap;
@@ -13,7 +12,6 @@ pub struct ListStoredProceduresResponse {
     pub stored_procedures: Vec<StoredProcedure>,
     pub charge: f64,
     pub activity_id: uuid::Uuid,
-    pub etag: String,
     pub session_token: String,
     pub last_change: DateTime<Utc>,
 }
@@ -36,7 +34,6 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListStoredProceduresResponse
             stored_procedures: serde_json::from_slice::<Response>(body)?.stored_procedures,
             charge: request_charge_from_headers(headers)?,
             activity_id: activity_id_from_headers(headers)?,
-            etag: etag_from_headers(headers)?,
             session_token: session_token_from_headers(headers)?,
             last_change: last_state_change_from_headers(headers)?,
         })

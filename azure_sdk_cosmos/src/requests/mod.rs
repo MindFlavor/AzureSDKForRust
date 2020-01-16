@@ -118,9 +118,19 @@ pub(crate) fn last_state_change_from_headers(
         .get(HEADER_MS_LAST_STATE_CHANGE_UTC)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_MS_LAST_STATE_CHANGE_UTC.to_owned()))?
         .to_str()?;
+    debug!("last_modified == {:#}", last_modified);
 
-    let last_modified = DateTime::parse_from_rfc2822(last_modified)?;
+    // since Azure returns "GMT" instead of +0000 as timezone we replace it
+    // ourselves.
+    // For example: Wed, 15 Jan 2020 23:39:44.369 GMT
+    let last_modified = last_modified.replace("GMT", "+0000");
+    debug!("last_modified == {:#}", last_modified);
+
+    let last_modified = DateTime::parse_from_str(&last_modified, "%a, %e %h %Y %H:%M:%S%.f %z")?;
+    debug!("last_modified == {:#}", last_modified);
+
     let last_modified = DateTime::from_utc(last_modified.naive_utc(), Utc);
+    debug!("last_modified == {:#}", last_modified);
 
     Ok(last_modified)
 }
