@@ -31,6 +31,8 @@ impl std::convert::TryFrom<&str> for ResourceQuota {
     type Error = failure::Error;
 
     fn try_from(s: &str) -> Result<Self, Self::Error> {
+        println!("ResourceQuota::try_into({})", s);
+
         if s.starts_with("databases=") {
             let tokens: Vec<&str> = s.split(';').collect();
             Ok(ResourceQuota::Databases(DatabaseResourceQuota {

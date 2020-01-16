@@ -32,6 +32,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // account. Database do not implement Display but deref to &str so you can pass it to methods
     // both as struct or id.
 
+    let resp = client.list_databases().execute().await?;
+
     let db = client
         .create_database()
         .with_database_name(&database_name)
