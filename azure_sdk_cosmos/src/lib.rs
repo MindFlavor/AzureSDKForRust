@@ -25,6 +25,7 @@ pub mod prelude;
 mod query;
 mod requests;
 mod resource;
+pub mod resource_quota;
 pub mod responses;
 pub mod stored_procedure;
 mod to_json_vector;
