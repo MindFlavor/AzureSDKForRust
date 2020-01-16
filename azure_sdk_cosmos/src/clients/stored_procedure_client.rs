@@ -67,6 +67,10 @@ where
     fn execute_stored_procedure(&self) -> requests::ExecuteStoredProcedureBuilder<'_, '_, CUB> {
         requests::ExecuteStoredProcedureBuilder::new(self)
     }
+
+    fn delete_stored_procedure(&self) -> requests::DeleteStoredProcedureBuilder<'_, CUB> {
+        requests::DeleteStoredProcedureBuilder::new(self)
+    }
 }
 
 impl<'a, CUB> StoredProcedureBuilderTrait<'a, CUB> for StoredProcedureClient<'a, CUB>
