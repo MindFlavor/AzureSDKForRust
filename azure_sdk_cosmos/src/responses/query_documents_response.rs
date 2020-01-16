@@ -1,5 +1,5 @@
 use crate::document_attributes::DocumentAttributes;
-use crate::{activity_id_from_headers, request_charge_from_headers};
+use crate::from_headers::*;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::{continuation_token_from_headers_optional, session_token_from_headers};
 use hyper::header::HeaderMap;

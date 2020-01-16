@@ -1,7 +1,5 @@
-use crate::{
-    number_of_read_regions_from_headers, request_charge_from_headers,
-    request_item_count_from_headers, Document, DocumentAttributes,
-};
+use crate::from_headers::*;
+use crate::{Document, DocumentAttributes};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::{
     continuation_token_from_headers_optional, etag_from_headers_optional,

@@ -14,6 +14,7 @@ mod database;
 mod document;
 mod document_attributes;
 mod errors;
+pub(crate) mod from_headers;
 mod headers;
 mod indexing_directive;
 pub mod offer;
