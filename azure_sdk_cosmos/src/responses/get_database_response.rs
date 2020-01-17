@@ -14,8 +14,8 @@ pub struct GetDatabaseResponse {
     pub session_token: String,
     pub etag: String,
     pub last_change: DateTime<Utc>,
-    pub resource_quota: ResourceQuota,
-    pub resource_usage: ResourceQuota,
+    pub resource_quota: Vec<ResourceQuota>,
+    pub resource_usage: Vec<ResourceQuota>,
 }
 
 impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetDatabaseResponse {

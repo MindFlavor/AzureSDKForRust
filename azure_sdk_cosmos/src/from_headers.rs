@@ -1,9 +1,9 @@
 use crate::headers::*;
+use crate::resource_quota::resource_quotas_from_str;
 use crate::ResourceQuota;
 use azure_sdk_core::errors::AzureError;
 use chrono::{DateTime, Utc};
 use http::HeaderMap;
-use std::convert::TryInto;
 
 pub(crate) fn request_charge_from_headers(headers: &HeaderMap) -> Result<f64, AzureError> {
     Ok(headers
@@ -55,22 +55,22 @@ pub(crate) fn alt_content_path_from_headers(headers: &HeaderMap) -> Result<&str,
 
 pub(crate) fn resource_quota_from_headers(
     headers: &HeaderMap,
-) -> Result<ResourceQuota, AzureError> {
+) -> Result<Vec<ResourceQuota>, AzureError> {
     let s = headers
         .get(HEADER_RESOURCE_QUOTA)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_RESOURCE_QUOTA.to_owned()))?
         .to_str()?;
-    Ok(s.try_into()?)
+    Ok(resource_quotas_from_str(s)?)
 }
 
 pub(crate) fn resource_usage_from_headers(
     headers: &HeaderMap,
-) -> Result<ResourceQuota, AzureError> {
+) -> Result<Vec<ResourceQuota>, AzureError> {
     let s = headers
         .get(HEADER_RESOURCE_USAGE)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_RESOURCE_USAGE.to_owned()))?
         .to_str()?;
-    Ok(s.try_into()?)
+    Ok(resource_quotas_from_str(s)?)
 }
 
 pub(crate) fn quorum_hacked_lsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {

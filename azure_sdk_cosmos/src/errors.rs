@@ -1,10 +1,10 @@
 #[derive(Debug, Fail)]
 pub enum TokenParsingError {
     #[fail(
-        display = "string has an unsupported starting token. String: \"{}\"",
-        s
+        display = "string has an unsupported starting token. Token: \"{}\", String: \"{}\"",
+        token, s
     )]
-    UnsupportedStartingString { s: String },
+    UnsupportedToken { token: String, s: String },
 
     #[fail(
         display = "string has unsufficient number of tokens. Required {}, found {}. String: \"{}\"",

@@ -1,136 +1,139 @@
-use crate::errors::{item_or_error, TokenParsingError};
-
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct DatabaseResourceQuota {
-    pub databases: u64,
-    pub collections: u64,
-    pub users: u64,
-    pub permissions: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct DocumentResourceQuota {
-    pub document_size: u64,
-    pub documents_size: u64,
-    pub collection_size: u64,
-}
+use crate::errors::TokenParsingError;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum ResourceQuota {
-    Databases(DatabaseResourceQuota),
+    Databases(u64),
     StoredProcedures(u64),
     Collections(u64),
-    Documents(DocumentResourceQuota),
+    DocumentSize(u64),
+    DocumentsSize(u64),
+    CollectionSize(u64),
     Users(u64),
     Permissions(u64),
     Triggers(u64),
     Functions(u64),
 }
 
-impl std::convert::TryFrom<&str> for ResourceQuota {
-    type Error = failure::Error;
+const DATABASES: &str = "databases=";
+const STORED_PROCEDURES: &str = "storedProcedures=";
+const COLLECTIONS: &str = "collections=";
+const DOCUMENT_SIZE: &str = "documentSize=";
+const DOCUMENTS_SIZE: &str = "documentsSize=";
+const COLLECTION_SIZE: &str = "collectionSize=";
+const USERS: &str = "users=";
+const PERMISSIONS: &str = "permissions=";
+const TRIGGERS: &str = "triggers=";
+const FUNCTIONS: &str = "functions=";
 
-    fn try_from(s: &str) -> Result<Self, Self::Error> {
-        println!("ResourceQuota::try_into({})", s);
+pub(crate) fn resource_quotas_from_str(s: &str) -> Result<Vec<ResourceQuota>, failure::Error> {
+    println!("resource_quotas_from_str(\"{}\") called", s);
+    let tokens: Vec<&str> = s.split(';').collect();
+    let mut v = Vec::with_capacity(tokens.len());
 
-        if s.starts_with("databases=") {
-            let tokens: Vec<&str> = s.split(';').collect();
-            Ok(ResourceQuota::Databases(DatabaseResourceQuota {
-                databases: str::parse(item_or_error(s, &tokens, "databases=")?)?,
-                collections: str::parse(item_or_error(s, &tokens, "collections=")?)?,
-                users: str::parse(item_or_error(s, &tokens, "users=")?)?,
-                permissions: str::parse(item_or_error(s, &tokens, "permissions=")?)?,
-            }))
-        } else if s.starts_with("storedProcedures=") {
-            Ok(ResourceQuota::StoredProcedures(str::parse(
-                &s["storedProcedures=".len()..s.len() - 1],
-            )?))
-        } else if s.starts_with("collections=") {
-            Ok(ResourceQuota::Collections(str::parse(
-                &s["collections=".len()..s.len() - 1],
-            )?))
-        } else if s.starts_with("documentSize=") {
-            let tokens: Vec<&str> = s.split(';').collect();
-            Ok(ResourceQuota::Documents(DocumentResourceQuota {
-                document_size: str::parse(item_or_error(s, &tokens, "documentSize=")?)?,
-                documents_size: str::parse(item_or_error(s, &tokens, "documentsSize=")?)?,
-                collection_size: str::parse(item_or_error(s, &tokens, "collectionSize=")?)?,
-            }))
-        } else if s.starts_with("users=") {
-            Ok(ResourceQuota::Users(str::parse(
-                &s["users=".len()..s.len() - 1],
-            )?))
-        } else if s.starts_with("permissions=") {
-            Ok(ResourceQuota::Permissions(str::parse(
-                &s["permissions=".len()..s.len() - 1],
-            )?))
-        } else if s.starts_with("triggers=") {
-            Ok(ResourceQuota::Triggers(str::parse(
-                &s["triggers=".len()..s.len() - 1],
-            )?))
-        } else if s.starts_with("functions=") {
-            Ok(ResourceQuota::Functions(str::parse(
-                &s["functions=".len()..s.len() - 1],
-            )?))
+    for token in tokens.into_iter().filter(|token| !token.is_empty()) {
+        println!("processing token == {}", token);
+
+        if token.starts_with(DATABASES) {
+            v.push(ResourceQuota::Databases(str::parse(
+                &token[DATABASES.len()..],
+            )?));
+        } else if token.starts_with(STORED_PROCEDURES) {
+            v.push(ResourceQuota::StoredProcedures(str::parse(
+                &token[STORED_PROCEDURES.len()..],
+            )?));
+        } else if token.starts_with(COLLECTIONS) {
+            v.push(ResourceQuota::Collections(str::parse(
+                &token[COLLECTIONS.len()..],
+            )?));
+        } else if token.starts_with(DOCUMENT_SIZE) {
+            v.push(ResourceQuota::DocumentSize(str::parse(
+                &token[DOCUMENT_SIZE.len()..],
+            )?));
+        } else if token.starts_with(DOCUMENTS_SIZE) {
+            v.push(ResourceQuota::DocumentsSize(str::parse(
+                &token[DOCUMENTS_SIZE.len()..],
+            )?));
+        } else if token.starts_with(COLLECTION_SIZE) {
+            v.push(ResourceQuota::CollectionSize(str::parse(
+                &token[COLLECTION_SIZE.len()..],
+            )?));
+        } else if token.starts_with(USERS) {
+            v.push(ResourceQuota::Users(str::parse(&token[USERS.len()..])?));
+        } else if token.starts_with(PERMISSIONS) {
+            v.push(ResourceQuota::Permissions(str::parse(
+                &token[PERMISSIONS.len()..],
+            )?));
+        } else if token.starts_with(TRIGGERS) {
+            v.push(ResourceQuota::Triggers(str::parse(
+                &token[TRIGGERS.len()..],
+            )?));
+        } else if token.starts_with(FUNCTIONS) {
+            v.push(ResourceQuota::Functions(str::parse(
+                &token[FUNCTIONS.len()..],
+            )?));
         } else {
-            Err(TokenParsingError::UnsupportedStartingString { s: s.to_owned() }.into())
+            return Err(TokenParsingError::UnsupportedToken {
+                token: token.to_string(),
+                s: s.to_owned(),
+            }
+            .into());
         }
+
+        println!("v == {:#?}", v);
     }
+
+    Ok(v)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::convert::TryInto;
 
     #[test]
     fn parse_resource_quota() {
-        let resource_quota: ResourceQuota = "storedProcedures=25;".try_into().unwrap();
-        assert_eq!(resource_quota, ResourceQuota::StoredProcedures(25));
+        let resource_quota = resource_quotas_from_str("storedProcedures=25;").unwrap();
+        assert_eq!(resource_quota, vec![ResourceQuota::StoredProcedures(25)]);
 
-        let resource_quota: ResourceQuota =
-            "databases=100;collections=5000;users=500000;permissions=2000000;"
-                .try_into()
-                .unwrap();
+        let resource_quota = resource_quotas_from_str(
+            "databases=100;collections=5000;users=500000;permissions=2000000;",
+        )
+        .unwrap();
 
-        let database_resource_quota =
-            if let ResourceQuota::Databases(database_resource_quota) = resource_quota {
-                database_resource_quota
-            } else {
-                panic!()
-            };
-        assert_eq!(database_resource_quota.databases, 100);
-        assert_eq!(database_resource_quota.collections, 5000);
-        assert_eq!(database_resource_quota.users, 500000);
-        assert_eq!(database_resource_quota.permissions, 2000000);
+        assert_eq!(
+            resource_quota,
+            vec![
+                ResourceQuota::Databases(100),
+                ResourceQuota::Collections(5000),
+                ResourceQuota::Users(500000),
+                ResourceQuota::Permissions(2000000)
+            ]
+        );
 
-        let resource_quota: ResourceQuota = "collections=27;".try_into().unwrap();
-        assert_eq!(resource_quota, ResourceQuota::Collections(27));
+        let resource_quota = resource_quotas_from_str("collections=27;").unwrap();
+        assert_eq!(resource_quota, vec![ResourceQuota::Collections(27)]);
 
-        let resource_quota: ResourceQuota = "documentSize=0;documentsSize=2;collectionSize=3;"
-            .try_into()
-            .unwrap();
+        let resource_quota =
+            resource_quotas_from_str("documentSize=0;documentsSize=2;collectionSize=3;").unwrap();
 
-        let document_resource_quota =
-            if let ResourceQuota::Documents(document_resource_quota) = resource_quota {
-                document_resource_quota
-            } else {
-                panic!()
-            };
-        assert_eq!(document_resource_quota.document_size, 0);
-        assert_eq!(document_resource_quota.documents_size, 2);
-        assert_eq!(document_resource_quota.collection_size, 3);
+        assert_eq!(
+            resource_quota,
+            vec![
+                ResourceQuota::DocumentSize(0),
+                ResourceQuota::DocumentsSize(2),
+                ResourceQuota::CollectionSize(3)
+            ]
+        );
 
-        let resource_quota: ResourceQuota = "users=500000;".try_into().unwrap();
-        assert_eq!(resource_quota, ResourceQuota::Users(500000));
+        let resource_quota = resource_quotas_from_str("users=500000;").unwrap();
+        assert_eq!(resource_quota, vec![ResourceQuota::Users(500000)]);
 
-        let resource_quota: ResourceQuota = "permissions=2000000;".try_into().unwrap();
-        assert_eq!(resource_quota, ResourceQuota::Permissions(2000000));
+        let resource_quota = resource_quotas_from_str("permissions=2000000;").unwrap();
+        assert_eq!(resource_quota, vec![ResourceQuota::Permissions(2000000)]);
 
-        let resource_quota: ResourceQuota = "triggers=25;".try_into().unwrap();
-        assert_eq!(resource_quota, ResourceQuota::Triggers(25));
+        let resource_quota = resource_quotas_from_str("triggers=25;").unwrap();
+        assert_eq!(resource_quota, vec![ResourceQuota::Triggers(25)]);
 
-        let resource_quota: ResourceQuota = "functions=26;".try_into().unwrap();
-        assert_eq!(resource_quota, ResourceQuota::Functions(26));
+        let resource_quota = resource_quotas_from_str("functions=26;").unwrap();
+        assert_eq!(resource_quota, vec![ResourceQuota::Functions(26)]);
     }
 }
