@@ -35,7 +35,12 @@ where
             max_item_count: -1,
         }
     }
+}
 
+impl<'a, CUB> Clone for ListDatabasesBuilder<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
     fn clone(&self) -> Self {
         ListDatabasesBuilder {
             client: self.client,
