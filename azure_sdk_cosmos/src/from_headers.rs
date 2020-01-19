@@ -38,11 +38,10 @@ pub(crate) fn activity_id_from_headers(headers: &HeaderMap) -> Result<uuid::Uuid
 }
 
 pub(crate) fn content_path_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
-    let s = headers
+    Ok(headers
         .get(HEADER_CONTENT_PATH)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_CONTENT_PATH.to_owned()))?
-        .to_str()?;
-    Ok(s)
+        .to_str()?)
 }
 
 pub(crate) fn alt_content_path_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
