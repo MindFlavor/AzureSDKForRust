@@ -46,11 +46,10 @@ pub(crate) fn content_path_from_headers(headers: &HeaderMap) -> Result<&str, Azu
 }
 
 pub(crate) fn alt_content_path_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
-    let s = headers
+    Ok(headers
         .get(HEADER_ALT_CONTENT_PATH)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_ALT_CONTENT_PATH.to_owned()))?
-        .to_str()?;
-    Ok(s)
+        .to_str()?)
 }
 
 pub(crate) fn resource_quota_from_headers(
@@ -99,28 +98,25 @@ pub(crate) fn current_replica_set_size_from_headers(
         .parse()?)
 }
 
-pub(crate) fn schema_version_from_headers(headers: &HeaderMap) -> Result<String, AzureError> {
+pub(crate) fn schema_version_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
     Ok(headers
         .get(HEADER_SCHEMA_VERSION)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_SCHEMA_VERSION.to_owned()))?
-        .to_str()?
-        .to_owned())
+        .to_str()?)
 }
 
-pub(crate) fn service_version_from_headers(headers: &HeaderMap) -> Result<String, AzureError> {
+pub(crate) fn service_version_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
     Ok(headers
         .get(HEADER_SERVICE_VERSION)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_SERVICE_VERSION.to_owned()))?
-        .to_str()?
-        .to_owned())
+        .to_str()?)
 }
 
-pub(crate) fn gateway_version_from_headers(headers: &HeaderMap) -> Result<String, AzureError> {
+pub(crate) fn gateway_version_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
     Ok(headers
         .get(HEADER_GATEWAY_VERSION)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_GATEWAY_VERSION.to_owned()))?
-        .to_str()?
-        .to_owned())
+        .to_str()?)
 }
 
 pub(crate) fn last_state_change_from_headers(

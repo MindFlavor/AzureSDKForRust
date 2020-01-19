@@ -42,10 +42,10 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for CreateDatabaseResponse {
             quorum_hacked_lsn: quorum_hacked_lsn_from_headers(headers)?,
             current_write_quorum: current_write_quorum_from_headers(headers)?,
             current_replica_set_size: current_replica_set_size_from_headers(headers)?,
-            schema_version: schema_version_from_headers(headers)?,
-            service_version: service_version_from_headers(headers)?,
+            schema_version: schema_version_from_headers(headers)?.to_owned(),
+            service_version: service_version_from_headers(headers)?.to_owned(),
             activity_id: activity_id_from_headers(headers)?,
-            gateway_version: gateway_version_from_headers(headers)?,
+            gateway_version: gateway_version_from_headers(headers)?.to_owned(),
         })
     }
 }
