@@ -29,6 +29,8 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListDatabasesResponse {
         let headers = value.0;
         let body = value.1;
 
+        debug!("headers == {:#?}", headers);
+
         #[derive(Deserialize, Debug)]
         pub struct Response {
             #[serde(rename = "_rid")]

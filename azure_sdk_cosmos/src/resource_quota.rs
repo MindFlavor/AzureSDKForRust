@@ -26,12 +26,12 @@ const TRIGGERS: &str = "triggers=";
 const FUNCTIONS: &str = "functions=";
 
 pub(crate) fn resource_quotas_from_str(s: &str) -> Result<Vec<ResourceQuota>, failure::Error> {
-    println!("resource_quotas_from_str(\"{}\") called", s);
+    debug!("resource_quotas_from_str(\"{}\") called", s);
     let tokens: Vec<&str> = s.split(';').collect();
     let mut v = Vec::with_capacity(tokens.len());
 
     for token in tokens.into_iter().filter(|token| !token.is_empty()) {
-        println!("processing token == {}", token);
+        debug!("processing token == {}", token);
 
         if token.starts_with(DATABASES) {
             v.push(ResourceQuota::Databases(str::parse(
@@ -79,7 +79,7 @@ pub(crate) fn resource_quotas_from_str(s: &str) -> Result<Vec<ResourceQuota>, fa
             .into());
         }
 
-        println!("v == {:#?}", v);
+        debug!("v == {:#?}", v);
     }
 
     Ok(v)
