@@ -30,3 +30,6 @@ pub(crate) const HEADER_RESOURCE_USAGE: &str = "x-ms-resource-usage"; // [Resour
 pub(crate) const HEADER_QUORUM_ACKED_LSN: &str = "x-ms-quorum-acked-lsn"; // [u64]
 pub(crate) const HEADER_CURRENT_WRITE_QUORUM: &str = "x-ms-current-write-quorum"; // [u64]
 pub(crate) const HEADER_CURRENT_REPLICA_SET_SIZE: &str = "x-ms-current-replica-set-size"; // [u64]
+pub(crate) const HEADER_SCHEMA_VERSION: &str = "x-ms-schemaversion"; // [String]
+pub(crate) const HEADER_SERVICE_VERSION: &str = "x-ms-serviceversion"; // [String]
+pub(crate) const HEADER_GATEWAY_VERSION: &str = "x-ms-gatewayversion:"; // [String]
