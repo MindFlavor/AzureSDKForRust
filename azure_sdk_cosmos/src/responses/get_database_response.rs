@@ -13,9 +13,12 @@ pub struct GetDatabaseResponse {
     pub activity_id: uuid::Uuid,
     pub session_token: String,
     pub etag: String,
-    pub last_change: DateTime<Utc>,
+    pub last_state_change: DateTime<Utc>,
     pub resource_quota: Vec<ResourceQuota>,
     pub resource_usage: Vec<ResourceQuota>,
+    pub schema_version: String,
+    pub service_version: String,
+    pub gateway_version: String,
 }
 
 impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetDatabaseResponse {
@@ -32,9 +35,12 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetDatabaseResponse {
             activity_id: activity_id_from_headers(headers)?,
             session_token: session_token_from_headers(headers)?,
             etag: etag_from_headers(headers)?,
-            last_change: last_state_change_from_headers(headers)?,
+            last_state_change: last_state_change_from_headers(headers)?,
             resource_quota: resource_quota_from_headers(headers)?,
             resource_usage: resource_usage_from_headers(headers)?,
+            schema_version: schema_version_from_headers(headers)?,
+            service_version: service_version_from_headers(headers)?,
+            gateway_version: gateway_version_from_headers(headers)?,
         })
     }
 }
