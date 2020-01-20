@@ -21,6 +21,14 @@ pub(crate) fn request_item_count_from_headers(headers: &HeaderMap) -> Result<u64
         .parse()?)
 }
 
+pub(crate) fn role_from_headers(headers: &HeaderMap) -> Result<u32, AzureError> {
+    Ok(headers
+        .get(HEADER_ROLE)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_ROLE.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
 pub(crate) fn number_of_read_regions_from_headers(headers: &HeaderMap) -> Result<u32, AzureError> {
     Ok(headers
         .get(HEADER_NUMBER_OF_READ_REGIONS)
@@ -75,6 +83,16 @@ pub(crate) fn quorum_hacked_lsn_from_headers(headers: &HeaderMap) -> Result<u64,
     Ok(headers
         .get(HEADER_QUORUM_ACKED_LSN)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_QUORUM_ACKED_LSN.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn cosmos_quorum_hacked_llsn_from_headers(
+    headers: &HeaderMap,
+) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_COSMOS_QUORUM_ACKED_LLSN)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_COSMOS_QUORUM_ACKED_LLSN.to_owned()))?
         .to_str()?
         .parse()?)
 }
@@ -186,26 +204,34 @@ pub(crate) fn gateway_version_from_headers(headers: &HeaderMap) -> Result<&str, 
         .to_str()?)
 }
 
-pub(crate) fn last_state_change_from_headers(
-    headers: &HeaderMap,
-) -> Result<DateTime<Utc>, AzureError> {
-    let last_modified = headers
-        .get(HEADER_LAST_STATE_CHANGE_UTC)
-        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_LAST_STATE_CHANGE_UTC.to_owned()))?
+fn _date_from_headers(headers: &HeaderMap, header_name: &str) -> Result<DateTime<Utc>, AzureError> {
+    let date = headers
+        .get(header_name)
+        .ok_or_else(|| AzureError::HeaderNotFound(header_name.to_owned()))?
         .to_str()?;
-    debug!("last_modified == {:#}", last_modified);
+    debug!("date == {:#}", date);
 
     // since Azure returns "GMT" instead of +0000 as timezone we replace it
     // ourselves.
     // For example: Wed, 15 Jan 2020 23:39:44.369 GMT
-    let last_modified = last_modified.replace("GMT", "+0000");
-    debug!("last_modified == {:#}", last_modified);
+    let date = date.replace("GMT", "+0000");
+    debug!("date == {:#}", date);
 
-    let last_modified = DateTime::parse_from_str(&last_modified, "%a, %e %h %Y %H:%M:%S%.f %z")?;
-    debug!("last_modified == {:#}", last_modified);
+    let date = DateTime::parse_from_str(&date, "%a, %e %h %Y %H:%M:%S%.f %z")?;
+    debug!("date == {:#}", date);
 
-    let last_modified = DateTime::from_utc(last_modified.naive_utc(), Utc);
-    debug!("last_modified == {:#}", last_modified);
+    let date = DateTime::from_utc(date.naive_utc(), Utc);
+    debug!("date == {:#}", date);
 
-    Ok(last_modified)
+    Ok(date)
+}
+
+pub(crate) fn last_state_change_from_headers(
+    headers: &HeaderMap,
+) -> Result<DateTime<Utc>, AzureError> {
+    _date_from_headers(headers, HEADER_LAST_STATE_CHANGE_UTC)
+}
+
+pub(crate) fn date_from_headers(headers: &HeaderMap) -> Result<DateTime<Utc>, AzureError> {
+    _date_from_headers(headers, http::header::DATE.as_str())
 }

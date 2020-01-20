@@ -46,7 +46,7 @@ impl<'a, T> From<&'a GetDocumentResponse<T>> for ConsistencyLevel<'a> {
 
 impl<'a> From<&'a CreateDocumentResponse> for ConsistencyLevel<'a> {
     fn from(create_document_response: &'a CreateDocumentResponse) -> Self {
-        ConsistencyLevel::Session(&create_document_response.additional_headers.session_token)
+        ConsistencyLevel::Session(&create_document_response.session_token)
     }
 }
 

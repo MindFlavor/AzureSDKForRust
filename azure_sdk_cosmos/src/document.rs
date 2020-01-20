@@ -68,6 +68,7 @@ where
     }
 }
 
+// TO REMOVE
 #[derive(Debug, Clone)]
 pub struct DocumentAdditionalHeaders {
     pub charge: f64,

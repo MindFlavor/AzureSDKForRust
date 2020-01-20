@@ -7,6 +7,7 @@ pub enum ResourceQuota {
     Collections(u64),
     DocumentSize(u64),
     DocumentsSize(u64),
+    DocumentsCount(i64),
     CollectionSize(u64),
     Users(u64),
     Permissions(u64),
@@ -19,6 +20,7 @@ const STORED_PROCEDURES: &str = "storedProcedures=";
 const COLLECTIONS: &str = "collections=";
 const DOCUMENT_SIZE: &str = "documentSize=";
 const DOCUMENTS_SIZE: &str = "documentsSize=";
+const DOCUMENTS_COUNT: &str = "documentsCount=";
 const COLLECTION_SIZE: &str = "collectionSize=";
 const USERS: &str = "users=";
 const PERMISSIONS: &str = "permissions=";
@@ -52,6 +54,10 @@ pub(crate) fn resource_quotas_from_str(s: &str) -> Result<Vec<ResourceQuota>, fa
         } else if token.starts_with(DOCUMENTS_SIZE) {
             v.push(ResourceQuota::DocumentsSize(str::parse(
                 &token[DOCUMENTS_SIZE.len()..],
+            )?));
+        } else if token.starts_with(DOCUMENTS_COUNT) {
+            v.push(ResourceQuota::DocumentsCount(str::parse(
+                &token[DOCUMENTS_COUNT.len()..],
             )?));
         } else if token.starts_with(COLLECTION_SIZE) {
             v.push(ResourceQuota::CollectionSize(str::parse(
