@@ -33,7 +33,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // account. Database do not implement Display but deref to &str so you can pass it to methods
     // both as struct or id.
 
-    let _resp = client.list_databases().execute().await?;
+    let list_databases_response = client.list_databases().execute().await?;
+    println!("list_databases_response = {:#?}", list_databases_response);
 
     let db = client
         .create_database()
@@ -79,6 +80,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         );
 
         let db_collection = db_client.with_collection(&"panzadoro");
+
+        let get_collection_response = db_collection.get_collection().execute().await?;
+        println!("get_collection_response == {:#?}", get_collection_response);
 
         let stream = db_client.list_collections();
         let mut stream = Box::pin(stream.stream());

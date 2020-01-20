@@ -2,14 +2,14 @@
 	"name": "GetCollectionBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-			"crate::client2::{CosmosUriBuilder, ResourceType}",
-			"crate::prelude::*",
-			"crate::responses::GetCollectionResponse",
-			"crate::CollectionClient",
-			"crate::CollectionClientRequired",
-			"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
-			"std::convert::TryInto",
-			"hyper::StatusCode"
+		"crate::clients::{CollectionClient, CosmosUriBuilder, ResourceType}",
+		"crate::prelude::*",
+		"crate::responses::GetCollectionResponse",
+		"crate::CollectionClientRequired",
+		"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
+		"hyper::StatusCode",
+		"azure_sdk_core::prelude::*",
+		"std::convert::TryInto"
 	],
 	"inline": true,
 	"extra_types": [ "'a", "CUB" ],
@@ -22,5 +22,26 @@
 		}
 	],
 	"fields": [
+		{
+			"name": "user_agent",
+			"field_type": "&'a str",
+			"optional": true,
+			"trait_get": "UserAgentOption<'a>",
+			"trait_set": "UserAgentSupport<'a>"
+		},
+		{
+			"name": "activity_id",
+			"field_type": "&'a str",
+			"optional": true,
+			"trait_get": "ActivityIdOption<'a>",
+			"trait_set": "ActivityIdSupport<'a>"
+		},
+		{
+			"name": "consistency_level",
+			"field_type": "ConsistencyLevel<'a>",
+			"optional": true,
+			"trait_get": "ConsistencyLevelOption<'a>",
+			"trait_set": "ConsistencyLevelSupport<'a>"
+		}
 	]
 }

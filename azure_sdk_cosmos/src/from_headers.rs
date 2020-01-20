@@ -87,6 +87,74 @@ pub(crate) fn current_write_quorum_from_headers(headers: &HeaderMap) -> Result<u
         .parse()?)
 }
 
+pub(crate) fn collection_partition_index_from_headers(
+    headers: &HeaderMap,
+) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_COLLECTION_PARTITION_INDEX)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_COLLECTION_PARTITION_INDEX.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn collection_service_index_from_headers(
+    headers: &HeaderMap,
+) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_COLLECTION_SERVICE_INDEX)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_COLLECTION_SERVICE_INDEX.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn lsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_LSN)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_LSN.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn item_lsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_ITEM_LSN)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_ITEM_LSN.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn transport_request_id_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_TRANSPORT_REQUEST_ID)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_TRANSPORT_REQUEST_ID.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn global_committed_lsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_GLOBAL_COMMITTED_LSN)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_GLOBAL_COMMITTED_LSN.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn cosmos_llsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_COSMOS_LLSN)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_COSMOS_LLSN.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn cosmos_item_llsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_COSMOS_ITEM_LLSN)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_COSMOS_ITEM_LLSN.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
 pub(crate) fn current_replica_set_size_from_headers(
     headers: &HeaderMap,
 ) -> Result<u64, AzureError> {

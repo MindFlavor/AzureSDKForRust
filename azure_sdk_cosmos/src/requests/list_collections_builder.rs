@@ -207,15 +207,19 @@ where
 {
     pub async fn execute(&self) -> Result<ListCollectionsResponse, AzureError> {
         trace!("ListCollectionsBuilder::execute called");
-        let request = self
-            .database_client
-            .main_client()
-            .prepare_request(
-                &format!("dbs/{}/colls", self.database_client.database_name().name()),
-                hyper::Method::GET,
-                ResourceType::Collections,
-            )
-            .body(hyper::Body::empty())?;
+        let mut request = self.database_client.main_client().prepare_request(
+            &format!("dbs/{}/colls", self.database_client.database_name().name()),
+            hyper::Method::GET,
+            ResourceType::Collections,
+        );
+
+        UserAgentOption::add_header(self, &mut request);
+        ActivityIdOption::add_header(self, &mut request);
+        ConsistencyLevelOption::add_header(self, &mut request);
+        ContinuationOption::add_header(self, &mut request);
+        MaxItemCountOption::add_header(self, &mut request);
+
+        let request = request.body(hyper::Body::empty())?;
 
         trace!("request prepared == {:?}", request);
 
