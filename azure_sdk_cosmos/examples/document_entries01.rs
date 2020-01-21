@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client = client.with_database(&database_name);
     let client = client.with_collection(&collection_name);
 
-    let doc = Document::new(
+    let mut doc = Document::new(
         format!("unique_id{}", 500),
         MySampleStruct {
             a_string: Cow::Borrowed("Something here"),
@@ -94,6 +94,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!(
         "query_documents_response == {:#?}",
         query_documents_response
+    );
+
+    doc.document.a_number = 43;
+
+    let replace_document_response = client
+        .replace_document()
+        .with_document(&doc)
+        .with_partition_keys(&partition_keys)
+        .execute()
+        .await?;
+    println!(
+        "replace_document_response == {:#?}",
+        replace_document_response
     );
 
     Ok(())

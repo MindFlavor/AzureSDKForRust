@@ -36,7 +36,7 @@ pub use self::authorization_token::*;
 use self::collection::IndexingPolicy;
 pub use self::consistency_level::ConsistencyLevel;
 pub use self::database::{Database, DatabaseName};
-pub use self::document::{Document, DocumentAdditionalHeaders, DocumentName};
+pub use self::document::{Document, DocumentName};
 pub use self::document_attributes::DocumentAttributes;
 pub use self::indexing_directive::IndexingDirective;
 pub use self::offer::Offer;

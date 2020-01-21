@@ -25,7 +25,7 @@ where
         let body = response.2;
 
         debug!("status_code == {:?}", status_code);
-        println!("headers == {:#?}", headers);
+        debug!("headers == {:#?}", headers);
         debug!("body == {:#?}", std::str::from_utf8(body)?);
 
         let has_been_found =

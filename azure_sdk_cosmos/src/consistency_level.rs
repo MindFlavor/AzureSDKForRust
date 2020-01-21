@@ -59,7 +59,7 @@ impl<'a> From<&'a CreateDocumentResponse> for ConsistencyLevel<'a> {
 
 impl<'a> From<&'a ReplaceDocumentResponse> for ConsistencyLevel<'a> {
     fn from(replace_document_response: &'a ReplaceDocumentResponse) -> Self {
-        ConsistencyLevel::Session(&replace_document_response.additional_headers.session_token)
+        ConsistencyLevel::Session(&replace_document_response.session_token)
     }
 }
 
