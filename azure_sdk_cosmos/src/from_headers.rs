@@ -97,12 +97,30 @@ pub(crate) fn cosmos_quorum_hacked_llsn_from_headers(
         .parse()?)
 }
 
+pub(crate) fn cosmos_quorum_hacked_llsn_from_headers_optional(
+    headers: &HeaderMap,
+) -> Result<Option<u64>, AzureError> {
+    Ok(match headers.get(HEADER_COSMOS_QUORUM_ACKED_LLSN) {
+        Some(val) => Some(val.to_str()?.parse()?),
+        None => None,
+    })
+}
+
 pub(crate) fn current_write_quorum_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
     Ok(headers
         .get(HEADER_CURRENT_WRITE_QUORUM)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_CURRENT_WRITE_QUORUM.to_owned()))?
         .to_str()?
         .parse()?)
+}
+
+pub(crate) fn current_write_quorum_from_headers_optional(
+    headers: &HeaderMap,
+) -> Result<Option<u64>, AzureError> {
+    Ok(match headers.get(HEADER_CURRENT_WRITE_QUORUM) {
+        Some(val) => Some(val.to_str()?.parse()?),
+        None => None,
+    })
 }
 
 pub(crate) fn collection_partition_index_from_headers(
@@ -183,6 +201,15 @@ pub(crate) fn current_replica_set_size_from_headers(
         .parse()?)
 }
 
+pub(crate) fn current_replica_set_size_from_headers_optional(
+    headers: &HeaderMap,
+) -> Result<Option<u64>, AzureError> {
+    Ok(match headers.get(HEADER_CURRENT_REPLICA_SET_SIZE) {
+        Some(val) => Some(val.to_str()?.parse()?),
+        None => None,
+    })
+}
+
 pub(crate) fn schema_version_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
     Ok(headers
         .get(HEADER_SCHEMA_VERSION)
@@ -194,6 +221,15 @@ pub(crate) fn service_version_from_headers(headers: &HeaderMap) -> Result<&str, 
     Ok(headers
         .get(HEADER_SERVICE_VERSION)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_SERVICE_VERSION.to_owned()))?
+        .to_str()?)
+}
+
+pub(crate) fn content_location_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
+    Ok(headers
+        .get(http::header::CONTENT_LOCATION)
+        .ok_or_else(|| {
+            AzureError::HeaderNotFound(http::header::CONTENT_LOCATION.as_str().to_owned())
+        })?
         .to_str()?)
 }
 

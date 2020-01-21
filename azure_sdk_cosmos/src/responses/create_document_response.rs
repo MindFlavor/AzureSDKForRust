@@ -43,7 +43,7 @@ impl std::convert::TryFrom<(StatusCode, &HeaderMap, &[u8])> for CreateDocumentRe
         let headers = value.1;
         let body = value.2;
 
-        println!("headers == {:#?}", headers);
+        debug!("headers == {:#?}", headers);
 
         Ok(CreateDocumentResponse {
             document_attributes: DocumentAttributes::try_from((headers, body))?,

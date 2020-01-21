@@ -41,19 +41,40 @@ async fn main() -> Result<(), Box<dyn Error>> {
         },
     );
 
+    let mut partition_keys = PartitionKeys::new();
+    partition_keys.push(doc.document_attributes.id())?;
+
     // let's add an entity.
     let create_document_response = client
         .create_document()
         .with_document(&doc)
-        .with_partition_keys(PartitionKeys::new().push(doc.document_attributes.id())?)
+        .with_partition_keys(&partition_keys)
         .with_is_upsert(true)
         .execute()
         .await?;
 
     println!(
-        "create_document_response == {:#?}",
+        "create_document_response == {:#?}\n\n\n",
         create_document_response
     );
+
+    let document_client = client.with_document(&doc);
+
+    let get_document_response = document_client
+        .get_document()
+        .with_partition_keys(&partition_keys)
+        .execute::<serde_json::Value>()
+        .await?;
+    println!("get_document_response == {:#?}", get_document_response);
+
+    let document_client = client.with_document(&"ciccia");
+
+    let get_document_response = document_client
+        .get_document()
+        .with_partition_keys(&partition_keys)
+        .execute::<serde_json::Value>()
+        .await?;
+    println!("get_document_response == {:#?}", get_document_response);
 
     Ok(())
 }

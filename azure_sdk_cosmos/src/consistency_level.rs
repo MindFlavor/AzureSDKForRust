@@ -40,7 +40,14 @@ impl<'a, T> From<&'a QueryDocumentsResponse<T>> for ConsistencyLevel<'a> {
 
 impl<'a, T> From<&'a GetDocumentResponse<T>> for ConsistencyLevel<'a> {
     fn from(get_document_response: &'a GetDocumentResponse<T>) -> Self {
-        ConsistencyLevel::Session(&get_document_response.additional_headers.session_token)
+        match get_document_response {
+            GetDocumentResponse::Found(response) => {
+                ConsistencyLevel::Session(&response.session_token)
+            }
+            GetDocumentResponse::NotFound(response) => {
+                ConsistencyLevel::Session(&response.session_token)
+            }
+        }
     }
 }
 
