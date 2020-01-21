@@ -18,7 +18,7 @@ pub struct CreateCollectionResponse {
     pub service_version: String,
     pub gateway_version: String,
     pub alt_content_path: String,
-    pub quorum_hacked_lsn: u64,
+    pub quorum_acked_lsn: u64,
     pub current_write_quorum: u64,
     pub current_replica_set_size: u64,
 }
@@ -40,7 +40,7 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for CreateCollectionResponse {
             service_version: service_version_from_headers(headers)?.to_owned(),
             gateway_version: gateway_version_from_headers(headers)?.to_owned(),
             alt_content_path: alt_content_path_from_headers(headers)?.to_owned(),
-            quorum_hacked_lsn: quorum_hacked_lsn_from_headers(headers)?,
+            quorum_acked_lsn: quorum_acked_lsn_from_headers(headers)?,
             current_write_quorum: current_write_quorum_from_headers(headers)?,
             current_replica_set_size: current_replica_set_size_from_headers(headers)?,
         })

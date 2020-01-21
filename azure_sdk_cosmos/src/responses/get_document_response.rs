@@ -2,7 +2,7 @@ use crate::from_headers::*;
 use crate::Document;
 use crate::ResourceQuota;
 use azure_sdk_core::errors::AzureError;
-use azure_sdk_core::{etag_from_headers, session_token_from_headers};
+use azure_sdk_core::{etag_from_headers, session_token_from_headers, SessionToken};
 use chrono::{DateTime, Utc};
 use http::StatusCode;
 use hyper::header::HeaderMap;
@@ -62,7 +62,7 @@ pub struct FoundDocumentResponse<T> {
     pub transport_request_id: u64,
     pub cosmos_llsn: u64,
     pub cosmos_item_llsn: u64,
-    pub session_token: String,
+    pub session_token: SessionToken,
     pub charge: f64,
     pub service_version: String,
     pub activity_id: uuid::Uuid,
@@ -121,8 +121,8 @@ pub struct NotFoundDocumentResponse {
     pub number_of_read_regions: u32,
     pub transport_request_id: u64,
     pub cosmos_llsn: u64,
-    pub cosmos_quorum_hacked_llsn: Option<u64>,
-    pub session_token: String,
+    pub cosmos_quorum_acked_llsn: Option<u64>,
+    pub session_token: SessionToken,
     pub charge: f64,
     pub service_version: String,
     pub activity_id: uuid::Uuid,
@@ -147,7 +147,7 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for NotFoundDocumentResponse {
             number_of_read_regions: number_of_read_regions_from_headers(headers)?,
             transport_request_id: transport_request_id_from_headers(headers)?,
             cosmos_llsn: cosmos_llsn_from_headers(headers)?,
-            cosmos_quorum_hacked_llsn: cosmos_quorum_hacked_llsn_from_headers_optional(headers)?,
+            cosmos_quorum_acked_llsn: cosmos_quorum_acked_llsn_from_headers_optional(headers)?,
             session_token: session_token_from_headers(headers)?,
             charge: request_charge_from_headers(headers)?,
             service_version: service_version_from_headers(headers)?.to_owned(),

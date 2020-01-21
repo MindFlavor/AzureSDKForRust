@@ -13,7 +13,7 @@ pub(crate) fn request_charge_from_headers(headers: &HeaderMap) -> Result<f64, Az
         .parse()?)
 }
 
-pub(crate) fn request_item_count_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+pub(crate) fn request_item_count_from_headers(headers: &HeaderMap) -> Result<u32, AzureError> {
     Ok(headers
         .get(HEADER_ITEM_COUNT)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_ITEM_COUNT.to_owned()))?
@@ -79,7 +79,7 @@ pub(crate) fn resource_usage_from_headers(
     Ok(resource_quotas_from_str(s)?)
 }
 
-pub(crate) fn quorum_hacked_lsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+pub(crate) fn quorum_acked_lsn_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
     Ok(headers
         .get(HEADER_QUORUM_ACKED_LSN)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_QUORUM_ACKED_LSN.to_owned()))?
@@ -87,7 +87,16 @@ pub(crate) fn quorum_hacked_lsn_from_headers(headers: &HeaderMap) -> Result<u64,
         .parse()?)
 }
 
-pub(crate) fn cosmos_quorum_hacked_llsn_from_headers(
+pub(crate) fn quorum_acked_lsn_from_headers_optional(
+    headers: &HeaderMap,
+) -> Result<Option<u64>, AzureError> {
+    Ok(match headers.get(HEADER_QUORUM_ACKED_LSN) {
+        Some(val) => Some(val.to_str()?.parse()?),
+        None => None,
+    })
+}
+
+pub(crate) fn cosmos_quorum_acked_llsn_from_headers(
     headers: &HeaderMap,
 ) -> Result<u64, AzureError> {
     Ok(headers
@@ -97,7 +106,7 @@ pub(crate) fn cosmos_quorum_hacked_llsn_from_headers(
         .parse()?)
 }
 
-pub(crate) fn cosmos_quorum_hacked_llsn_from_headers_optional(
+pub(crate) fn cosmos_quorum_acked_llsn_from_headers_optional(
     headers: &HeaderMap,
 ) -> Result<Option<u64>, AzureError> {
     Ok(match headers.get(HEADER_COSMOS_QUORUM_ACKED_LLSN) {

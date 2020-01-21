@@ -74,7 +74,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .with_partition_keys(&partition_keys)
         .execute::<serde_json::Value>()
         .await?;
-    println!("get_document_response == {:#?}", get_document_response);
+    println!(
+        "get_document_response == {:#?}\n\n\n",
+        get_document_response
+    );
+
+    let list_documents_response = client
+        .list_documents()
+        .execute::<serde_json::Value>()
+        .await?;
+    println!("list_documents_response == {:#?}", list_documents_response);
 
     Ok(())
 }
