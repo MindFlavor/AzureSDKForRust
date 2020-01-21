@@ -85,5 +85,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?;
     println!("list_documents_response == {:#?}", list_documents_response);
 
+    let query_documents_response = client
+        .query_documents()
+        .with_query(&("SELECT * FROM c WHERE c.a_number = 600".into()))
+        .with_query_cross_partition(true)
+        .execute::<serde_json::Value>()
+        .await?;
+    println!(
+        "query_documents_response == {:#?}",
+        query_documents_response
+    );
+
     Ok(())
 }

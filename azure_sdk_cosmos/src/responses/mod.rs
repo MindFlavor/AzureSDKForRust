@@ -50,9 +50,7 @@ pub use self::list_documents_response::{
 pub use self::list_permissions_response::ListPermissionsResponse;
 pub use self::list_stored_procedures_response::ListStoredProceduresResponse;
 pub use self::list_users_response::ListUsersResponse;
-pub use self::query_documents_response::{
-    QueryDocumentsResponse, QueryDocumentsResponseAdditonalHeaders, QueryResponseMeta, QueryResult,
-};
+pub use self::query_documents_response::{QueryDocumentsResponse, QueryResponseMeta, QueryResult};
 pub use self::replace_document_response::ReplaceDocumentResponse;
 pub use self::replace_permission_response::ReplacePermissionResponse;
 pub use self::replace_stored_procedure_response::ReplaceStoredProcedureResponse;

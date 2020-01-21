@@ -34,7 +34,7 @@ impl<'a, T> From<&'a ListDocumentsResponse<T>> for ConsistencyLevel<'a> {
 
 impl<'a, T> From<&'a QueryDocumentsResponse<T>> for ConsistencyLevel<'a> {
     fn from(query_documents_response: &'a QueryDocumentsResponse<T>) -> Self {
-        ConsistencyLevel::Session(&query_documents_response.additional_headers.session_token)
+        ConsistencyLevel::Session(&query_documents_response.session_token)
     }
 }
 
