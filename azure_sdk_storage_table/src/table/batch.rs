@@ -3,8 +3,8 @@
 1. Only support single changeset in a batch request
 2. Only allow PUT and GET in changeset
 */
-use super::entry_path;
-use crate::TableEntry;
+use super::entity_path;
+use crate::TableEntity;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use serde_json;
@@ -25,7 +25,7 @@ const ACCEPT_HEADER: &str = "Accept: application/json;odata=nometadata\n";
 const IF_MATCH_HEADER: &str = "If-Match: *\n";
 
 // RowKey, Payload. Payload None for deletion
-pub struct BatchItem<T>(String, Option<TableEntry<T>>)
+pub struct BatchItem<T>(String, Option<TableEntity<T>>)
 where
     T: Serialize + DeserializeOwned;
 
@@ -33,7 +33,7 @@ impl<T> BatchItem<T>
 where
     T: Serialize + DeserializeOwned,
 {
-    pub fn new(row_key: String, value: Option<TableEntry<T>>) -> Self {
+    pub fn new(row_key: String, value: Option<TableEntity<T>>) -> Self {
         BatchItem(row_key, value)
     }
 }
@@ -53,7 +53,7 @@ where
         payload.push_str(if item.1.is_some() { "PUT" } else { "DELETE" });
         payload.push_str(" ");
         payload.push_str(uri_prefix);
-        payload.push_str(entry_path(table, primary_key, item.0.as_str()).as_str());
+        payload.push_str(entity_path(table, primary_key, item.0.as_str()).as_str());
         payload.push_str(" HTTP/1.1\n");
         payload.push_str(ACCEPT_HEADER);
         if let Some(ref v) = item.1 {
@@ -132,7 +132,7 @@ If-Match: *
     fn bupdate(pk: &str, rk: &str, rating: i32, text: &str) -> BatchItem<Entity> {
         BatchItem(
             rk.to_owned(),
-            Some(TableEntry {
+            Some(TableEntity {
                 partition_key: pk.to_owned(),
                 row_key: rk.to_owned(),
                 etag: None,

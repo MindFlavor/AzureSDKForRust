@@ -3,11 +3,11 @@ extern crate serde_derive;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::client::Client;
 use azure_sdk_storage_table::table::{TableService, TableStorage};
-use azure_sdk_storage_table::TableEntry;
+use azure_sdk_storage_table::TableEntity;
 use std::error::Error;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct MyEntry {
+struct MyEntity {
     pub my_value: String,
 }
 
@@ -31,47 +31,47 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let table_storage = TableStorage::new(table_service, table_name);
     table_storage.create_if_not_exists().await?;
 
-    let my_entry = TableEntry {
+    let my_entity = TableEntity {
         row_key: row_key,
         partition_key: "100".to_owned(),
         etag: None,
         payload: {
-            MyEntry {
+            MyEntity {
                 my_value: "Itsy bitsy spider".to_owned(),
             }
         },
     };
 
-    // insert the entry
-    let mut my_entry = table_storage.insert_entry(my_entry).await?;
-    println!("entry inserted: {:?}", my_entry);
+    // insert the entity
+    let mut my_entity = table_storage.insert_entity(my_entity).await?;
+    println!("entity inserted: {:?}", my_entity);
 
-    // get the entry (notice the etag)
-    let ret: TableEntry<MyEntry> = table_storage
-        .get_entry(&my_entry.partition_key, &my_entry.row_key)
+    // get the entity (notice the etag)
+    let ret: TableEntity<MyEntity> = table_storage
+        .get_entity(&my_entity.partition_key, &my_entity.row_key)
         .await?
         .ok_or(AzureError::GenericErrorWithText(
             "item not found after insertion".to_string(),
         ))?;
-    println!("get_entry result == {:?}", ret);
+    println!("get_entity result == {:?}", ret);
 
-    // now we update the entry passing the etag.
-    my_entry.payload.my_value = "Wheel on the bus".to_owned();
+    // now we update the entity passing the etag.
+    my_entity.payload.my_value = "Wheel on the bus".to_owned();
 
-    let my_entry = table_storage.update_entry(my_entry).await?;
+    let my_entity = table_storage.update_entity(my_entity).await?;
     println!(
-        "update_entry completed without errors: {:?}",
-        my_entry
+        "update_entity completed without errors: {:?}",
+        my_entity
     );
 
-    // get the entry again (new payload and etag)
-    let ret: TableEntry<MyEntry> = table_storage
-        .get_entry(&my_entry.partition_key, &my_entry.row_key)
+    // get the entity again (new payload and etag)
+    let ret: TableEntity<MyEntity> = table_storage
+        .get_entity(&my_entity.partition_key, &my_entity.row_key)
         .await?
         .ok_or(AzureError::GenericErrorWithText(
             "item not found after update".to_string(),
         ))?;
-    println!("get_entry result == {:?}", ret);
+    println!("get_entity result == {:?}", ret);
 
     Ok(())
 }

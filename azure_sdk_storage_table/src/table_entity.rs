@@ -5,7 +5,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TableEntry<T> {
+pub struct TableEntity<T> {
     #[serde(rename = "RowKey")]
     pub row_key: String,
     #[serde(rename = "PartitionKey")]
@@ -19,7 +19,7 @@ pub struct TableEntry<T> {
     pub payload: T,
 }
 
-impl<T> TableEntry<T>
+impl<T> TableEntity<T>
 where
     T: Serialize + DeserializeOwned,
 {
@@ -28,8 +28,8 @@ where
         partition_key: String,
         etag: Option<String>,
         payload: T,
-    ) -> TableEntry<T> {
-        TableEntry {
+    ) -> TableEntity<T> {
+        TableEntity {
             row_key,
             partition_key,
             etag,
@@ -38,7 +38,7 @@ where
     }
 }
 
-impl<T> std::convert::TryFrom<(&HeaderMap, &[u8])> for TableEntry<T>
+impl<T> std::convert::TryFrom<(&HeaderMap, &[u8])> for TableEntity<T>
 where
     T: Serialize + DeserializeOwned,
 {
@@ -50,7 +50,7 @@ where
         debug!("headers == {:?}", headers);
         debug!("body == {:?}", body);
 
-        let mut ret: TableEntry<T> = serde_json::from_slice(&body)?;
+        let mut ret: TableEntity<T> = serde_json::from_slice(&body)?;
 
         // inject etag if present
         ret.etag = match headers.get(header::ETAG) {
