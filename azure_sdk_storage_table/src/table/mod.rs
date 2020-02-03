@@ -206,13 +206,9 @@ impl TableService {
         self.stream_query_entities_metadata(table_name, query, true)
     }
 
-<<<<<<< HEAD
-    pub async fn insert_entity<T>(
-=======
     /// Insert a new entity into the table. If entity already exists, the operation fails.
     /// See https://docs.microsoft.com/en-us/rest/api/storageservices/insert-entity
-    pub async fn insert_entry<T>(
->>>>>>> issue_227
+    pub async fn insert_entity<T>(
         &self,
         table_name: &str,
         entity: TableEntity<T>,
@@ -252,7 +248,7 @@ impl TableService {
         let obj_ser = serde_json::to_string(&entity)?.to_owned();
         let path = &entity_path(table_name, &entity.partition_key, &entity.row_key);
 
-        let etag = entry.etag;
+        let etag = entity.etag;
 
         let future_response = self.request_with_default_header(
             path,
