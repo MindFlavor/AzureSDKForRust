@@ -222,7 +222,7 @@ where
         ConsistencyLevelOption::add_header(self, &mut req);
         AllowTentativeWritesOption::add_header(self, &mut req);
 
-        req.header(http::header::CONTENT_TYPE, "application/json");
+        req = req.header(http::header::CONTENT_TYPE, "application/json");
 
         let body = ParametersOption::generate_body(self);
 

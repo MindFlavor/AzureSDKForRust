@@ -503,7 +503,7 @@ where
             ResourceType::Collections,
         );
 
-        req.header(http::header::CONTENT_TYPE, "application/json");
+        req = req.header(http::header::CONTENT_TYPE, "application/json");
 
         // add trait headers
         OfferRequired::add_header(self, &mut req);
