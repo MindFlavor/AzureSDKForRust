@@ -205,15 +205,15 @@ where
     pub async fn execute(&self) -> Result<ListDatabasesResponse, AzureError> {
         trace!("ListDatabasesBuilder::execute called");
 
-        let mut request =
+        let request =
             self.client
                 .prepare_request("dbs", hyper::Method::GET, ResourceType::Databases);
 
-        UserAgentOption::add_header(self, &mut request);
-        ActivityIdOption::add_header(self, &mut request);
-        ConsistencyLevelOption::add_header(self, &mut request);
-        ContinuationOption::add_header(self, &mut request);
-        MaxItemCountOption::add_header(self, &mut request);
+        let request = UserAgentOption::add_header(self, request);
+        let request = ActivityIdOption::add_header(self, request);
+        let request = ConsistencyLevelOption::add_header(self, request);
+        let request = ContinuationOption::add_header(self, request);
+        let request = MaxItemCountOption::add_header(self, request);
 
         let request = request.body(hyper::Body::empty())?;
 

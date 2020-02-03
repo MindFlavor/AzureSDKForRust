@@ -212,17 +212,17 @@ where
     {
         trace!("ExecuteStoredProcedureBuilder::execute called");
 
-        let mut req = self
+        let req = self
             .stored_procedure_client()
             .prepare_request(hyper::Method::POST);
 
         // add trait headers
-        UserAgentOption::add_header(self, &mut req);
-        ActivityIdOption::add_header(self, &mut req);
-        ConsistencyLevelOption::add_header(self, &mut req);
-        AllowTentativeWritesOption::add_header(self, &mut req);
+        let req = UserAgentOption::add_header(self, req);
+        let req = ActivityIdOption::add_header(self, req);
+        let req = ConsistencyLevelOption::add_header(self, req);
+        let req = AllowTentativeWritesOption::add_header(self, req);
 
-        req = req.header(http::header::CONTENT_TYPE, "application/json");
+        let req = req.header(http::header::CONTENT_TYPE, "application/json");
 
         let body = ParametersOption::generate_body(self);
 

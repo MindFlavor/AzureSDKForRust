@@ -323,6 +323,7 @@ pub trait StoredProcedureBodySupport<'a> {
 pub trait ExpirySecondsOption {
     fn expiry_seconds(&self) -> u64;
 
+    #[must_use]
     fn add_header(&self, builder: Builder) -> Builder {
         builder.header(HEADER_DOCUMENTDB_EXPIRY_SECONDS, self.expiry_seconds())
     }

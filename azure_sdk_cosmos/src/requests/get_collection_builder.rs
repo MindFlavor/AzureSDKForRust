@@ -137,7 +137,7 @@ where
     pub async fn execute(&self) -> Result<GetCollectionResponse, AzureError> {
         trace!("GetCollectionResponse::execute called");
 
-        let mut request = self.collection_client().main_client().prepare_request(
+        let request = self.collection_client().main_client().prepare_request(
             &format!(
                 "dbs/{}/colls/{}",
                 self.collection_client.database_name().name(),
@@ -147,9 +147,9 @@ where
             ResourceType::Collections,
         );
 
-        UserAgentOption::add_header(self, &mut request);
-        ActivityIdOption::add_header(self, &mut request);
-        ConsistencyLevelOption::add_header(self, &mut request);
+        let request = UserAgentOption::add_header(self, request);
+        let request = ActivityIdOption::add_header(self, request);
+        let request = ConsistencyLevelOption::add_header(self, request);
 
         let request = request.body(hyper::Body::empty())?;
 

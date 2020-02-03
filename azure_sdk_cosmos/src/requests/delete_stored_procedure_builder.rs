@@ -138,7 +138,7 @@ where
     pub async fn execute(&self) -> Result<DeleteStoredProcedureResponse, AzureError> {
         trace!("DeleteStoredProcedureBuilder::execute called");
 
-        let mut req = self.stored_procedure_client.main_client().prepare_request(
+        let req = self.stored_procedure_client.main_client().prepare_request(
             &format!(
                 "dbs/{}/colls/{}/sprocs/{}",
                 self.stored_procedure_client.database_name().name(),
@@ -150,16 +150,14 @@ where
         );
 
         // add trait headers
-        UserAgentOption::add_header(self, &mut req);
-        ActivityIdOption::add_header(self, &mut req);
-        ConsistencyLevelOption::add_header(self, &mut req);
+        let req = UserAgentOption::add_header(self, req);
+        let req = ActivityIdOption::add_header(self, req);
+        let req = ConsistencyLevelOption::add_header(self, req);
 
-        let request = req.body(hyper::Body::empty())?;
+        let req = req.body(hyper::Body::empty())?;
 
         let (headers, body) = check_status_extract_headers_and_body(
-            self.stored_procedure_client()
-                .hyper_client()
-                .request(request),
+            self.stored_procedure_client().hyper_client().request(req),
             StatusCode::NO_CONTENT,
         )
         .await?;

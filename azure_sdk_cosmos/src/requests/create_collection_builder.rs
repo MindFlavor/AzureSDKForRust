@@ -506,10 +506,10 @@ where
         req = req.header(http::header::CONTENT_TYPE, "application/json");
 
         // add trait headers
-        OfferRequired::add_header(self, &mut req);
-        UserAgentOption::add_header(self, &mut req);
-        ActivityIdOption::add_header(self, &mut req);
-        ConsistencyLevelOption::add_header(self, &mut req);
+        let req = OfferRequired::add_header(self, req);
+        let req = UserAgentOption::add_header(self, req);
+        let req = ActivityIdOption::add_header(self, req);
+        let req = ConsistencyLevelOption::add_header(self, req);
 
         let mut collection = Collection::new(
             self.collection_name().name(),

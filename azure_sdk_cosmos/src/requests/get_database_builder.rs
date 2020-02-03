@@ -101,14 +101,14 @@ where
     pub async fn execute(&self) -> Result<GetDatabaseResponse, AzureError> {
         trace!("GetDatabaseResponse::execute called");
 
-        let mut request = self.database_client().main_client().prepare_request(
+        let request = self.database_client().main_client().prepare_request(
             &format!("dbs/{}", self.database_client().database_name().name()),
             hyper::Method::GET,
             ResourceType::Databases,
         );
 
-        UserAgentOption::add_header(self, &mut request);
-        ActivityIdOption::add_header(self, &mut request);
+        let request = UserAgentOption::add_header(self, request);
+        let request = ActivityIdOption::add_header(self, request);
 
         let request = request.body(hyper::Body::empty())?;
 

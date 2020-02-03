@@ -138,7 +138,7 @@ where
     pub async fn execute(&self) -> Result<ListStoredProceduresResponse, AzureError> {
         trace!("ListStoredProceduresBuilder::execute called");
 
-        let mut req = self.collection_client.main_client().prepare_request(
+        let req = self.collection_client.main_client().prepare_request(
             &format!(
                 "dbs/{}/colls/{}/sprocs",
                 self.collection_client.database_name().name(),
@@ -149,9 +149,9 @@ where
         );
 
         // add trait headers
-        UserAgentOption::add_header(self, &mut req);
-        ActivityIdOption::add_header(self, &mut req);
-        ConsistencyLevelOption::add_header(self, &mut req);
+        let req = UserAgentOption::add_header(self, req);
+        let req = ActivityIdOption::add_header(self, req);
+        let req = ConsistencyLevelOption::add_header(self, req);
 
         let request = req.body(hyper::Body::empty())?;
 
