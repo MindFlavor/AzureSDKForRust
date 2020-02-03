@@ -1,7 +1,7 @@
 mod batch;
 use self::batch::generate_batch_payload;
 pub use self::batch::BatchItem;
-use crate::TableEntry;
+use crate::TableEntity;
 use azure_sdk_core::errors::{
     check_status_extract_body, check_status_extract_headers_and_body, AzureError,
 };
@@ -32,18 +32,18 @@ impl TableService {
     }
 
     pub async fn list_tables(&self) -> Result<Vec<String>, AzureError> {
-        let entities = self.query_entries(TABLE_TABLES, None).await?;
+        let entities = self.query_entities(TABLE_TABLES, None).await?;
         let e: Vec<String> = entities
             .into_iter()
-            .map(|x: TableEntry<TableEntity>| x.payload.TableName)
+            .map(|x: TableEntity<TableData>| x.payload.table_name)
             .collect();
         Ok(e)
     }
 
     // Create table if not exists.
     pub async fn create_table<T: Into<String>>(&self, table_name: T) -> Result<(), AzureError> {
-        let body = &serde_json::to_string(&TableEntity {
-            TableName: table_name.into(),
+        let body = &serde_json::to_string(&TableData {
+            table_name: table_name.into(),
         })
         .unwrap();
         debug!("body == {}", body);
@@ -59,16 +59,16 @@ impl TableService {
         Ok(())
     }
 
-    pub async fn get_entry<T: DeserializeOwned>(
+    pub async fn get_entity<T: DeserializeOwned>(
         &self,
         table_name: &str,
         partition_key: &str,
         row_key: &str,
-    ) -> Result<Option<TableEntry<T>>, AzureError>
+    ) -> Result<Option<TableEntity<T>>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
-        let path = &entry_path(table_name, partition_key, row_key);
+        let path = &entity_path(table_name, partition_key, row_key);
         let future_response =
             self.request_with_default_header(path, &Method::GET, None, false, |_| {})?;
         let (headers, body) =
@@ -79,14 +79,14 @@ impl TableService {
                 x => x,
             }?;
 
-        TableEntry::try_from((&headers, &body as &[u8])).map(|entry| Some(entry))
+        TableEntity::try_from((&headers, &body as &[u8])).map(|entity| Some(entity))
     }
 
-    pub async fn query_entries<T>(
+    pub async fn query_entities<T>(
         &self,
         table_name: &str,
         query: Option<&str>,
-    ) -> Result<Vec<TableEntry<T>>, AzureError>
+    ) -> Result<Vec<TableEntity<T>>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
@@ -99,21 +99,21 @@ impl TableService {
         let future_response =
             self.request_with_default_header(path.as_str(), &Method::GET, None, false, |_| {})?;
         let body = check_status_extract_body(future_response, StatusCode::OK).await?;
-        let ec = serde_json::from_str::<EntryCollection<T>>(&body)?;
+        let ec = serde_json::from_str::<EntityCollection<T>>(&body)?;
         Ok(ec.value)
     }
 
-    async fn query_entry_collection<T>(
+    async fn query_entity_collection<T>(
         &self,
         table_name: &str,
         query: Option<&str>,
         continuation: Option<&Continuation>,
         fullmetadata: bool,
-    ) -> Result<EntryCollection<T>, AzureError>
+    ) -> Result<EntityCollection<T>, AzureError>
     where
         T: DeserializeOwned + Serialize,
     {
-        debug!("query_entry_collection(table_name == {}, query == {:?}, continuation == {:?}, fullmetadata == {:?}) called", table_name, query, continuation, fullmetadata);
+        debug!("query_entity_collection(table_name == {}, query == {:?}, continuation == {:?}, fullmetadata == {:?}) called", table_name, query, continuation, fullmetadata);
         let mut path = table_name.to_owned();
         path.push_str("?");
         if let Some(clause) = query {
@@ -138,19 +138,19 @@ impl TableService {
             check_status_extract_headers_and_body(future_response, StatusCode::OK).await?;
 
         Ok(
-            serde_json::from_slice::<EntryCollection<T>>(&body).map(|mut ec| {
+            serde_json::from_slice::<EntityCollection<T>>(&body).map(|mut ec| {
                 ec.continuation = continuation_from_headers(&headers);
                 ec
             })?,
         )
     }
 
-    fn stream_query_entries_metadata<'a, T>(
+    fn stream_query_entities_metadata<'a, T>(
         &'a self,
         table_name: &'a str,
         query: Option<&'a str>,
         fullmetadata: bool,
-    ) -> impl Stream<Item = Result<Vec<TableEntry<T>>, AzureError>> + 'a
+    ) -> impl Stream<Item = Result<Vec<TableEntity<T>>, AzureError>> + 'a
     where
         T: Serialize + DeserializeOwned + 'a,
     {
@@ -171,7 +171,7 @@ impl TableService {
                 }
 
                 let ec = self
-                    .query_entry_collection(table_name, query, cont.as_ref(), fullmetadata)
+                    .query_entity_collection(table_name, query, cont.as_ref(), fullmetadata)
                     .await;
 
                 let ec = match ec {
@@ -184,37 +184,37 @@ impl TableService {
         })
     }
 
-    pub fn stream_query_entries<'a, T>(
+    pub fn stream_query_entities<'a, T>(
         &'a self,
         table_name: &'a str,
         query: Option<&'a str>,
-    ) -> impl Stream<Item = Result<Vec<TableEntry<T>>, AzureError>> + 'a
+    ) -> impl Stream<Item = Result<Vec<TableEntity<T>>, AzureError>> + 'a
     where
         T: Serialize + DeserializeOwned + 'a,
     {
-        self.stream_query_entries_metadata(table_name, query, false)
+        self.stream_query_entities_metadata(table_name, query, false)
     }
 
-    pub fn stream_query_entries_fullmetadata<'a, T>(
+    pub fn stream_query_entities_fullmetadata<'a, T>(
         &'a self,
         table_name: &'a str,
         query: Option<&'a str>,
-    ) -> impl Stream<Item = Result<Vec<TableEntry<T>>, AzureError>> + 'a
+    ) -> impl Stream<Item = Result<Vec<TableEntity<T>>, AzureError>> + 'a
     where
         T: Serialize + DeserializeOwned + 'a,
     {
-        self.stream_query_entries_metadata(table_name, query, true)
+        self.stream_query_entities_metadata(table_name, query, true)
     }
 
-    pub async fn insert_entry<T>(
+    pub async fn insert_entity<T>(
         &self,
         table_name: &str,
-        entry: TableEntry<T>,
-    ) -> Result<TableEntry<T>, AzureError>
+        entity: TableEntity<T>,
+    ) -> Result<TableEntity<T>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
-        let obj_ser = serde_json::to_string(&entry)?.to_owned();
+        let obj_ser = serde_json::to_string(&entity)?.to_owned();
 
         let future_response = self.request_with_default_header(
             table_name,
@@ -226,23 +226,23 @@ impl TableService {
 
         let (headers, body) =
             check_status_extract_headers_and_body(future_response, StatusCode::CREATED).await?;
-        TableEntry::try_from((&headers, &body as &[u8]))
+        TableEntity::try_from((&headers, &body as &[u8]))
     }
 
-    pub async fn update_entry<T>(
+    pub async fn update_entity<T>(
         &self,
         table_name: &str,
-        mut entry: TableEntry<T>,
-    ) -> Result<TableEntry<T>, AzureError>
+        mut entity: TableEntity<T>,
+    ) -> Result<TableEntity<T>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
-        let obj_ser = serde_json::to_string(&entry)?.to_owned();
-        let path = &entry_path(table_name, &entry.partition_key, &entry.row_key);
+        let obj_ser = serde_json::to_string(&entity)?.to_owned();
+        let path = &entity_path(table_name, &entity.partition_key, &entity.row_key);
 
         // IsMatched is mandatory, we pass * if the caller
         // does not care for it.
-        let etag = match entry.etag {
+        let etag = match entity.etag {
             Some(ref etag) => etag.as_ref(),
             None => "*",
         };
@@ -261,21 +261,21 @@ impl TableService {
             check_status_extract_headers_and_body(future_response, StatusCode::NO_CONTENT).await?;
 
         // inject etag if present
-        entry.etag = match headers.get(header::ETAG) {
+        entity.etag = match headers.get(header::ETAG) {
             Some(etag) => Some(etag.to_str()?.to_owned()),
             None => None,
         };
-        Ok(entry)
+        Ok(entity)
     }
 
-    pub async fn delete_entry<'a>(
+    pub async fn delete_entity<'a>(
         &self,
         table_name: &str,
         partition_key: &'a str,
         row_key: &'a str,
         etag: Option<&'a str>,
     ) -> Result<(), AzureError> {
-        let path = &entry_path(table_name, partition_key, row_key);
+        let path = &entity_path(table_name, partition_key, row_key);
 
         let etag = match etag {
             Some(ref etag) => etag,
@@ -415,74 +415,74 @@ impl TableStorage {
         self.create().await.or_else(ignore_409)
     }
 
-    pub async fn get_entry<T: DeserializeOwned>(
+    pub async fn get_entity<T: DeserializeOwned>(
         &self,
         partition_key: &str,
         row_key: &str,
-    ) -> Result<Option<TableEntry<T>>, AzureError>
+    ) -> Result<Option<TableEntity<T>>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
         self.service
-            .get_entry(&self.table_name, partition_key, row_key)
+            .get_entity(&self.table_name, partition_key, row_key)
             .await
     }
 
-    pub async fn query_entries<T>(
+    pub async fn query_entities<T>(
         &self,
         query: Option<&str>,
-    ) -> Result<Vec<TableEntry<T>>, AzureError>
+    ) -> Result<Vec<TableEntity<T>>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
-        self.service.query_entries(&self.table_name, query).await
+        self.service.query_entities(&self.table_name, query).await
     }
 
-    pub fn stream_query_entries<'a, T>(
+    pub fn stream_query_entities<'a, T>(
         &'a self,
         query: Option<&'a str>,
-    ) -> impl Stream<Item = Result<Vec<TableEntry<T>>, AzureError>> + 'a
+    ) -> impl Stream<Item = Result<Vec<TableEntity<T>>, AzureError>> + 'a
     where
         T: Serialize + DeserializeOwned + 'a,
     {
-        self.service.stream_query_entries(&self.table_name, query)
+        self.service.stream_query_entities(&self.table_name, query)
     }
 
-    pub fn stream_query_entries_fullmetadata<'a, T>(
+    pub fn stream_query_entities_fullmetadata<'a, T>(
         &'a self,
         query: Option<&'a str>,
-    ) -> impl Stream<Item = Result<Vec<TableEntry<T>>, AzureError>> + 'a
+    ) -> impl Stream<Item = Result<Vec<TableEntity<T>>, AzureError>> + 'a
     where
         T: Serialize + DeserializeOwned + 'a,
     {
         self.service
-            .stream_query_entries_fullmetadata(&self.table_name, query)
+            .stream_query_entities_fullmetadata(&self.table_name, query)
     }
 
-    pub async fn insert_entry<T>(&self, entry: TableEntry<T>) -> Result<TableEntry<T>, AzureError>
+    pub async fn insert_entity<T>(&self, entity: TableEntity<T>) -> Result<TableEntity<T>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
         self.service
-            .insert_entry::<T>(&self.table_name, entry)
+            .insert_entity::<T>(&self.table_name, entity)
             .await
     }
 
-    pub async fn update_entry<T>(&self, entry: TableEntry<T>) -> Result<TableEntry<T>, AzureError>
+    pub async fn update_entity<T>(&self, entity: TableEntity<T>) -> Result<TableEntity<T>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
-        self.service.update_entry(&self.table_name, entry).await
+        self.service.update_entity(&self.table_name, entity).await
     }
 
-    pub async fn delete_entry<'a>(
+    pub async fn delete_entity<'a>(
         &self,
         partition_key: &'a str,
         row_key: &'a str,
         etag: Option<&'a str>,
     ) -> Result<(), AzureError> {
         self.service
-            .delete_entry(&self.table_name, partition_key, row_key, etag)
+            .delete_entity(&self.table_name, partition_key, row_key, etag)
             .await
     }
 
@@ -517,15 +517,15 @@ fn continuation_from_headers(headers: &HeaderMap) -> Option<Continuation> {
     }
 }
 
-#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize)]
-struct TableEntity {
-    TableName: String,
+#[serde(rename_all = "PascalCase")]
+struct TableData {
+    table_name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct EntryCollection<T> {
-    value: Vec<TableEntry<T>>,
+struct EntityCollection<T> {
+    value: Vec<TableEntity<T>>,
     #[serde(skip)]
     continuation: Option<Continuation>,
 }
@@ -543,7 +543,7 @@ enum ContinuationState {
 }
 
 #[inline]
-fn entry_path(table_name: &str, partition_key: &str, row_key: &str) -> String {
+fn entity_path(table_name: &str, partition_key: &str, row_key: &str) -> String {
     table_name.to_owned() + "(PartitionKey='" + partition_key + "',RowKey='" + row_key + "')"
 }
 

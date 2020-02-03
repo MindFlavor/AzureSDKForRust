@@ -32,18 +32,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut stream = Box::pin(
         from_table_service
-            .stream_query_entries_fullmetadata::<serde_json::Value>(&from_table_name, None),
+            .stream_query_entities_fullmetadata::<serde_json::Value>(&from_table_name, None),
     );
 
-    while let Some(entries) = stream.next().await {
-        let entries = entries?;
-        for entry in entries {
+    while let Some(entities) = stream.next().await {
+        let entities = entities?;
+        for entity in entities {
             count += 1;
-            println!("before {:?}", entry);
-            let entry = to_table_service
-                .insert_entry(&to_table_name, entry)
+            println!("before {:?}", entity);
+            let entity = to_table_service
+                .insert_entity(&to_table_name, entity)
                 .await?;
-            println!("after {:?}", entry);
+            println!("after {:?}", entity);
         }
     }
     println!(
