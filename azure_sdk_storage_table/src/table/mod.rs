@@ -206,7 +206,13 @@ impl TableService {
         self.stream_query_entities_metadata(table_name, query, true)
     }
 
+<<<<<<< HEAD
     pub async fn insert_entity<T>(
+=======
+    /// Insert a new entity into the table. If entity already exists, the operation fails.
+    /// See https://docs.microsoft.com/en-us/rest/api/storageservices/insert-entity
+    pub async fn insert_entry<T>(
+>>>>>>> issue_227
         &self,
         table_name: &str,
         entity: TableEntity<T>,
@@ -229,6 +235,12 @@ impl TableService {
         TableEntity::try_from((&headers, &body as &[u8]))
     }
 
+    /// Insert or update an entity.
+    /// If etag is provided the entry is updated and failes if the entity is not present in the table.
+    /// If etag is None, the function act as a insert_or_update operation, to perform an uncoditional update
+    /// on an existing item set etag to "*".
+    /// See https://docs.microsoft.com/en-us/rest/api/storageservices/insert-or-replace-entity, 
+    /// https://docs.microsoft.com/en-us/rest/api/storageservices/update-entity2
     pub async fn update_entity<T>(
         &self,
         table_name: &str,
@@ -240,12 +252,7 @@ impl TableService {
         let obj_ser = serde_json::to_string(&entity)?.to_owned();
         let path = &entity_path(table_name, &entity.partition_key, &entity.row_key);
 
-        // IsMatched is mandatory, we pass * if the caller
-        // does not care for it.
-        let etag = match entity.etag {
-            Some(ref etag) => etag.as_ref(),
-            None => "*",
-        };
+        let etag = entry.etag;
 
         let future_response = self.request_with_default_header(
             path,
@@ -253,7 +260,9 @@ impl TableService {
             Some(&obj_ser),
             false,
             |headers| {
-                headers.append(header::IF_MATCH, etag.parse().unwrap());
+                if let Some(etag) = etag {
+                    headers.append(header::IF_MATCH, etag.parse().unwrap());
+                }
             },
         )?;
 
