@@ -1,5 +1,5 @@
 use azure_sdk_cosmos::prelude::*;
-use futures_util::stream::StreamExt;
+use futures::stream::StreamExt;
 use std::error::Error;
 
 #[tokio::main]
