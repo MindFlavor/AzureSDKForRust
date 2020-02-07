@@ -98,6 +98,16 @@ impl CloudTable {
         let entity = TableEntity::try_from((&headers, &body as &[u8]))?;
         Ok(entity)
     }
+    
+    pub async fn insert_entity_by_entity<T>(
+        &self,
+        entity: TableEntity<T>
+    ) -> Result<TableEntity<T>, AzureError>
+    where
+        T: Serialize + DeserializeOwned,
+    {
+        self.insert_entity(&entity.partition_key, &entity.row_key, entity.payload).await
+    }
 
     /// Insert or updates an entity. Even if the entity is already present the operation succeeds and the
     /// entity is replaced.

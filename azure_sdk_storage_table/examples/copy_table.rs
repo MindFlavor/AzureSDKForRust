@@ -1,5 +1,4 @@
-use azure_sdk_storage_core::client::Client;
-use azure_sdk_storage_table::table::TableService;
+use azure_sdk_storage_table::{TableClient, CloudTable};
 use futures::stream::StreamExt;
 use std::error::Error;
 
@@ -22,26 +21,23 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .nth(2)
         .expect("please specify destination table name as second command line parameter");
 
-    let from_table_service = TableService::new(Client::new(&account, &master_key)?);
-    let to_table_service = TableService::new(Client::new(&to_account, &to_master_key)?);
+    let from_table = CloudTable::new(TableClient::new(&account, &master_key)?, from_table_name);
+    let to_table = CloudTable::new(TableClient::new(&to_account, &to_master_key)?, to_table_name);
 
     println!("creating table {}", &to_table_name);
-    to_table_service.create_table(&to_table_name).await?;
+    to_table.create().await?;
 
     let mut count: u32 = 0;
 
-    let mut stream = Box::pin(
-        from_table_service
-            .stream_query_entities_fullmetadata::<serde_json::Value>(&from_table_name, None),
-    );
+    let mut stream = Box::pin(from_table.stream_entities::<serde_json::Value>(None));
 
     while let Some(entities) = stream.next().await {
         let entities = entities?;
         for entity in entities {
             count += 1;
             println!("before {:?}", entity);
-            let entity = to_table_service
-                .insert_entity(&to_table_name, entity)
+            let entity = to_table
+                .insert_entity_by_entity(entity)
                 .await?;
             println!("after {:?}", entity);
         }
