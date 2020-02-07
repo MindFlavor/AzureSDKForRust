@@ -10,8 +10,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
     let client = TableClient::new(&account, &master_key)?;
-
-    let tables = table_service.list_tables().await?;
+    let tables = client.list_tables().await?;
 
     println!("Account {} has {} tables(s)", account, tables.len());
     for ref table in tables {

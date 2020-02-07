@@ -30,14 +30,20 @@ impl TableClient {
         })
     }
 
-    /*pub async fn list_tables(&self) -> Result<Vec<String>, AzureError> {
-        let entities = self.query_entities(TABLE_TABLES, None).await?;
-        let e: Vec<String> = entities
-            .into_iter()
-            .map(|x: TableEntity<TableData>| x.payload.table_name)
-            .collect();
+    pub async fn list_tables(&self) -> Result<Vec<String>, AzureError> {
+        let future_response = self.request_with_default_header(
+            TABLE_TABLES,
+            &Method::GET,
+            None,
+            MetadataDetail::None,
+            |req| req,
+        )?;
+        let body = check_status_extract_body(future_response, StatusCode::OK).await?;
+        let entities = serde_json::from_str::<TableDataCollection>(&body)?;
+        // todo: shall we use the continuation or query result always fits into a single page
+        let e: Vec<String> = entities.value.into_iter().map(|x| x.table_name).collect();
         Ok(e)
-    }*/
+    }
 
     // Create table if not exists.
     pub async fn create_table<T: Into<String>>(&self, table_name: T) -> Result<(), AzureError> {
@@ -128,6 +134,11 @@ impl TableClient {
 #[serde(rename_all = "PascalCase")]
 struct TableData {
     table_name: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct TableDataCollection {
+    value: Vec<TableData>,
 }
 
 #[inline]
