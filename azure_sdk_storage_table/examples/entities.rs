@@ -59,10 +59,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     my_entity.payload.my_value = "Wheel on the bus".to_owned();
 
     let my_entity = table_storage.update_entity(my_entity).await?;
-    println!(
-        "update_entity completed without errors: {:?}",
-        my_entity
-    );
+    println!("update_entity completed without errors: {:?}", my_entity);
 
     // get the entity again (new payload and etag)
     let ret: TableEntity<MyEntity> = table_storage
