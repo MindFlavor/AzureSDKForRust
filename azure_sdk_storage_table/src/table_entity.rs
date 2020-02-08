@@ -58,21 +58,21 @@ pub(crate) struct ContinuationCursor {
 }
 
 #[derive(Debug, Clone)]
-pub struct Continuation2 {
+pub struct Continuation {
     pub(crate) fused: bool,
     pub(crate) next: Option<ContinuationCursor>,
 }
 
-impl Continuation2 {
+impl Continuation {
     pub fn start() -> Self {
-        Continuation2 {
+        Continuation {
             fused: false,
             next: None,
         }
     }
 }
 
-impl std::convert::TryFrom<&HeaderMap> for Continuation2 {
+impl std::convert::TryFrom<&HeaderMap> for Continuation {
     type Error = AzureError;
 
     fn try_from(headers: &HeaderMap) -> Result<Self, Self::Error> {
@@ -81,7 +81,7 @@ impl std::convert::TryFrom<&HeaderMap> for Continuation2 {
 
         if headers.contains_key(HEADER_NEXTPARTITIONKEY) && headers.contains_key(HEADER_NEXTROWKEY)
         {
-            Ok(Continuation2 {
+            Ok(Continuation {
                 fused: false,
                 next: Some(ContinuationCursor {
                     partition_key: headers[HEADER_NEXTPARTITIONKEY].to_str()?.to_string(),
@@ -89,7 +89,7 @@ impl std::convert::TryFrom<&HeaderMap> for Continuation2 {
                 }),
             })
         } else {
-            Ok(Continuation2 {
+            Ok(Continuation {
                 fused: true,
                 next: None,
             })

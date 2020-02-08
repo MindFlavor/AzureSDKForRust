@@ -6,7 +6,8 @@ use azure_sdk_storage_core::{
 use hyper::client::ResponseFuture;
 use hyper::header::{self, HeaderValue};
 use hyper::{Method, StatusCode};
-use serde::Serialize;
+use log;
+use serde::{Deserialize, Serialize};
 use serde_json;
 
 const TABLE_TABLES: &str = "TABLES";
@@ -51,7 +52,7 @@ impl TableClient {
             table_name: table_name.into(),
         })
         .unwrap();
-        debug!("body == {}", body);
+        log::debug!("body == {}", body);
         let future_response = self.request_with_default_header(
             TABLE_TABLES,
             &Method::POST,

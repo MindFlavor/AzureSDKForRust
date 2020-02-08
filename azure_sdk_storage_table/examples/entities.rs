@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate serde_derive;
+
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_table::{CloudTable, TableClient, TableEntity};
 use std::error::Error;
@@ -30,7 +31,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // insert the entity
     let mut my_entity = table
-        .insert_entity(
+        .insert(
             &row_key,
             "100",
             MyEntity {
@@ -42,7 +43,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // get the entity (notice the etag)
     let ret: TableEntity<MyEntity> = table
-        .get_entity(&my_entity.partition_key, &my_entity.row_key)
+        .get(&my_entity.partition_key, &my_entity.row_key)
         .await?
         .ok_or(AzureError::GenericErrorWithText(
             "item not found after insertion".to_string(),
@@ -55,7 +56,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("update_entity completed without errors: {:?}", my_entity);
 
     my_entity.payload.my_value = "Going round and round".to_owned();
-    let my_entity = table.insert_or_update_entity_by_entity(my_entity).await?;
+    let my_entity = table.insert_or_update_entity(my_entity).await?;
     println!(
         "insert_or_update_entity completed without errors: {:?}",
         my_entity
@@ -63,7 +64,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // get the entity again (new payload and etag)
     let ret: TableEntity<MyEntity> = table
-        .get_entity(&my_entity.partition_key, &my_entity.row_key)
+        .get(&my_entity.partition_key, &my_entity.row_key)
         .await?
         .ok_or(AzureError::GenericErrorWithText(
             "item not found after update".to_string(),

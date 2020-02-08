@@ -1,10 +1,12 @@
 use crate::{
-    entity_path, get_batch_mime, Batch, Continuation2, MetadataDetail, TableClient, TableEntity,
+    entity_path, get_batch_mime, Batch, Continuation, MetadataDetail, TableClient, TableEntity,
 };
 use azure_sdk_core::errors::{
     check_status_extract_body, check_status_extract_headers_and_body, AzureError,
 };
+use futures::stream::Stream;
 use hyper::{header, Method, StatusCode};
+use log;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json;
 use std::convert::TryFrom;
@@ -38,7 +40,7 @@ impl CloudTable {
         })
     }
 
-    pub async fn get_entity<T>(
+    pub async fn get<T>(
         &self,
         partition_key: &str,
         row_key: &str,
@@ -67,7 +69,7 @@ impl CloudTable {
 
     /// Insert a new entity into the table. If entity already exists, the operation fails.
     /// See https://docs.microsoft.com/en-us/rest/api/storageservices/insert-entity
-    pub async fn insert_entity<T>(
+    pub async fn insert<T>(
         &self,
         partition_key: &str,
         row_key: &str,
@@ -98,21 +100,22 @@ impl CloudTable {
         let entity = TableEntity::try_from((&headers, &body as &[u8]))?;
         Ok(entity)
     }
-    
-    pub async fn insert_entity_by_entity<T>(
+
+    pub async fn insert_entity<T>(
         &self,
-        entity: TableEntity<T>
+        entity: TableEntity<T>,
     ) -> Result<TableEntity<T>, AzureError>
     where
         T: Serialize + DeserializeOwned,
     {
-        self.insert_entity(&entity.partition_key, &entity.row_key, entity.payload).await
+        self.insert(&entity.partition_key, &entity.row_key, entity.payload)
+            .await
     }
 
     /// Insert or updates an entity. Even if the entity is already present the operation succeeds and the
     /// entity is replaced.
     /// See https://docs.microsoft.com/en-us/rest/api/storageservices/insert-or-replace-entity
-    pub async fn insert_or_update_entity<T>(
+    pub async fn insert_or_update<T>(
         &self,
         partition_key: &str,
         row_key: &str,
@@ -139,25 +142,25 @@ impl CloudTable {
         )?;
         let (headers, _body) =
             check_status_extract_headers_and_body(future_response, StatusCode::NO_CONTENT).await?;
-          
+
         // only header values are returned in the response, thus timestamp cannot be extracted without
         // an explicit query
         entity.etag = match headers.get(header::ETAG) {
             Some(etag) => Some(etag.to_str()?.to_owned()),
             None => None,
         };
-        
+
         Ok(entity)
     }
 
-    pub async fn insert_or_update_entity_by_entity<T>(
+    pub async fn insert_or_update_entity<T>(
         &self,
         entity: TableEntity<T>,
     ) -> Result<TableEntity<T>, AzureError>
     where
         T: Serialize + DeserializeOwned + std::fmt::Debug,
     {
-        self.insert_or_update_entity(&entity.partition_key, &entity.row_key, entity.payload)
+        self.insert_or_update(&entity.partition_key, &entity.row_key, entity.payload)
             .await
     }
 
@@ -187,7 +190,7 @@ impl CloudTable {
         )?;
         let (headers, _body) =
             check_status_extract_headers_and_body(future_response, StatusCode::NO_CONTENT).await?;
-        
+
         // only header values are returned in the response, thus timestamp cannot be extracted without
         // an explicit query
         entity.etag = match headers.get(header::ETAG) {
@@ -200,7 +203,7 @@ impl CloudTable {
         Ok(entity)
     }
 
-    pub async fn delete_entity<'a>(
+    pub async fn delete<'a>(
         &self,
         partition_key: &'a str,
         row_key: &'a str,
@@ -225,11 +228,8 @@ impl CloudTable {
         Ok(())
     }
 
-    pub async fn delete_entity_by_entity<'a, T>(
-        &self,
-        entity: TableEntity<T>,
-    ) -> Result<(), AzureError> {
-        self.delete_entity(
+    pub async fn delete_entity<'a, T>(&self, entity: TableEntity<T>) -> Result<(), AzureError> {
+        self.delete(
             &entity.partition_key,
             &entity.row_key,
             entity.etag.as_deref(),
@@ -237,17 +237,18 @@ impl CloudTable {
         .await
     }
 
-    pub async fn query_entities<T>(
+    pub async fn execute_query<T>(
         &self,
         query: Option<&str>,
-        continuation: &mut Continuation2,
+        continuation: &mut Continuation,
     ) -> Result<Option<Vec<TableEntity<T>>>, AzureError>
     where
         T: DeserializeOwned + Serialize,
     {
-        debug!(
+        log::debug!(
             "query_entities(query = {:?}, continuation = {:?})",
-            query, continuation
+            query,
+            continuation
         );
         if continuation.fused {
             return Ok(None);
@@ -278,11 +279,28 @@ impl CloudTable {
 
         log::trace!("body == {:?}", std::str::from_utf8(&body));
         let entities = serde_json::from_slice::<EntityCollection<T>>(&body)?;
-        *continuation = Continuation2::try_from(&headers)?;
+        *continuation = Continuation::try_from(&headers)?;
         Ok(Some(entities.value))
     }
 
-    pub async fn batch(&self, batch: Batch) -> Result<(), AzureError> {
+    pub fn stream_query<'a, T>(
+        &'a self,
+        query: Option<&'a str>,
+    ) -> impl Stream<Item = Result<Vec<TableEntity<T>>, AzureError>> + 'a
+    where
+        T: Serialize + DeserializeOwned + 'a,
+    {
+        futures::stream::unfold(Continuation::start(), move |mut cont| async move {
+            log::debug!("cont == {:?}", cont);
+            match self.execute_query::<T>(query, &mut cont).await {
+                Ok(Some(segment)) => Some((Ok(segment), cont)),
+                Ok(None) => None,
+                Err(err) => Some((Err(err), cont)),
+            }
+        })
+    }
+
+    pub async fn execute_batch(&self, batch: Batch) -> Result<(), AzureError> {
         let payload = batch.into_payload(self.client.get_uri_prefix().as_str(), &self.table_name);
 
         let future_response =
@@ -304,4 +322,10 @@ impl CloudTable {
 #[derive(Debug, Serialize, Deserialize)]
 struct EntityCollection<T> {
     value: Vec<TableEntity<T>>,
+}
+
+#[derive(Debug, Clone)]
+enum ContinuationState {
+    Start,
+    Next(Option<Continuation>),
 }
