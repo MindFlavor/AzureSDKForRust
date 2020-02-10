@@ -28,8 +28,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     for r in 0usize..2000 {
         let pk = "big2";
         let rk = &format!("{}", r);
-        println!("delete {}:{}", pk, rk);
-        let _ = cloud_table.delete(pk, rk, None).await;
+        println!("insert {}:{}", pk, rk);
+        cloud_table.insert_or_update(pk, rk, MyEntity{data:"data".to_owned()}).await?;
     }
 
     let mut cont = Continuation::start();
@@ -38,6 +38,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?
     {
         println!("segment: {:?}", entities.first());
+    }
+
+    for r in 0usize..2000 {
+        let pk = "big2";
+        let rk = &format!("{}", r);
+        println!("delete {}:{}", pk, rk);
+        cloud_table.delete(pk, rk, None).await?;
     }
 
     Ok(())

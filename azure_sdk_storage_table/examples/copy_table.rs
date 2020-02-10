@@ -1,6 +1,14 @@
+#[macro_use]
+extern crate serde_derive;
+
 use azure_sdk_storage_table::{CloudTable, TableClient};
 use futures::stream::StreamExt;
 use std::error::Error;
+
+#[derive(Debug, Serialize, Deserialize)]
+struct MyEntity {
+    data: String,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -30,7 +38,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut count: u32 = 0;
 
-    let mut stream = Box::pin(from_table.stream_query::<serde_json::Value>(None));
+    let mut stream = Box::pin(from_table.stream_query::<MyEntity>(None));
 
     while let Some(Ok(entities)) = stream.next().await {
         println!("segemnt len: {}", entities.len());
