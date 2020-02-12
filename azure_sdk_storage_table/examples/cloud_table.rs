@@ -25,12 +25,27 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let entity = cloud_table.get::<MyEntity>("pk", "rk").await?;
     println!("entity: {:?}", entity);
 
-    for r in 0usize..2000 {
+    let cnt = 20usize;
+
+    for r in 0usize..cnt {
         let pk = "big2";
         let rk = &format!("{}", r);
-        println!("delete {}:{}", pk, rk);
-        let _ = cloud_table.delete(pk, rk, None).await;
+        let entity = cloud_table
+            .insert(
+                pk,
+                rk,
+                MyEntity {
+                    data: "hello".to_owned(),
+                },
+            )
+            .await?;
+        if r % 100 == 0 {
+            println!("insert {:?}", entity);
+        }
     }
+
+    let entity = cloud_table.get::<serde_json::Value>("big2", "0").await?;
+    println!("entity(value): {:?}", entity);
 
     let mut cont = Continuation::start();
     while let Some(entities) = cloud_table
@@ -38,6 +53,23 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?
     {
         println!("segment: {:?}", entities.first());
+    }
+
+    let mut cont = Continuation::start();
+    while let Some(entities) = cloud_table
+        .execute_query::<serde_json::Value>(None, &mut cont)
+        .await?
+    {
+        println!("segment(value): {:?}", entities.first());
+    }
+
+    for r in 0usize..cnt {
+        let pk = "big2";
+        let rk = &format!("{}", r);
+        if r % 100 == 0 {
+            println!("delete {}:{}", pk, rk);
+        }
+        let _ = cloud_table.delete(pk, rk, None).await;
     }
 
     Ok(())
