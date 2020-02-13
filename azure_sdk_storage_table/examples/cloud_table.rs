@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate serde_derive;
 
-use azure_sdk_storage_table::{CloudTable, Continuation, TableClient};
+use azure_sdk_storage_table::{Batch, CloudTable, Continuation, TableClient};
 use std::error::Error;
+use std::mem;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct MyEntity {
@@ -26,21 +27,23 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let cnt = 20usize;
 
+    let mut batch = Batch::new("big2".to_owned());
     for r in 0usize..cnt {
-        let pk = "big2";
-        let rk = &format!("{}", r);
-        let entity = cloud_table
-            .insert(
-                pk,
-                rk,
-                MyEntity {
-                    data: "hello".to_owned(),
-                },
-            )
-            .await?;
-        if r % 100 == 0 {
-            println!("insert {:?}", entity);
+        batch.add_insert(
+            format!("rk-{}", r),
+            &MyEntity {
+                data: "hello".to_owned(),
+            },
+        )?;
+        if batch.is_full() {
+            println!("batch insert {}", r);
+            let batch = mem::replace(&mut batch, Batch::new("big2".to_owned()));
+            cloud_table.execute_batch(batch).await?;
         }
+    }
+    if !batch.is_empty() {
+        println!("batch insert last part");
+        cloud_table.execute_batch(batch).await?;
     }
 
     let entity = cloud_table
@@ -64,13 +67,28 @@ async fn main() -> Result<(), Box<dyn Error>> {
         println!("segment(value): {:?}", entities.first());
     }
 
+    let mut batch = Batch::new("big2".to_owned());
     for r in 0usize..cnt {
-        let pk = "big2";
-        let rk = &format!("{}", r);
-        if r % 100 == 0 {
-            println!("delete {}:{}", pk, rk);
+        if r % 2 == 0 {
+            batch.add_delete(format!("rk-{}", r), None)?;
+        } else {
+            batch.add_update(
+                format!("rk-{}", r),
+                &MyEntity {
+                    data: "updated".to_owned(),
+                },
+                None,
+            )?;
         }
-        let _ = cloud_table.delete(pk, rk, None).await;
+        if batch.is_full() {
+            println!("batch delete/update {}", r);
+            let batch = mem::replace(&mut batch, Batch::new("big2".to_owned()));
+            cloud_table.execute_batch(batch).await?;
+        }
+    }
+    if !batch.is_empty() {
+        println!("batch delete/update last part");
+        cloud_table.execute_batch(batch).await?;
     }
 
     Ok(())
