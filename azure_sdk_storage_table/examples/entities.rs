@@ -43,7 +43,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // get the entity (notice the etag)
     let ret: TableEntity<MyEntity> = table
-        .get(&my_entity.partition_key, &my_entity.row_key)
+        .get(&my_entity.partition_key, &my_entity.row_key, None)
         .await?
         .ok_or(AzureError::GenericErrorWithText(
             "item not found after insertion".to_string(),
@@ -64,7 +64,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // get the entity again (new payload and etag)
     let ret: TableEntity<MyEntity> = table
-        .get(&my_entity.partition_key, &my_entity.row_key)
+        .get(&my_entity.partition_key, &my_entity.row_key, None)
         .await?
         .ok_or(AzureError::GenericErrorWithText(
             "item not found after update".to_string(),

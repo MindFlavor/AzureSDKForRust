@@ -3,11 +3,12 @@ use azure_sdk_storage_core::client::Client;
 use azure_sdk_storage_core::{
     get_default_json_mime, get_json_mime_fullmetadata, get_json_mime_nometadata, ServiceType,
 };
-use hyper::client::ResponseFuture;
-use hyper::header::{self, HeaderValue};
+use hyper::{
+    client::ResponseFuture,
+    header::{self, HeaderValue},
+};
 use hyper::{Method, StatusCode};
 use log;
-use serde::{Deserialize, Serialize};
 use serde_json;
 
 const TABLE_TABLES: &str = "TABLES";

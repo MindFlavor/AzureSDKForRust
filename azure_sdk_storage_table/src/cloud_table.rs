@@ -7,7 +7,7 @@ use azure_sdk_core::errors::{
 use futures::stream::Stream;
 use hyper::{header, Method, StatusCode};
 use log;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Serialize};
 use serde_json;
 use std::convert::TryFrom;
 
@@ -44,6 +44,7 @@ impl CloudTable {
         &self,
         partition_key: &str,
         row_key: &str,
+        etag: Option<&str>,
     ) -> Result<Option<TableEntity<T>>, AzureError>
     where
         T: DeserializeOwned,
@@ -54,7 +55,12 @@ impl CloudTable {
             &Method::GET,
             None,
             MetadataDetail::None, // etag is provided through header, no extra meta info is required
-            |req| req,
+            |mut request| {
+                if let Some(etag) = etag {
+                    request = request.header(header::IF_MATCH, etag);
+                }
+                request
+            },
         )?;
         let (headers, body) =
             match check_status_extract_headers_and_body(future_response, StatusCode::OK).await {
@@ -203,11 +209,11 @@ impl CloudTable {
         Ok(entity)
     }
 
-    pub async fn delete<'a>(
+    pub async fn delete(
         &self,
-        partition_key: &'a str,
-        row_key: &'a str,
-        etag: Option<&'a str>,
+        partition_key: &str,
+        row_key: &str,
+        etag: Option<&str>,
     ) -> Result<(), AzureError> {
         let path = &entity_path(&self.table_name, partition_key, row_key);
 
@@ -322,10 +328,4 @@ impl CloudTable {
 #[derive(Debug, Serialize, Deserialize)]
 struct EntityCollection<T> {
     value: Vec<TableEntity<T>>,
-}
-
-#[derive(Debug, Clone)]
-enum ContinuationState {
-    Start,
-    Next(Option<Continuation>),
 }

@@ -2,7 +2,6 @@
 extern crate serde_derive;
 
 use azure_sdk_storage_table::{CloudTable, Continuation, TableClient};
-use serde::{Deserialize, Serialize};
 use std::error::Error;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -22,7 +21,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let cloud_table = CloudTable::new(client, "test");
     cloud_table.create_if_not_exists().await?;
 
-    let entity = cloud_table.get::<MyEntity>("pk", "rk").await?;
+    let entity = cloud_table.get::<MyEntity>("pk", "rk", None).await?;
     println!("entity: {:?}", entity);
 
     let cnt = 20usize;
@@ -44,7 +43,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    let entity = cloud_table.get::<serde_json::Value>("big2", "0").await?;
+    let entity = cloud_table
+        .get::<serde_json::Value>("big2", "0", None)
+        .await?;
     println!("entity(value): {:?}", entity);
 
     let mut cont = Continuation::start();

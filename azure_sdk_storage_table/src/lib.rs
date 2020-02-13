@@ -1,6 +1,5 @@
 #![recursion_limit = "128"]
 
-#[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
@@ -15,3 +14,4 @@ mod table_entity;
 pub use table_entity::*;
 mod batch;
 pub use batch::*;
+pub mod de;
