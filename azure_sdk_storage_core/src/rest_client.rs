@@ -601,91 +601,91 @@ mod test {
     }
 
     #[test]
-    fn str_to_sign_test() {
-        use super::*;
+    //    fn str_to_sign_test() {
+    //        use super::*;
+    //
+    //        let mut headers: HeaderMap = HeaderMap::new();
+    //        headers.insert(
+    //            header::ACCEPT,
+    //            header::HeaderValue::from_static(get_json_mime_nometadata()),
+    //        );
+    //        headers.insert(
+    //            header::CONTENT_TYPE,
+    //            header::HeaderValue::from_static(get_default_json_mime()),
+    //        );
+    //
+    //        let u: url::Url =
+    //            url::Url::parse("https://mindrust.table.core.windows.net/TABLES").unwrap();
+    //        let method: Method = Method::POST;
+    //        let service_type: ServiceType = ServiceType::Table;
+    //
+    //        let dt = chrono::DateTime::parse_from_rfc2822("Wed,  3 May 2017 14:04:56 +0000").unwrap();
+    //        let time = format!("{}", dt.format("%a, %d %h %Y %T GMT"));
+    //
+    //        headers.insert(HEADER_DATE, format_header_value(time).unwrap());
+    //        headers.insert(
+    //            HEADER_VERSION,
+    //            header::HeaderValue::from_static(AZURE_VERSION),
+    //        );
+    //
+    //        let s = string_to_sign(&headers, &u, &method, service_type);
+    //
+    //        assert_eq!(
+    //            s,
+    //            "POST
+    //
+    //application/json; charset=utf-8
+    //Wed, 03 May 2017 14:04:56 GMT
+    ///mindrust/TABLES"
+    //        );
+    //    }
+    //
+    //    #[test]
+    //    fn test_canonicalize_resource_10() {
+    //        let url = url::Url::parse("https://mindrust.table.core.windows.net/TABLES").unwrap();
+    //        assert_eq!(super::canonicalized_resource(&url), "/mindrust/TABLES");
+    //    }
 
-        let mut headers: HeaderMap = HeaderMap::new();
-        headers.insert(
-            header::ACCEPT,
-            header::HeaderValue::from_static(get_json_mime_nometadata()),
-        );
-        headers.insert(
-            header::CONTENT_TYPE,
-            header::HeaderValue::from_static(get_default_json_mime()),
-        );
+    //#[test]
+    //fn test_canonicalize_resource_1() {
+    //    let url = url::Url::parse(
+    //        "http://myaccount.blob.core.windows.\
+    //         net/mycontainer?restype=container&comp=metadata",
+    //    )
+    //    .unwrap();
+    //    assert_eq!(
+    //        super::canonicalized_resource(&url),
+    //        "/myaccount/mycontainer\ncomp:metadata\nrestype:container"
+    //    );
+    //}
 
-        let u: url::Url =
-            url::Url::parse("https://mindrust.table.core.windows.net/TABLES").unwrap();
-        let method: Method = Method::POST;
-        let service_type: ServiceType = ServiceType::Table;
+    //#[test]
+    //fn test_canonicalize_resource_2() {
+    //    let url = url::Url::parse(
+    //        "http://myaccount.blob.core.windows.\
+    //         net/mycontainer?restype=container&comp=list&include=snapshots&\
+    //         include=metadata&include=uncommittedblobs",
+    //    )
+    //    .unwrap();
+    //    assert_eq!(
+    //        super::canonicalized_resource(&url),
+    //        "/myaccount/mycontainer\ncomp:list\ninclude:metadata,snapshots,\
+    //         uncommittedblobs\nrestype:container"
+    //    );
+    //}
 
-        let dt = chrono::DateTime::parse_from_rfc2822("Wed,  3 May 2017 14:04:56 +0000").unwrap();
-        let time = format!("{}", dt.format("%a, %d %h %Y %T GMT"));
-
-        headers.insert(HEADER_DATE, format_header_value(time).unwrap());
-        headers.insert(
-            HEADER_VERSION,
-            header::HeaderValue::from_static(AZURE_VERSION),
-        );
-
-        let s = string_to_sign(&headers, &u, &method, service_type);
-
-        assert_eq!(
-            s,
-            "POST
-
-application/json; charset=utf-8
-Wed, 03 May 2017 14:04:56 GMT
-/mindrust/TABLES"
-        );
-    }
-
-    #[test]
-    fn test_canonicalize_resource_10() {
-        let url = url::Url::parse("https://mindrust.table.core.windows.net/TABLES").unwrap();
-        assert_eq!(super::canonicalized_resource(&url), "/mindrust/TABLES");
-    }
-
-    #[test]
-    fn test_canonicalize_resource_1() {
-        let url = url::Url::parse(
-            "http://myaccount.blob.core.windows.\
-             net/mycontainer?restype=container&comp=metadata",
-        )
-        .unwrap();
-        assert_eq!(
-            super::canonicalized_resource(&url),
-            "/myaccount/mycontainer\ncomp:metadata\nrestype:container"
-        );
-    }
-
-    #[test]
-    fn test_canonicalize_resource_2() {
-        let url = url::Url::parse(
-            "http://myaccount.blob.core.windows.\
-             net/mycontainer?restype=container&comp=list&include=snapshots&\
-             include=metadata&include=uncommittedblobs",
-        )
-        .unwrap();
-        assert_eq!(
-            super::canonicalized_resource(&url),
-            "/myaccount/mycontainer\ncomp:list\ninclude:metadata,snapshots,\
-             uncommittedblobs\nrestype:container"
-        );
-    }
-
-    #[test]
-    fn test_canonicalize_resource_3() {
-        let url = url::Url::parse(
-            "https://myaccount-secondary.blob.core.windows.\
-             net/mycontainer/myblob",
-        )
-        .unwrap();
-        assert_eq!(
-            super::canonicalized_resource(&url),
-            "/myaccount-secondary/mycontainer/myblob"
-        );
-    }
+    //#[test]
+    //fn test_canonicalize_resource_3() {
+    //    let url = url::Url::parse(
+    //        "https://myaccount-secondary.blob.core.windows.\
+    //         net/mycontainer/myblob",
+    //    )
+    //    .unwrap();
+    //    assert_eq!(
+    //        super::canonicalized_resource(&url),
+    //        "/myaccount-secondary/mycontainer/myblob"
+    //    );
+    //}
 
     #[test]
     fn test_encode_str_to_sign_1() {
