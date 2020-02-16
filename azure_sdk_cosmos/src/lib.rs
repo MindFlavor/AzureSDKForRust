@@ -149,11 +149,12 @@ pub trait AIMOption {
     fn a_im(&self) -> bool;
 
     #[must_use]
-    fn add_header(&self, mut builder: Builder) -> Builder {
+    fn add_header(&self, builder: Builder) -> Builder {
         if self.a_im() {
-            builder = builder.header(HEADER_A_IM, "Incremental feed");
+            builder.header(HEADER_A_IM, "Incremental feed")
+        } else {
+            builder
         }
-        builder
     }
 }
 
@@ -183,9 +184,9 @@ pub trait ConsistencyLevelOption<'a> {
     fn consistency_level(&self) -> Option<ConsistencyLevel<'a>>;
 
     #[must_use]
-    fn add_header(&self, mut builder: Builder) -> Builder {
+    fn add_header(&self, builder: Builder) -> Builder {
         if let Some(consistency_level) = self.consistency_level() {
-            builder = builder.header(
+            let builder = builder.header(
                 HEADER_CONSISTENCY_LEVEL,
                 consistency_level.to_consistency_level_header(),
             );
@@ -193,10 +194,13 @@ pub trait ConsistencyLevelOption<'a> {
             // if we have a Session consistency level we make sure to pass
             // the x-ms-session-token header too.
             if let ConsistencyLevel::Session(session_token) = consistency_level {
-                builder = builder.header(HEADER_SESSION_TOKEN, session_token);
+                builder.header(HEADER_SESSION_TOKEN, session_token)
+            } else {
+                builder
             }
+        } else {
+            builder
         }
-        builder
     }
 }
 
@@ -209,11 +213,12 @@ pub trait PartitionRangeIdOption<'a> {
     fn partition_range_id(&self) -> Option<&'a str>;
 
     #[must_use]
-    fn add_header(&self, mut builder: Builder) -> Builder {
+    fn add_header(&self, builder: Builder) -> Builder {
         if let Some(partition_range_id) = self.partition_range_id() {
-            builder = builder.header(HEADER_DOCUMENTDB_PARTITIONRANGEID, partition_range_id);
+            builder.header(HEADER_DOCUMENTDB_PARTITIONRANGEID, partition_range_id)
+        } else {
+            builder
         }
-        builder
     }
 }
 
@@ -226,11 +231,12 @@ pub trait ContinuationOption<'a> {
     fn continuation(&self) -> Option<&'a str>;
 
     #[must_use]
-    fn add_header(&self, mut builder: Builder) -> Builder {
+    fn add_header(&self, builder: Builder) -> Builder {
         if let Some(continuation) = self.continuation() {
-            builder = builder.header(HEADER_CONTINUATION, continuation);
+            builder.header(HEADER_CONTINUATION, continuation)
+        } else {
+            builder
         }
-        builder
     }
 }
 
@@ -302,12 +308,13 @@ pub trait PartitionKeysOption<'a> {
     fn partition_keys(&self) -> Option<&'a PartitionKeys>;
 
     #[must_use]
-    fn add_header(&self, mut builder: Builder) -> Builder {
+    fn add_header(&self, builder: Builder) -> Builder {
         if let Some(partition_keys) = self.partition_keys() {
             let serialized = partition_keys.to_json();
-            builder = builder.header(HEADER_DOCUMENTDB_PARTITIONKEY, serialized);
+            builder.header(HEADER_DOCUMENTDB_PARTITIONKEY, serialized)
+        } else {
+            builder
         }
-        builder
     }
 }
 
