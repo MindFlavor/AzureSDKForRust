@@ -15,7 +15,7 @@ pub struct Database {
     pub users: String,
 }
 
-pub trait DatabaseName: std::fmt::Debug {
+pub trait DatabaseName: std::fmt::Debug + Send + Sync {
     fn name(&self) -> &str;
 }
 
@@ -27,7 +27,7 @@ impl DatabaseName for Database {
 
 impl<R> DatabaseName for R
 where
-    R: AsRef<str> + std::fmt::Debug,
+    R: AsRef<str> + std::fmt::Debug + Send + Sync,
 {
     fn name(&self) -> &str {
         self.as_ref()

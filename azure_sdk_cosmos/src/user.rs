@@ -1,4 +1,4 @@
-pub trait UserName: std::fmt::Debug {
+pub trait UserName: std::fmt::Debug + Send + Sync {
     fn id(&self) -> &str;
 }
 

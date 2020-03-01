@@ -3,7 +3,7 @@ use azure_sdk_core::errors::AzureError;
 use hyper::header::HeaderMap;
 use serde::de::DeserializeOwned;
 
-pub trait DocumentName: std::fmt::Debug {
+pub trait DocumentName: std::fmt::Debug + Send + Sync {
     fn name(&self) -> &str;
 }
 
@@ -34,7 +34,7 @@ impl<T> Document<T> {
 
 impl<T> DocumentName for Document<T>
 where
-    T: std::fmt::Debug,
+    T: std::fmt::Debug + Send + Sync,
 {
     fn name(&self) -> &str {
         self.id()

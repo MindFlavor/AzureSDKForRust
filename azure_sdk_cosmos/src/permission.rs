@@ -4,13 +4,13 @@ use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::convert::TryInto;
 
-pub trait PermissionName: std::fmt::Debug {
+pub trait PermissionName: std::fmt::Debug + Send + Sync {
     fn name(&self) -> &str;
 }
 
 impl<'a, T> PermissionName for Permission<'a, T>
 where
-    T: PermissionResource + Clone + std::fmt::Debug,
+    T: PermissionResource + Clone + std::fmt::Debug + Send + Sync,
 {
     fn name(&self) -> &str {
         &self.id
@@ -19,7 +19,7 @@ where
 
 impl<R> PermissionName for R
 where
-    R: AsRef<str> + std::fmt::Debug,
+    R: AsRef<str> + std::fmt::Debug + Send + Sync,
 {
     fn name(&self) -> &str {
         self.as_ref()

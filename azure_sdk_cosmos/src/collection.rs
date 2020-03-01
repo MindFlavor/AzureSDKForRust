@@ -139,7 +139,7 @@ impl Collection {
     }
 }
 
-pub trait CollectionName: std::fmt::Debug {
+pub trait CollectionName: std::fmt::Debug + Send + Sync {
     fn name(&self) -> &str;
 }
 
