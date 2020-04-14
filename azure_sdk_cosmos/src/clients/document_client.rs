@@ -72,6 +72,10 @@ where
     ) -> AttachmentClient<'_, CUB> {
         AttachmentClient::new(&self, attachment_name)
     }
+
+    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB> {
+        requests::ListAttachmentsBuilder::new(self)
+    }
 }
 
 impl<'a, CUB> DocumentBuilderTrait<'a, CUB> for DocumentClient<'a, CUB>

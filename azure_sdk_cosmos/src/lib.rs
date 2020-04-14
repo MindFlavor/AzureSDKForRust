@@ -366,6 +366,13 @@ where
 //    fn collection(&self) -> &'a str;
 //}
 
+pub trait AttachmentClientRequired<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn attachment_client(&self) -> &'a AttachmentClient<'a, CUB>;
+}
+
 pub trait StoredProcedureClientRequired<'a, CUB>
 where
     CUB: CosmosUriBuilder,
@@ -603,6 +610,7 @@ where
     fn document_name(&self) -> &'a dyn DocumentName;
     fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB, No>;
     fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB, No>;
+    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB>;
     fn with_attachment(
         &'a self,
         attachment_name: &'a dyn AttachmentName,
