@@ -1,4 +1,5 @@
-use crate::clients::{Client, CollectionClient, CosmosUriBuilder, ResourceType};
+use crate::attachment::AttachmentName;
+use crate::clients::{AttachmentClient, Client, CollectionClient, CosmosUriBuilder, ResourceType};
 use crate::collection::CollectionName;
 use crate::database::DatabaseName;
 use crate::document::DocumentName;
@@ -63,6 +64,13 @@ where
 
     fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB, No> {
         requests::DeleteDocumentBuilder::new(self)
+    }
+
+    fn with_attachment(
+        &'a self,
+        attachment_name: &'a dyn AttachmentName,
+    ) -> AttachmentClient<'_, CUB> {
+        AttachmentClient::new(&self, attachment_name)
     }
 }
 

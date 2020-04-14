@@ -6,6 +6,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate failure;
 
+pub mod attachment;
 mod authorization_token;
 pub mod clients;
 pub mod collection;
@@ -48,8 +49,8 @@ pub use self::requests::*;
 pub use self::resource::Resource;
 pub use self::resource_quota::ResourceQuota;
 use crate::clients::{
-    Client, CollectionClient, CosmosUriBuilder, DatabaseClient, DocumentClient, PermissionClient,
-    StoredProcedureClient, UserClient,
+    AttachmentClient, Client, CollectionClient, CosmosUriBuilder, DatabaseClient, DocumentClient,
+    PermissionClient, StoredProcedureClient, UserClient,
 };
 use crate::collection::Collection;
 use crate::collection::CollectionName;
@@ -57,6 +58,7 @@ use crate::headers::*;
 pub use crate::partition_keys::PartitionKeys;
 use crate::stored_procedure::{Parameters, StoredProcedureName};
 pub use crate::user::{User, UserName};
+use attachment::AttachmentName;
 use azure_sdk_core::No;
 use http::request::Builder;
 use serde::Serialize;
@@ -601,6 +603,10 @@ where
     fn document_name(&self) -> &'a dyn DocumentName;
     fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB, No>;
     fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB, No>;
+    fn with_attachment(
+        &'a self,
+        attachment_name: &'a dyn AttachmentName,
+    ) -> AttachmentClient<'_, CUB>;
 }
 
 pub(crate) trait DocumentBuilderTrait<'a, CUB>: DocumentTrait<'a, CUB>
@@ -625,6 +631,23 @@ where
 
 pub(crate) trait StoredProcedureBuilderTrait<'a, CUB>:
     StoredProcedureTrait<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
+}
+
+pub trait AttachmentTrait<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn database_name(&self) -> &'a dyn DatabaseName;
+    fn collection_name(&self) -> &'a dyn CollectionName;
+    fn document_name(&self) -> &'a dyn DocumentName;
+    fn attachment_name(&self) -> &'a dyn AttachmentName;
+}
+
+pub(crate) trait AttachmentBuilderTrait<'a, CUB>: AttachmentTrait<'a, CUB>
 where
     CUB: CosmosUriBuilder,
 {
