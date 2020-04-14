@@ -33,6 +33,7 @@ pub mod stored_procedure;
 mod to_json_vector;
 mod user;
 
+pub use self::attachment::Attachment;
 pub use self::authorization_token::*;
 use self::collection::IndexingPolicy;
 pub use self::consistency_level::ConsistencyLevel;
@@ -610,7 +611,7 @@ where
     fn document_name(&self) -> &'a dyn DocumentName;
     fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB, No>;
     fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB, No>;
-    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB>;
+    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB, No>;
     fn with_attachment(
         &'a self,
         attachment_name: &'a dyn AttachmentName,

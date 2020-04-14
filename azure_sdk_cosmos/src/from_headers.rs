@@ -13,7 +13,15 @@ pub(crate) fn request_charge_from_headers(headers: &HeaderMap) -> Result<f64, Az
         .parse()?)
 }
 
-pub(crate) fn request_item_count_from_headers(headers: &HeaderMap) -> Result<u32, AzureError> {
+//pub(crate) fn request_item_count_from_headers(headers: &HeaderMap) -> Result<u32, AzureError> {
+//    Ok(headers
+//        .get(HEADER_ITEM_COUNT)
+//        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_ITEM_COUNT.to_owned()))?
+//        .to_str()?
+//        .parse()?)
+//}
+
+pub(crate) fn item_count_from_headers(headers: &HeaderMap) -> Result<u32, AzureError> {
     Ok(headers
         .get(HEADER_ITEM_COUNT)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_ITEM_COUNT.to_owned()))?
@@ -247,6 +255,24 @@ pub(crate) fn gateway_version_from_headers(headers: &HeaderMap) -> Result<&str, 
         .get(HEADER_GATEWAY_VERSION)
         .ok_or_else(|| AzureError::HeaderNotFound(HEADER_GATEWAY_VERSION.to_owned()))?
         .to_str()?)
+}
+
+pub(crate) fn max_media_storage_usage_mb_from_headers(
+    headers: &HeaderMap,
+) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_MAX_MEDIA_STORAGE_USAGE_MB)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_MAX_MEDIA_STORAGE_USAGE_MB.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
+pub(crate) fn media_storage_usage_mb_from_headers(headers: &HeaderMap) -> Result<u64, AzureError> {
+    Ok(headers
+        .get(HEADER_MEDIA_STORAGE_USAGE_MB)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_MEDIA_STORAGE_USAGE_MB.to_owned()))?
+        .to_str()?
+        .parse()?)
 }
 
 fn _date_from_headers(headers: &HeaderMap, header_name: &str) -> Result<DateTime<Utc>, AzureError> {
