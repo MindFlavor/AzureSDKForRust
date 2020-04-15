@@ -5,8 +5,7 @@ use crate::database::DatabaseName;
 use crate::document::DocumentName;
 use crate::requests;
 use crate::CollectionTrait;
-use crate::{DocumentBuilderTrait, DocumentTrait};
-use azure_sdk_core::No;
+use crate::{DocumentBuilderTrait, DocumentTrait, PartitionKeys};
 
 #[derive(Debug, Clone)]
 pub struct DocumentClient<'a, CUB>
@@ -15,6 +14,7 @@ where
 {
     collection_client: &'a CollectionClient<'a, CUB>,
     document_name: &'a dyn DocumentName,
+    partition_keys: &'a PartitionKeys,
 }
 
 impl<'a, CUB> DocumentClient<'a, CUB>
@@ -24,10 +24,12 @@ where
     pub(crate) fn new(
         collection_client: &'a CollectionClient<'a, CUB>,
         document_name: &'a dyn DocumentName,
+        partition_keys: &'a PartitionKeys,
     ) -> Self {
         Self {
             collection_client,
             document_name,
+            partition_keys,
         }
     }
 
@@ -58,11 +60,15 @@ where
         self.document_name
     }
 
-    fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB, No> {
+    fn partition_keys(&self) -> &'a PartitionKeys {
+        self.partition_keys
+    }
+
+    fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB> {
         requests::GetDocumentBuilder::new(self)
     }
 
-    fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB, No> {
+    fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB> {
         requests::DeleteDocumentBuilder::new(self)
     }
 
@@ -73,7 +79,7 @@ where
         AttachmentClient::new(&self, attachment_name)
     }
 
-    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB, No> {
+    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB> {
         requests::ListAttachmentsBuilder::new(self)
     }
 }

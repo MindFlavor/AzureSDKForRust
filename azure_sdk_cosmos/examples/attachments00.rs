@@ -69,13 +69,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     };
 
-    let document_client = client.with_document(&id);
+    let mut partition_keys = PartitionKeys::new();
+    partition_keys.push(doc.document_attributes.id())?;
+    let document_client = client.with_document(&id, &partition_keys);
 
-    let ret = document_client
-        .list_attachments()
-        .with_partition_keys(PartitionKeys::new().push(doc.document_attributes.id())?)
-        .execute()
-        .await?;
+    let ret = document_client.list_attachments().execute().await?;
 
     println!("{:#?}", ret);
 

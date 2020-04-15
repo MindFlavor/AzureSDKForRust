@@ -297,13 +297,20 @@ pub trait PartitionKeysSupport<'a> {
     fn with_partition_keys(self, partition_keys: &'a PartitionKeys) -> Self::O;
 }
 
+pub(crate) fn add_partition_keys_header(
+    partition_keys: &PartitionKeys,
+    builder: Builder,
+) -> Builder {
+    let serialized = partition_keys.to_json();
+    builder.header(HEADER_DOCUMENTDB_PARTITIONKEY, serialized)
+}
+
 pub trait PartitionKeysRequired<'a> {
     fn partition_keys(&self) -> &'a PartitionKeys;
 
     #[must_use]
     fn add_header(&self, builder: Builder) -> Builder {
-        let serialized = self.partition_keys().to_json();
-        builder.header(HEADER_DOCUMENTDB_PARTITIONKEY, serialized)
+        add_partition_keys_header(self.partition_keys(), builder)
     }
 }
 
@@ -592,7 +599,11 @@ where
         stored_procedure_name: &'c dyn StoredProcedureName,
     ) -> StoredProcedureClient<'c, CUB>;
     fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB>;
-    fn with_document<'c>(&'c self, document_name: &'c dyn DocumentName) -> DocumentClient<'c, CUB>;
+    fn with_document<'c>(
+        &'c self,
+        document_name: &'c dyn DocumentName,
+        partition_keys: &'c PartitionKeys,
+    ) -> DocumentClient<'c, CUB>;
 }
 
 pub(crate) trait CollectionBuilderTrait<'a, CUB>: CollectionTrait<'a, CUB>
@@ -609,9 +620,10 @@ where
     fn database_name(&self) -> &'a dyn DatabaseName;
     fn collection_name(&self) -> &'a dyn CollectionName;
     fn document_name(&self) -> &'a dyn DocumentName;
-    fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB, No>;
-    fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB, No>;
-    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB, No>;
+    fn partition_keys(&self) -> &'a PartitionKeys;
+    fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB>;
+    fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB>;
+    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB>;
     fn with_attachment(
         &'a self,
         attachment_name: &'a dyn AttachmentName,

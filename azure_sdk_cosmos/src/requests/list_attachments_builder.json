@@ -5,10 +5,7 @@
 			"crate::clients::{ResourceType, CosmosUriBuilder}",
 			"crate::prelude::*",
 			"crate::DocumentClient",
-			"crate::DocumentBuilderTrait",
 			"crate::DocumentClientRequired",
-			"azure_sdk_core::{No, ToAssign, Yes}",
-			"std::marker::PhantomData",
 			"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 			"azure_sdk_core::prelude::*",
 			"hyper::StatusCode",
@@ -26,14 +23,6 @@
 		}
 	],
 	"fields": [
-		{
-			"name": "partition_keys",
-			"field_type": "&'b PartitionKeys",
-			"optional": false,
-			"builder_type": "PartitionKeysSet",
-			"trait_get": "PartitionKeysRequired<'b>",
-			"trait_set": "PartitionKeysSupport<'b>"
-		},
 		{
 			"name": "if_match_condition",
 			"field_type": "IfMatchCondition<'b>",
