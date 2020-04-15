@@ -3,8 +3,10 @@ use crate::clients::{Client, CosmosUriBuilder, DocumentClient, ResourceType};
 use crate::collection::CollectionName;
 use crate::database::DatabaseName;
 use crate::document::DocumentName;
+use crate::requests;
 use crate::DocumentTrait;
 use crate::{AttachmentBuilderTrait, AttachmentTrait};
+use azure_sdk_core::No;
 
 #[derive(Debug, Clone)]
 pub struct AttachmentClient<'a, CUB>
@@ -31,6 +33,10 @@ where
 
     pub(crate) fn main_client(&self) -> &Client<CUB> {
         self.document_client.main_client()
+    }
+
+    pub(crate) fn document_client(&self) -> &'a DocumentClient<'a, CUB> {
+        &self.document_client
     }
 
     pub(crate) fn hyper_client(
@@ -60,6 +66,10 @@ where
         self.attachment_name
     }
 
+    fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No> {
+        requests::CreateSlugAttachmentBuilder::new(self)
+    }
+
     //fn create_stored_procedure(&self) -> requests::CreateStoredProcedureBuilder<'_, CUB, No> {
     //    requests::CreateStoredProcedureBuilder::new(self)
     //}
@@ -84,7 +94,7 @@ where
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.main_client().prepare_request(
             &format!(
-                "dbs/{}/colls/{}/docs/{}",
+                "dbs/{}/colls/{}/docs/{}/attachments",
                 self.database_name().name(),
                 self.collection_name().name(),
                 self.document_name().name()

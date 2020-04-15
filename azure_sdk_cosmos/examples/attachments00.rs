@@ -64,8 +64,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Ok(_) => {
             println!("document created");
         }
-        Err(_) => {
-            println!("already exists?");
+        Err(err) => {
+            println!("already exists? ==> {:?}", err);
         }
     };
 
@@ -76,6 +76,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let ret = document_client.list_attachments().execute().await?;
 
     println!("{:#?}", ret);
+
+    let attachment_client = document_client.with_attachment(&"myattach");
+
+    attachment_client
+        .create_slug()
+        .with_body(b"FFFFF")
+        .execute()
+        .await?;
 
     Ok(())
 }
