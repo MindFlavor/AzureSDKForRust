@@ -35,6 +35,14 @@
 			"trait_set": "BodySupport<'b>"
 		},
 		{
+			"name": "content_type",
+			"field_type": "&'b str",
+			"builder_type": "ContentTypeSet",
+			"optional": false,
+			"trait_get": "ContentTypeRequired<'b>",
+			"trait_set": "ContentTypeSupport<'b>"
+		},
+		{
 			"name": "if_match_condition",
 			"field_type": "IfMatchCondition<'b>",
 			"optional": true,

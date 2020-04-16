@@ -77,10 +77,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("{:#?}", ret);
 
-    let attachment_client = document_client.with_attachment(&"myattach");
+    let attachment_client = document_client.with_attachment(&"myattach2");
 
     attachment_client
         .create_slug()
+        .with_content_type("text/plain")
         .with_body(b"FFFFF")
         .execute()
         .await?;

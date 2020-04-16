@@ -235,6 +235,15 @@ pub trait ContentTypeOption<'a> {
     }
 }
 
+pub trait ContentTypeRequired<'a> {
+    fn content_type(&self) -> &'a str;
+
+    #[must_use]
+    fn add_header(&self, mut builder: Builder) -> Builder {
+        builder.header(CONTENT_TYPE, self.content_type())
+    }
+}
+
 pub trait IfModifiedSinceSupport<'a> {
     type O;
     fn with_if_modified_since(self, if_modified_since: &'a DateTime<Utc>) -> Self::O;

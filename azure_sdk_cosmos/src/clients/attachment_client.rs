@@ -66,7 +66,7 @@ where
         self.attachment_name
     }
 
-    fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No> {
+    fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No, No> {
         requests::CreateSlugAttachmentBuilder::new(self)
     }
 
@@ -100,7 +100,7 @@ where
                 self.document_name().name()
             ),
             method,
-            ResourceType::StoredProcedures,
+            ResourceType::Attachments,
         )
     }
 }
