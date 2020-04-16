@@ -70,6 +70,10 @@ where
         requests::CreateSlugAttachmentBuilder::new(self)
     }
 
+    fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB> {
+        requests::GetAttachmentBuilder::new(self)
+    }
+
     //fn create_stored_procedure(&self) -> requests::CreateStoredProcedureBuilder<'_, CUB, No> {
     //    requests::CreateStoredProcedureBuilder::new(self)
     //}
@@ -94,10 +98,11 @@ where
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.main_client().prepare_request(
             &format!(
-                "dbs/{}/colls/{}/docs/{}/attachments",
+                "dbs/{}/colls/{}/docs/{}/attachments/{}",
                 self.database_name().name(),
                 self.collection_name().name(),
-                self.document_name().name()
+                self.document_name().name(),
+                self.attachment_name().name()
             ),
             method,
             ResourceType::Attachments,

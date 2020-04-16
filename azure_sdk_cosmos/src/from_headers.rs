@@ -1,6 +1,6 @@
 use crate::headers::*;
 use crate::resource_quota::resource_quotas_from_str;
-use crate::ResourceQuota;
+use crate::{IndexingDirective, ResourceQuota};
 use azure_sdk_core::errors::AzureError;
 use chrono::{DateTime, Utc};
 use http::HeaderMap;
@@ -150,6 +150,16 @@ pub(crate) fn collection_partition_index_from_headers(
         .parse()?)
 }
 
+pub(crate) fn indexing_directive_from_headers(
+    headers: &HeaderMap,
+) -> Result<IndexingDirective, AzureError> {
+    Ok(headers
+        .get(HEADER_INDEXING_DIRECTIVE)
+        .ok_or_else(|| AzureError::HeaderNotFound(HEADER_INDEXING_DIRECTIVE.to_owned()))?
+        .to_str()?
+        .parse()?)
+}
+
 pub(crate) fn collection_service_index_from_headers(
     headers: &HeaderMap,
 ) -> Result<u64, AzureError> {
@@ -247,6 +257,13 @@ pub(crate) fn content_location_from_headers(headers: &HeaderMap) -> Result<&str,
         .ok_or_else(|| {
             AzureError::HeaderNotFound(http::header::CONTENT_LOCATION.as_str().to_owned())
         })?
+        .to_str()?)
+}
+
+pub(crate) fn content_type_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
+    Ok(headers
+        .get(http::header::CONTENT_TYPE)
+        .ok_or_else(|| AzureError::HeaderNotFound(http::header::CONTENT_TYPE.as_str().to_owned()))?
         .to_str()?)
 }
 

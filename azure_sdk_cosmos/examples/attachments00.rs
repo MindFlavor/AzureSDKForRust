@@ -79,14 +79,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let attachment_client = document_client.with_attachment(&"myattach5");
 
-    let resp = attachment_client
-        .create_slug()
-        .with_content_type("text/plain")
-        .with_body(b"FFFFF")
-        .execute()
-        .await?;
+    let att = attachment_client.get().execute().await?;
+    println!("att == {:#?}", att);
 
-    println!("resp == {:#?}", resp);
+    //let resp = attachment_client
+    //    .create_slug()
+    //    .with_content_type("text/plain")
+    //    .with_body(b"FFFFF")
+    //    .execute()
+    //    .await?;
+
+    //println!("resp == {:#?}", resp);
 
     Ok(())
 }

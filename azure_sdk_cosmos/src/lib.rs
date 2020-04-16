@@ -667,6 +667,7 @@ where
     fn document_name(&self) -> &'a dyn DocumentName;
     fn attachment_name(&self) -> &'a dyn AttachmentName;
     fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No, No>;
+    fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB>;
 }
 
 pub(crate) trait AttachmentBuilderTrait<'a, CUB>: AttachmentTrait<'a, CUB>
