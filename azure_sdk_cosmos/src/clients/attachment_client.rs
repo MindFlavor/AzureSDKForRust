@@ -70,8 +70,18 @@ where
         requests::CreateSlugAttachmentBuilder::new(self)
     }
 
+    fn replace_slug(&self) -> requests::ReplaceSlugAttachmentBuilder<'_, '_, CUB, No, No> {
+        requests::ReplaceSlugAttachmentBuilder::new(self)
+    }
+
     fn create_reference(&self) -> requests::CreateReferenceAttachmentBuilder<'_, '_, CUB, No, No> {
         requests::CreateReferenceAttachmentBuilder::new(self)
+    }
+
+    fn replace_reference(
+        &self,
+    ) -> requests::ReplaceReferenceAttachmentBuilder<'_, '_, CUB, No, No> {
+        requests::ReplaceReferenceAttachmentBuilder::new(self)
     }
 
     fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB> {

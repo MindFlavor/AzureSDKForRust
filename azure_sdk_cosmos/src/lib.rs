@@ -676,7 +676,11 @@ where
     fn document_name(&self) -> &'a dyn DocumentName;
     fn attachment_name(&self) -> &'a dyn AttachmentName;
     fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No, No>;
+    fn replace_slug(&self) -> requests::ReplaceSlugAttachmentBuilder<'_, '_, CUB, No, No>;
     fn create_reference(&self) -> requests::CreateReferenceAttachmentBuilder<'_, '_, CUB, No, No>;
+    fn replace_reference(&self)
+        -> requests::ReplaceReferenceAttachmentBuilder<'_, '_, CUB, No, No>;
+
     fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB>;
 }
 
