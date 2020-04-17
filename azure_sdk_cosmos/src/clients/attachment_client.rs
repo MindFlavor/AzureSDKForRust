@@ -84,25 +84,13 @@ where
         requests::ReplaceReferenceAttachmentBuilder::new(self)
     }
 
+    fn delete(&self) -> requests::DeleteAttachmentBuilder<'_, '_, CUB> {
+        requests::DeleteAttachmentBuilder::new(self)
+    }
+
     fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB> {
         requests::GetAttachmentBuilder::new(self)
     }
-
-    //fn create_stored_procedure(&self) -> requests::CreateStoredProcedureBuilder<'_, CUB, No> {
-    //    requests::CreateStoredProcedureBuilder::new(self)
-    //}
-
-    //fn replace_stored_procedure(&self) -> requests::ReplaceStoredProcedureBuilder<'_, CUB, No> {
-    //    requests::ReplaceStoredProcedureBuilder::new(self)
-    //}
-
-    //fn execute_stored_procedure(&self) -> requests::ExecuteStoredProcedureBuilder<'_, '_, CUB> {
-    //    requests::ExecuteStoredProcedureBuilder::new(self)
-    //}
-
-    //fn delete_stored_procedure(&self) -> requests::DeleteStoredProcedureBuilder<'_, CUB> {
-    //    requests::DeleteStoredProcedureBuilder::new(self)
-    //}
 }
 
 impl<'a, CUB> AttachmentBuilderTrait<'a, CUB> for AttachmentClient<'a, CUB>

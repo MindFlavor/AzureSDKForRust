@@ -82,6 +82,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //let att = attachment_client.get().execute().await?;
     //println!("att == {:#?}", att);
 
+    println!("creating");
+    let attachment_client = document_client.with_attachment(&"myref03");
+    let resp = attachment_client
+        .create_reference()
+        .with_content_type("image/jpeg")
+        .with_media(
+            "https://cdn.pixabay.com/photo/2020/01/11/09/30/abstract-background-4756987__340.jpg",
+        )
+        .execute()
+        .await?;
+    println!("resp == {:#?}", resp);
+
+    println!("replacing");
     let attachment_client = document_client.with_attachment(&"myref03");
     let resp = attachment_client
         .replace_reference()
@@ -102,6 +115,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //    .await?;
 
     //println!("resp == {:#?}", resp);
+
+    println!("deleting");
+    let resp_delete = attachment_client.delete().execute().await?;
+    println!("resp_delete == {:#?}", resp_delete);
 
     Ok(())
 }

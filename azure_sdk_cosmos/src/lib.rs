@@ -680,7 +680,7 @@ where
     fn create_reference(&self) -> requests::CreateReferenceAttachmentBuilder<'_, '_, CUB, No, No>;
     fn replace_reference(&self)
         -> requests::ReplaceReferenceAttachmentBuilder<'_, '_, CUB, No, No>;
-
+    fn delete(&self) -> requests::DeleteAttachmentBuilder<'_, '_, CUB>;
     fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB>;
 }
 

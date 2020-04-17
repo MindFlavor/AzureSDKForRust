@@ -6,6 +6,7 @@ mod create_reference_attachment_response;
 mod create_slug_attachment_response;
 mod create_stored_procedure_response;
 mod create_user_response;
+mod delete_attachment_response;
 mod delete_collection_response;
 mod delete_database_response;
 mod delete_document_response;
@@ -38,6 +39,7 @@ pub use self::create_reference_attachment_response::CreateReferenceAttachmentRes
 pub use self::create_slug_attachment_response::CreateSlugAttachmentResponse;
 pub use self::create_stored_procedure_response::CreateStoredProcedureResponse;
 pub use self::create_user_response::CreateUserResponse;
+pub use self::delete_attachment_response::DeleteAttachmentResponse;
 pub use self::delete_collection_response::DeleteCollectionResponse;
 pub use self::delete_database_response::DeleteDatabaseResponse;
 pub use self::delete_document_response::DeleteDocumentResponse;
