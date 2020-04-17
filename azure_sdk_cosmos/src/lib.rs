@@ -328,6 +328,15 @@ pub trait PartitionKeysOption<'a> {
     }
 }
 
+pub trait MediaRequired<'a> {
+    fn media(&self) -> &'a str;
+}
+
+pub trait MediaSupport<'a> {
+    type O;
+    fn with_media(self, media: &'a str) -> Self::O;
+}
+
 pub trait StoredProcedureBodyRequired<'a> {
     fn body(&self) -> &'a str;
 }
@@ -667,6 +676,7 @@ where
     fn document_name(&self) -> &'a dyn DocumentName;
     fn attachment_name(&self) -> &'a dyn AttachmentName;
     fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No, No>;
+    fn create_reference(&self) -> requests::CreateReferenceAttachmentBuilder<'_, '_, CUB, No, No>;
     fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB>;
 }
 

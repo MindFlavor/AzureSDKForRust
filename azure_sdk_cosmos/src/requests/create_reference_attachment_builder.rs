@@ -1,6 +1,5 @@
 use crate::clients::{CosmosUriBuilder, ResourceType};
 use crate::prelude::*;
-use crate::responses::CreateSlugAttachmentResponse;
 use crate::AttachmentBuilderTrait;
 use crate::AttachmentClient;
 use crate::AttachmentClientRequired;
@@ -12,38 +11,36 @@ use std::convert::TryInto;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+pub struct CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
     attachment_client: &'a AttachmentClient<'a, CUB>,
-    p_body: PhantomData<BodySet>,
     p_content_type: PhantomData<ContentTypeSet>,
-    body: Option<&'b [u8]>,
+    p_media: PhantomData<MediaSet>,
     content_type: Option<&'b str>,
-    if_match_condition: Option<IfMatchCondition<'b>>,
+    media: Option<&'b str>,
     user_agent: Option<&'b str>,
     activity_id: Option<&'b str>,
     consistency_level: Option<ConsistencyLevel<'b>>,
 }
 
-impl<'a, 'b, CUB> CreateSlugAttachmentBuilder<'a, 'b, CUB, No, No>
+impl<'a, 'b, CUB> CreateReferenceAttachmentBuilder<'a, 'b, CUB, No, No>
 where
     CUB: CosmosUriBuilder,
 {
     #[inline]
     pub(crate) fn new(
         attachment_client: &'a AttachmentClient<'a, CUB>,
-    ) -> CreateSlugAttachmentBuilder<'a, 'b, CUB, No, No> {
-        CreateSlugAttachmentBuilder {
+    ) -> CreateReferenceAttachmentBuilder<'a, 'b, CUB, No, No> {
+        CreateReferenceAttachmentBuilder {
             attachment_client,
-            p_body: PhantomData {},
-            body: None,
             p_content_type: PhantomData {},
             content_type: None,
-            if_match_condition: None,
+            p_media: PhantomData {},
+            media: None,
             user_agent: None,
             activity_id: None,
             consistency_level: None,
@@ -51,11 +48,11 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> AttachmentClientRequired<'a, CUB>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet, MediaSet> AttachmentClientRequired<'a, CUB>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
     #[inline]
@@ -67,22 +64,10 @@ where
 //get mandatory no traits methods
 
 //set mandatory no traits methods
-impl<'a, 'b, CUB, ContentTypeSet> BodyRequired<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, Yes, ContentTypeSet>
+impl<'a, 'b, CUB, MediaSet> ContentTypeRequired<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, Yes, MediaSet>
 where
-    ContentTypeSet: ToAssign,
-    CUB: CosmosUriBuilder,
-{
-    #[inline]
-    fn body(&self) -> &'b [u8] {
-        self.body.unwrap()
-    }
-}
-
-impl<'a, 'b, CUB, BodySet> ContentTypeRequired<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, Yes>
-where
-    BodySet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
     #[inline]
@@ -91,24 +76,23 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> IfMatchConditionOption<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet> MediaRequired<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, Yes>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
     #[inline]
-    fn if_match_condition(&self) -> Option<IfMatchCondition<'b>> {
-        self.if_match_condition
+    fn media(&self) -> &'b str {
+        self.media.unwrap()
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> UserAgentOption<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet, MediaSet> UserAgentOption<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
     #[inline]
@@ -117,11 +101,11 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> ActivityIdOption<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet, MediaSet> ActivityIdOption<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
     #[inline]
@@ -130,11 +114,11 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> ConsistencyLevelOption<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet, MediaSet> ConsistencyLevelOption<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
     #[inline]
@@ -143,47 +127,22 @@ where
     }
 }
 
-impl<'a, 'b, CUB, ContentTypeSet> BodySupport<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, No, ContentTypeSet>
+impl<'a, 'b, CUB, MediaSet> ContentTypeSupport<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, No, MediaSet>
 where
-    ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateSlugAttachmentBuilder<'a, 'b, CUB, Yes, ContentTypeSet>;
-
-    #[inline]
-    fn with_body(self, body: &'b [u8]) -> Self::O {
-        CreateSlugAttachmentBuilder {
-            attachment_client: self.attachment_client,
-            p_body: PhantomData {},
-            p_content_type: PhantomData {},
-            body: Some(body),
-            content_type: self.content_type,
-            if_match_condition: self.if_match_condition,
-            user_agent: self.user_agent,
-            activity_id: self.activity_id,
-            consistency_level: self.consistency_level,
-        }
-    }
-}
-
-impl<'a, 'b, CUB, BodySet> ContentTypeSupport<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, No>
-where
-    BodySet: ToAssign,
-    CUB: CosmosUriBuilder,
-{
-    type O = CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, Yes>;
+    type O = CreateReferenceAttachmentBuilder<'a, 'b, CUB, Yes, MediaSet>;
 
     #[inline]
     fn with_content_type(self, content_type: &'b str) -> Self::O {
-        CreateSlugAttachmentBuilder {
+        CreateReferenceAttachmentBuilder {
             attachment_client: self.attachment_client,
-            p_body: PhantomData {},
             p_content_type: PhantomData {},
-            body: self.body,
+            p_media: PhantomData {},
             content_type: Some(content_type),
-            if_match_condition: self.if_match_condition,
+            media: self.media,
             user_agent: self.user_agent,
             activity_id: self.activity_id,
             consistency_level: self.consistency_level,
@@ -191,24 +150,22 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> IfMatchConditionSupport<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet> MediaSupport<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, No>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>;
+    type O = CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, Yes>;
 
     #[inline]
-    fn with_if_match_condition(self, if_match_condition: IfMatchCondition<'b>) -> Self::O {
-        CreateSlugAttachmentBuilder {
+    fn with_media(self, media: &'b str) -> Self::O {
+        CreateReferenceAttachmentBuilder {
             attachment_client: self.attachment_client,
-            p_body: PhantomData {},
             p_content_type: PhantomData {},
-            body: self.body,
+            p_media: PhantomData {},
             content_type: self.content_type,
-            if_match_condition: Some(if_match_condition),
+            media: Some(media),
             user_agent: self.user_agent,
             activity_id: self.activity_id,
             consistency_level: self.consistency_level,
@@ -216,24 +173,23 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> UserAgentSupport<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet, MediaSet> UserAgentSupport<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>;
+    type O = CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>;
 
     #[inline]
     fn with_user_agent(self, user_agent: &'b str) -> Self::O {
-        CreateSlugAttachmentBuilder {
+        CreateReferenceAttachmentBuilder {
             attachment_client: self.attachment_client,
-            p_body: PhantomData {},
             p_content_type: PhantomData {},
-            body: self.body,
+            p_media: PhantomData {},
             content_type: self.content_type,
-            if_match_condition: self.if_match_condition,
+            media: self.media,
             user_agent: Some(user_agent),
             activity_id: self.activity_id,
             consistency_level: self.consistency_level,
@@ -241,24 +197,23 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> ActivityIdSupport<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet, MediaSet> ActivityIdSupport<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>;
+    type O = CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>;
 
     #[inline]
     fn with_activity_id(self, activity_id: &'b str) -> Self::O {
-        CreateSlugAttachmentBuilder {
+        CreateReferenceAttachmentBuilder {
             attachment_client: self.attachment_client,
-            p_body: PhantomData {},
             p_content_type: PhantomData {},
-            body: self.body,
+            p_media: PhantomData {},
             content_type: self.content_type,
-            if_match_condition: self.if_match_condition,
+            media: self.media,
             user_agent: self.user_agent,
             activity_id: Some(activity_id),
             consistency_level: self.consistency_level,
@@ -266,24 +221,23 @@ where
     }
 }
 
-impl<'a, 'b, CUB, BodySet, ContentTypeSet> ConsistencyLevelSupport<'b>
-    for CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>
+impl<'a, 'b, CUB, ContentTypeSet, MediaSet> ConsistencyLevelSupport<'b>
+    for CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>
 where
-    BodySet: ToAssign,
     ContentTypeSet: ToAssign,
+    MediaSet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-    type O = CreateSlugAttachmentBuilder<'a, 'b, CUB, BodySet, ContentTypeSet>;
+    type O = CreateReferenceAttachmentBuilder<'a, 'b, CUB, ContentTypeSet, MediaSet>;
 
     #[inline]
     fn with_consistency_level(self, consistency_level: ConsistencyLevel<'b>) -> Self::O {
-        CreateSlugAttachmentBuilder {
+        CreateReferenceAttachmentBuilder {
             attachment_client: self.attachment_client,
-            p_body: PhantomData {},
             p_content_type: PhantomData {},
-            body: self.body,
+            p_media: PhantomData {},
             content_type: self.content_type,
-            if_match_condition: self.if_match_condition,
+            media: self.media,
             user_agent: self.user_agent,
             activity_id: self.activity_id,
             consistency_level: Some(consistency_level),
@@ -292,11 +246,13 @@ where
 }
 
 // methods callable only when every mandatory field has been filled
-impl<'a, 'b, CUB> CreateSlugAttachmentBuilder<'a, 'b, CUB, Yes, Yes>
+impl<'a, 'b, CUB> CreateReferenceAttachmentBuilder<'a, 'b, CUB, Yes, Yes>
 where
     CUB: CosmosUriBuilder,
 {
-    pub async fn execute(&self) -> Result<CreateSlugAttachmentResponse, AzureError> {
+    pub async fn execute(
+        &self,
+    ) -> Result<crate::responses::CreateReferenceAttachmentResponse, AzureError> {
         let mut req = self.attachment_client.main_client().prepare_request(
             &format!(
                 "dbs/{}/colls/{}/docs/{}/attachments",
@@ -309,7 +265,6 @@ where
         );
 
         // add trait headers
-        req = IfMatchConditionOption::add_header(self, req);
         req = UserAgentOption::add_header(self, req);
         req = ActivityIdOption::add_header(self, req);
         req = ConsistencyLevelOption::add_header(self, req);
@@ -319,13 +274,24 @@ where
             req,
         );
 
-        req = ContentTypeRequired::add_header(self, req);
+        // create serialized request
+        #[derive(Debug, Clone, Serialize)]
+        struct _Request<'r> {
+            pub id: &'r str,
+            #[serde(rename = "contentType")]
+            pub content_type: &'r str,
+            pub media: &'r str,
+        }
 
-        req = req.header("Slug", self.attachment_client.attachment_name().name());
-        req = req.header(http::header::CONTENT_LENGTH, self.body().len());
+        let request = serde_json::to_string(&_Request {
+            id: self.attachment_client.attachment_name().name(),
+            content_type: ContentTypeRequired::content_type(self),
+            media: self.media(),
+        })?;
 
-        let req = req.body(hyper::Body::from(self.body().to_owned()))?;
-
+        req = req.header(http::header::CONTENT_TYPE, "application/json");
+        req = req.header(http::header::CONTENT_LENGTH, request.len());
+        let req = req.body(hyper::Body::from(request))?;
         debug!("req == {:#?}", req);
 
         let (headers, whole_body) = check_status_extract_headers_and_body(

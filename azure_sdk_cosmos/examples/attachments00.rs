@@ -77,19 +77,30 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("{:#?}", ret);
 
-    let attachment_client = document_client.with_attachment(&"myattach5");
+    //let attachment_client = document_client.with_attachment(&"myref00");
 
-    let att = attachment_client.get().execute().await?;
-    println!("att == {:#?}", att);
+    //let att = attachment_client.get().execute().await?;
+    //println!("att == {:#?}", att);
 
-    //let resp = attachment_client
-    //    .create_slug()
-    //    .with_content_type("text/plain")
-    //    .with_body(b"FFFFF")
-    //    .execute()
-    //    .await?;
+    let attachment_client = document_client.with_attachment(&"myref03");
+    let resp = attachment_client
+        .create_reference()
+        .with_content_type("image/jpeg")
+        .with_media(
+            "https://cdn.pixabay.com/photo/2020/01/11/09/30/abstract-background-4756987__340.jpg",
+        )
+        .execute()
+        .await?;
+    println!("resp == {:#?}", resp);
 
-    //println!("resp == {:#?}", resp);
+    ////let resp = attachment_client
+    ////    .create_slug()
+    ////    .with_content_type("text/plain")
+    ////    .with_body(b"FFFFF")
+    ////    .execute()
+    ////    .await?;
+
+    ////println!("resp == {:#?}", resp);
 
     Ok(())
 }

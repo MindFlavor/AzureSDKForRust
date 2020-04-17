@@ -70,6 +70,10 @@ where
         requests::CreateSlugAttachmentBuilder::new(self)
     }
 
+    fn create_reference(&self) -> requests::CreateReferenceAttachmentBuilder<'_, '_, CUB, No, No> {
+        requests::CreateReferenceAttachmentBuilder::new(self)
+    }
+
     fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB> {
         requests::GetAttachmentBuilder::new(self)
     }
