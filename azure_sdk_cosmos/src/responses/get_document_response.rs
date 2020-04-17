@@ -11,7 +11,7 @@ use serde::de::DeserializeOwned;
 #[derive(Debug, Clone)]
 pub enum GetDocumentResponse<T> {
     Found(FoundDocumentResponse<T>),
-    NotFound(NotFoundDocumentResponse),
+    NotFound(Box<NotFoundDocumentResponse>),
 }
 
 impl<T> std::convert::TryFrom<(StatusCode, &HeaderMap, &[u8])> for GetDocumentResponse<T>
@@ -36,9 +36,9 @@ where
                 (headers, body),
             )?))
         } else {
-            Ok(GetDocumentResponse::NotFound(
+            Ok(GetDocumentResponse::NotFound(Box::new(
                 NotFoundDocumentResponse::try_from((headers, body))?,
-            ))
+            )))
         }
     }
 }

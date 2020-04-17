@@ -47,7 +47,7 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetAttachmentResponse {
             content_type: content_type_from_headers(headers)?.to_owned(),
             content_location: content_location_from_headers(headers)?.to_owned(),
             last_change: last_state_change_from_headers(headers)?,
-            etag: etag_from_headers(headers)?.to_owned(),
+            etag: etag_from_headers(headers)?,
             resource_quota: resource_quota_from_headers(headers)?,
             resource_usage: resource_usage_from_headers(headers)?,
             lsn: lsn_from_headers(headers)?,

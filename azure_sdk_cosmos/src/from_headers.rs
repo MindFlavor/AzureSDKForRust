@@ -255,7 +255,8 @@ pub(crate) fn content_location_from_headers(headers: &HeaderMap) -> Result<&str,
     Ok(headers
         .get(http::header::CONTENT_LOCATION)
         .ok_or_else(|| {
-            AzureError::HeaderNotFound(http::header::CONTENT_LOCATION.as_str().to_owned())
+            let header = http::header::CONTENT_LOCATION;
+            AzureError::HeaderNotFound(header.as_str().to_owned())
         })?
         .to_str()?)
 }
@@ -263,7 +264,10 @@ pub(crate) fn content_location_from_headers(headers: &HeaderMap) -> Result<&str,
 pub(crate) fn content_type_from_headers(headers: &HeaderMap) -> Result<&str, AzureError> {
     Ok(headers
         .get(http::header::CONTENT_TYPE)
-        .ok_or_else(|| AzureError::HeaderNotFound(http::header::CONTENT_TYPE.as_str().to_owned()))?
+        .ok_or_else(|| {
+            let header = http::header::CONTENT_TYPE;
+            AzureError::HeaderNotFound(header.as_str().to_owned())
+        })?
         .to_str()?)
 }
 
@@ -321,5 +325,6 @@ pub(crate) fn last_state_change_from_headers(
 }
 
 pub(crate) fn date_from_headers(headers: &HeaderMap) -> Result<DateTime<Utc>, AzureError> {
-    _date_from_headers(headers, http::header::DATE.as_str())
+    let header = http::header::DATE;
+    _date_from_headers(headers, header.as_str())
 }
