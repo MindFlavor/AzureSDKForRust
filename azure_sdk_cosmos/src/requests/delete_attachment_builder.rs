@@ -1,14 +1,12 @@
-use crate::clients::{CosmosUriBuilder, ResourceType};
+use crate::clients::CosmosUriBuilder;
 use crate::prelude::*;
 use crate::AttachmentBuilderTrait;
 use crate::AttachmentClient;
 use crate::AttachmentClientRequired;
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
-use azure_sdk_core::{No, ToAssign, Yes};
 use hyper::StatusCode;
 use std::convert::TryInto;
-use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
 pub struct DeleteAttachmentBuilder<'a, 'b, CUB>

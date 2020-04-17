@@ -2,7 +2,7 @@
 	"name": "ReplaceSlugAttachmentBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-			"crate::clients::{ResourceType, CosmosUriBuilder}",
+			"crate::clients::{CosmosUriBuilder}",
 			"crate::prelude::*",
 			"crate::AttachmentClient",
 			"crate::AttachmentClientRequired",

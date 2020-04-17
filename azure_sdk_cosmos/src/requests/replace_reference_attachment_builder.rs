@@ -1,4 +1,4 @@
-use crate::clients::{CosmosUriBuilder, ResourceType};
+use crate::clients::CosmosUriBuilder;
 use crate::prelude::*;
 use crate::AttachmentBuilderTrait;
 use crate::AttachmentClient;

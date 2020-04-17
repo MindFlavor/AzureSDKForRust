@@ -239,7 +239,7 @@ pub trait ContentTypeRequired<'a> {
     fn content_type(&self) -> &'a str;
 
     #[must_use]
-    fn add_header(&self, mut builder: Builder) -> Builder {
+    fn add_header(&self, builder: Builder) -> Builder {
         builder.header(CONTENT_TYPE, self.content_type())
     }
 }

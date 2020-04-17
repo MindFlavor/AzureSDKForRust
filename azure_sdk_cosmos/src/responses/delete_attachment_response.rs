@@ -1,9 +1,9 @@
 use crate::from_headers::*;
-use crate::{Attachment, ResourceQuota};
+use crate::ResourceQuota;
 use azure_sdk_core::errors::AzureError;
-use azure_sdk_core::{etag_from_headers, session_token_from_headers, SessionToken};
+use azure_sdk_core::{session_token_from_headers, SessionToken};
 use chrono::{DateTime, Utc};
-use http::{HeaderMap, StatusCode};
+use http::HeaderMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct DeleteAttachmentResponse {

@@ -3,7 +3,7 @@ use crate::{Attachment, ResourceQuota};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::{etag_from_headers, session_token_from_headers, SessionToken};
 use chrono::{DateTime, Utc};
-use http::{HeaderMap, StatusCode};
+use http::HeaderMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ReplaceReferenceAttachmentResponse {

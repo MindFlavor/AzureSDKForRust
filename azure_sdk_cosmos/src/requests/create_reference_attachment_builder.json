@@ -10,7 +10,6 @@
 			"azure_sdk_core::prelude::*",
 			"azure_sdk_core::{Yes, No, ToAssign}",
 			"std::marker::PhantomData",
-			"crate::AttachmentBuilderTrait",
 			"hyper::StatusCode",
 			"std::convert::TryInto"
 	],

@@ -1,6 +1,5 @@
 use crate::clients::{CosmosUriBuilder, ResourceType};
 use crate::prelude::*;
-use crate::AttachmentBuilderTrait;
 use crate::AttachmentClient;
 use crate::AttachmentClientRequired;
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
