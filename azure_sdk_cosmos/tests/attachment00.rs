@@ -141,6 +141,29 @@ async fn attachment() -> Result<(), Box<dyn Error>> {
         .await?;
     assert_eq!(2, ret.attachments.len());
 
+    // get reference attachment, it must have the updated media link
+    let reference_attachment = document_client
+        .with_attachment(&"reference")
+        .get()
+        .with_consistency_level(session_token.clone())
+        .execute()
+        .await?;
+    assert_eq!(
+        "https://www.microsoft.com",
+        reference_attachment.attachment.media
+    );
+
+    // get slug attachment, it must have the text/plain content type
+    println!("getting slug attachment");
+    let slug_attachment = document_client
+        .with_attachment(&"slug")
+        .get()
+        .with_consistency_level(session_token.clone())
+        .execute()
+        .await
+        .unwrap();
+    assert_eq!("text/plain", slug_attachment.attachment.content_type);
+
     // delete slug attachment
     let _resp_delete = attachment_client
         .delete()

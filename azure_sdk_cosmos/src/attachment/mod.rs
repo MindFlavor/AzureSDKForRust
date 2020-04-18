@@ -5,9 +5,9 @@ pub use self::attachment_name::AttachmentName;
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 pub struct Attachment {
     #[serde(rename = "contentType")]
-    content_type: String,
-    id: String,
-    media: String,
+    pub content_type: String,
+    pub id: String,
+    pub media: String,
     #[serde(rename = "_rid")]
     pub rid: String,
     #[serde(rename = "_ts")]
