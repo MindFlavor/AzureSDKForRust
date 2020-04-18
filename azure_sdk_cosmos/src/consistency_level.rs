@@ -58,6 +58,12 @@ impl<'a> From<&'a CreateDocumentResponse> for ConsistencyLevel<'a> {
     }
 }
 
+impl<'a> From<CreateDocumentResponse> for ConsistencyLevel<'a> {
+    fn from(create_document_response: CreateDocumentResponse) -> Self {
+        ConsistencyLevel::Session(Cow::from(create_document_response.session_token))
+    }
+}
+
 impl<'a> From<&'a ReplaceDocumentResponse> for ConsistencyLevel<'a> {
     fn from(replace_document_response: &'a ReplaceDocumentResponse) -> Self {
         ConsistencyLevel::Session(Cow::from(&replace_document_response.session_token))

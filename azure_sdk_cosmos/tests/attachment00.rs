@@ -83,7 +83,7 @@ async fn attachment() -> Result<(), Box<dyn Error>> {
     );
 
     // let's add an entity.
-    let session_token = collection_client
+    let session_token: ConsistencyLevel = collection_client
         .create_document()
         .with_document(&doc)
         .with_partition_keys(PartitionKeys::new().push(doc.document_attributes.id())?)
@@ -98,7 +98,7 @@ async fn attachment() -> Result<(), Box<dyn Error>> {
     // list attachments, there must be none.
     let ret = document_client
         .list_attachments()
-        .with_consistency_level(session_token)
+        .with_consistency_level(session_token.clone())
         .execute()
         .await?;
     assert_eq!(0, ret.attachments.len());
@@ -107,6 +107,7 @@ async fn attachment() -> Result<(), Box<dyn Error>> {
     let attachment_client = document_client.with_attachment(&"reference");
     let _resp = attachment_client
         .create_reference()
+        .with_consistency_level(session_token.clone())
         .with_content_type("image/jpeg")
         .with_media("https://www.bing.com")
         .execute()
@@ -116,6 +117,7 @@ async fn attachment() -> Result<(), Box<dyn Error>> {
     let attachment_client = document_client.with_attachment(&"reference");
     let _resp = attachment_client
         .replace_reference()
+        .with_consistency_level(session_token.clone())
         .with_content_type("image/jpeg")
         .with_media("https://www.microsoft.com")
         .execute()
@@ -124,14 +126,35 @@ async fn attachment() -> Result<(), Box<dyn Error>> {
     // create slug attachment
     let attachment_client = document_client.with_attachment(&"slug");
     let _resp = attachment_client
-        .replace_slug()
+        .create_slug()
+        .with_consistency_level(session_token.clone())
         .with_content_type("text/plain")
         .with_body(b"something cool here")
         .execute()
         .await?;
 
+    // list attachments, there must be two.
+    let ret = document_client
+        .list_attachments()
+        .with_consistency_level(session_token.clone())
+        .execute()
+        .await?;
+    assert_eq!(2, ret.attachments.len());
+
     // delete slug attachment
-    let _resp_delete = attachment_client.delete().execute().await?;
+    let _resp_delete = attachment_client
+        .delete()
+        .with_consistency_level(session_token.clone())
+        .execute()
+        .await?;
+
+    // list attachments, there must be one.
+    let ret = document_client
+        .list_attachments()
+        .with_consistency_level(session_token.clone())
+        .execute()
+        .await?;
+    assert_eq!(1, ret.attachments.len());
 
     // delete the database
     database_client.delete_database().execute().await?;
