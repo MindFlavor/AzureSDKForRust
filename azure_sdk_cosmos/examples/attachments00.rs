@@ -70,15 +70,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     partition_keys.push(doc.document_attributes.id())?;
     let document_client = client.with_document(&id, &partition_keys);
 
+    // list attachments
     let ret = document_client.list_attachments().execute().await?;
+    println!("list attachments == {:#?}", ret);
 
-    println!("{:#?}", ret);
-
-    //let attachment_client = document_client.with_attachment(&"myref00");
-
-    //let att = attachment_client.get().execute().await?;
-    //println!("att == {:#?}", att);
-
+    // reference attachment
     println!("creating");
     let attachment_client = document_client.with_attachment(&"myref03");
     let resp = attachment_client
@@ -89,33 +85,52 @@ async fn main() -> Result<(), Box<dyn Error>> {
         )
         .execute()
         .await?;
-    println!("resp == {:#?}", resp);
+    println!("create reference == {:#?}", resp);
+
+    // we pass the consistency level to make
+    // sure to find the just created attachment
+    let session_token: ConsistencyLevel = resp.into();
 
     println!("replacing");
     let attachment_client = document_client.with_attachment(&"myref03");
     let resp = attachment_client
         .replace_reference()
+        .with_consistency_level(session_token.clone())
         .with_content_type("image/jpeg")
         .with_media(
             "https://Adn.pixabay.com/photo/2020/01/11/09/30/abstract-background-4756987__340.jpg",
         )
         .execute()
         .await?;
-    println!("resp == {:#?}", resp);
-
-    //let attachment_client = document_client.with_attachment(&"slug00");
-    //let resp = attachment_client
-    //    .replace_slug()
-    //    .with_content_type("text/plain")
-    //    .with_body(b"FFFFF")
-    //    .execute()
-    //    .await?;
-
-    //println!("resp == {:#?}", resp);
+    println!("replace reference == {:#?}", resp);
 
     println!("deleting");
-    let resp_delete = attachment_client.delete().execute().await?;
-    println!("resp_delete == {:#?}", resp_delete);
+    let resp_delete = attachment_client
+        .delete()
+        .with_consistency_level(session_token.clone())
+        .execute()
+        .await?;
+    println!("delete attachment == {:#?}", resp_delete);
+
+    // slug attachment
+    println!("creating slug attachment");
+    let attachment_client = document_client.with_attachment(&"slug00");
+    let resp = attachment_client
+        .create_slug()
+        .with_content_type("text/plain")
+        .with_body(b"FFFFF")
+        .execute()
+        .await?;
+
+    println!("create slug == {:#?}", resp);
+
+    println!("deleting");
+    let resp_delete = attachment_client
+        .delete()
+        .with_consistency_level(session_token)
+        .execute()
+        .await?;
+    println!("delete attachment == {:#?}", resp_delete);
 
     Ok(())
 }

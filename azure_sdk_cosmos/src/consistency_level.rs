@@ -1,6 +1,7 @@
 use crate::responses::{
-    CreateDocumentResponse, DeleteDocumentResponse, ExecuteStoredProcedureResponse,
-    GetDocumentResponse, ListDocumentsResponse, QueryDocumentsResponse, ReplaceDocumentResponse,
+    CreateDocumentResponse, CreateReferenceAttachmentResponse, CreateSlugAttachmentResponse,
+    DeleteDocumentResponse, ExecuteStoredProcedureResponse, GetDocumentResponse,
+    ListDocumentsResponse, QueryDocumentsResponse, ReplaceDocumentResponse,
 };
 use serde::de::DeserializeOwned;
 use std::borrow::Cow;
@@ -24,6 +25,30 @@ impl<'a> ConsistencyLevel<'a> {
             Self::ConsistentPrefix => "Prefix", //this is guessed since it's missing here: https://docs.microsoft.com/en-us/rest/api/cosmos-db/common-cosmosdb-rest-request-headers
             Self::Eventual => "Eventual",
         }
+    }
+}
+
+impl<'a> From<&'a CreateSlugAttachmentResponse> for ConsistencyLevel<'a> {
+    fn from(a: &'a CreateSlugAttachmentResponse) -> Self {
+        ConsistencyLevel::Session(Cow::from(&a.session_token))
+    }
+}
+
+impl<'a> From<CreateSlugAttachmentResponse> for ConsistencyLevel<'a> {
+    fn from(a: CreateSlugAttachmentResponse) -> Self {
+        ConsistencyLevel::Session(Cow::from(a.session_token))
+    }
+}
+
+impl<'a> From<&'a CreateReferenceAttachmentResponse> for ConsistencyLevel<'a> {
+    fn from(a: &'a CreateReferenceAttachmentResponse) -> Self {
+        ConsistencyLevel::Session(Cow::from(&a.session_token))
+    }
+}
+
+impl<'a> From<CreateReferenceAttachmentResponse> for ConsistencyLevel<'a> {
+    fn from(a: CreateReferenceAttachmentResponse) -> Self {
+        ConsistencyLevel::Session(Cow::from(a.session_token))
     }
 }
 
