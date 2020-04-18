@@ -82,6 +82,4 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListAttachmentsResponse {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-}
+mod tests {}

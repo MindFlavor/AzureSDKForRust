@@ -197,7 +197,7 @@ pub trait ConsistencyLevelOption<'a> {
             // if we have a Session consistency level we make sure to pass
             // the x-ms-session-token header too.
             if let ConsistencyLevel::Session(session_token) = consistency_level {
-                builder.header(HEADER_SESSION_TOKEN, session_token)
+                builder.header(HEADER_SESSION_TOKEN, session_token.as_ref())
             } else {
                 builder
             }

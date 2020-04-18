@@ -71,6 +71,4 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetAttachmentResponse {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-}
+mod tests {}
