@@ -7,6 +7,7 @@ use azure_sdk_core::{No, ToAssign, Yes};
 use azure_sdk_storage_core::prelude::*;
 use hyper::{Method, StatusCode};
 use std::collections::HashMap;
+use std::convert::TryInto;
 use std::marker::PhantomData;
 
 pub struct CopyBlobFromUrlBuilder<'a, ContainerNameSet, BlobNameSet, SourceUrlSet>
@@ -873,6 +874,6 @@ impl<'a> CopyBlobFromUrlBuilder<'a, Yes, Yes, Yes> {
 
         let (headers, _body) =
             check_status_extract_headers_and_body(future_response, StatusCode::ACCEPTED).await?;
-        CopyBlobFromUrlResponse::from_headers(&headers)
+        (&headers).try_into()
     }
 }

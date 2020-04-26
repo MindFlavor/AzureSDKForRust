@@ -8,6 +8,7 @@
 		"crate::blob::responses::CopyBlobFromUrlResponse",
 		"azure_sdk_core::{No, ToAssign, Yes}",
 		"azure_sdk_storage_core::prelude::*",
+		"std::convert::TryInto",
 		"std::collections::HashMap",
 		"std::marker::PhantomData",
 		"hyper::{Method, StatusCode}",
