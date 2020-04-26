@@ -3,4 +3,3 @@ pub use crate::blob::{
     BlockListTypeRequired, BlockListTypeSupport,
 };
 pub use crate::container::{PublicAccess, PublicAccessSupport};
-pub use crate::{Blob as BlobTrait, Container as ContainerTrait};

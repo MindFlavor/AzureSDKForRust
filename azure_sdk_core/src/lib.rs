@@ -23,13 +23,7 @@ pub mod modify_conditions;
 use self::modify_conditions::{IfMatchCondition, IfSinceCondition, SequenceNumberCondition};
 pub mod headers;
 pub mod range;
-use self::headers::{
-    ACCOUNT_KIND, ACTIVITY_ID, APPEND_POSITION, BLOB_ACCESS_TIER, BLOB_CONTENT_LENGTH,
-    BLOB_SEQUENCE_NUMBER, CACHE_CONTROL, CLIENT_REQUEST_ID, CONTENT_DISPOSITION, CONTENT_MD5,
-    DELETE_SNAPSHOTS, DELETE_TYPE_PERMANENT, HEADER_CONTINUATION, LEASE_BREAK_PERIOD,
-    LEASE_DURATION, LEASE_ID, LEASE_TIME, PROPOSED_LEASE_ID, REQUEST_ID, REQUEST_SERVER_ENCRYPTED,
-    SESSION_TOKEN, SKU_NAME,
-};
+use self::headers::*;
 use hyper::header::{
     HeaderName, CONTENT_ENCODING, CONTENT_LANGUAGE, CONTENT_LENGTH, CONTENT_TYPE, DATE, ETAG,
     IF_MODIFIED_SINCE, LAST_MODIFIED, RANGE, USER_AGENT,
@@ -198,6 +192,20 @@ pub trait CacheControlOption<'a> {
     }
 }
 
+pub trait IsSynchronousSupport {
+    type O;
+    fn with_is_synchronous(self, is_synchronous: bool) -> Self::O;
+}
+
+pub trait IsSynchronousOption {
+    fn is_synchronous(&self) -> bool;
+
+    #[must_use]
+    fn add_header(&self, mut builder: Builder) -> Builder {
+        builder.header(REQUIRES_SYNC, format!("{}", self.is_synchronous()))
+    }
+}
+
 pub trait ContentEncodingSupport<'a> {
     type O;
     fn with_content_encoding(self, content_encoding: &'a str) -> Self::O;
@@ -238,6 +246,20 @@ pub trait ContentTypeRequired<'a> {
     #[must_use]
     fn add_header(&self, builder: Builder) -> Builder {
         builder.header(CONTENT_TYPE, self.content_type())
+    }
+}
+
+pub trait SourceUrlSupport<'a> {
+    type O;
+    fn with_source_url(self, source_url: &'a str) -> Self::O;
+}
+
+pub trait SourceUrlRequired<'a> {
+    fn source_url(&self) -> &'a str;
+
+    #[must_use]
+    fn add_header(&self, builder: Builder) -> Builder {
+        builder.header(COPY_SOURCE, encode(self.source_url()))
     }
 }
 
@@ -713,6 +735,25 @@ pub trait ContentMD5Option<'a> {
             builder = add_content_md5_header(content_md5, builder);
         }
         builder
+    }
+}
+
+pub trait SourceContentMD5Support<'a> {
+    type O;
+    fn with_source_content_md5(self, _: &'a [u8]) -> Self::O;
+}
+
+pub trait SourceContentMD5Option<'a> {
+    fn source_content_md5(&self) -> Option<&'a [u8]>;
+
+    #[must_use]
+    fn add_header(&self, mut builder: Builder) -> Builder {
+        if let Some(source_content_md5) = self.source_content_md5() {
+            let s = encode(source_content_md5);
+            builder.header(SOURCE_CONTENT_MD5, &s as &str)
+        } else {
+            builder
+        }
     }
 }
 
