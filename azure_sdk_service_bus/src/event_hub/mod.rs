@@ -58,7 +58,7 @@ fn peek_lock_prepare(
     ))?;
     if let Some(t) = timeout {
         url.query_pairs_mut()
-            .append_pair("timeout", &t.num_seconds().to_string());
+            .append_pair("timeout", &t.whole_seconds().to_string());
     }
     debug!("url == {:?}", url);
 
@@ -411,7 +411,9 @@ fn generate_signature(
 ) -> String {
     use url::form_urlencoded::Serializer;
 
-    let expiry = ::chrono::Utc::now().add(ttl).timestamp();
+    let duration = ::chrono::Duration::from_std(ttl);
+
+    let expiry = ::chrono::Utc::now().add(duration).timestamp();
     debug!("expiry == {:?}", expiry);
 
     let url_encoded: String = form_urlencoded::byte_serialize(url.as_bytes()).collect();
