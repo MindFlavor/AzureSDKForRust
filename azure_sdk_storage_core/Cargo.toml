@@ -17,12 +17,9 @@ edition       = "2018"
 [dependencies]
 azure_sdk_core          = { path = "../azure_sdk_core", version = "0.43.2" }
 ring                    = "0.16"
-md5                     = "0.7"
-RustyXML                = "0.3"
 base64                  = "0.12"
 chrono                  = "0.4"
 http                    = "0.2"
-http-body               = "0.3"
 futures                 = "0.3"
 hyper                   = "0.13"
 log                     = "0.4"
