@@ -7,7 +7,6 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate md5;
 extern crate ring;
-extern crate time;
 extern crate url;
 extern crate uuid;
 extern crate xml;

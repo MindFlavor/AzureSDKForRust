@@ -1,11 +1,11 @@
 use azure_sdk_core::errors::{
     check_status_extract_body, extract_location_status_and_body, AzureError,
 };
+use chrono::Duration;
 use hyper::{self, header, Body, StatusCode};
 use hyper_rustls::HttpsConnector;
 use ring::hmac;
 use std::ops::Add;
-use time::Duration;
 use url::{form_urlencoded, Url};
 
 mod client;
@@ -58,7 +58,7 @@ fn peek_lock_prepare(
     ))?;
     if let Some(t) = timeout {
         url.query_pairs_mut()
-            .append_pair("timeout", &t.whole_seconds().to_string());
+            .append_pair("timeout", &t.num_seconds().to_string());
     }
     debug!("url == {:?}", url);
 
@@ -411,9 +411,7 @@ fn generate_signature(
 ) -> String {
     use url::form_urlencoded::Serializer;
 
-    let duration = ::chrono::Duration::from_std(ttl);
-
-    let expiry = ::chrono::Utc::now().add(duration).timestamp();
+    let expiry = ::chrono::Utc::now().add(ttl).timestamp();
     debug!("expiry == {:?}", expiry);
 
     let url_encoded: String = form_urlencoded::byte_serialize(url.as_bytes()).collect();
