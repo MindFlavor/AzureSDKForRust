@@ -1,4 +1,5 @@
 use crate::from_headers::*;
+use crate::PartitionKeyRange;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::session_token_from_headers;
 use chrono::{DateTime, Utc};
@@ -6,6 +7,7 @@ use http::HeaderMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct GetPartitionKeyRangesResponse {
+    pub rid: String,
     pub content_location: String,
     pub server: String,
     pub last_state_change: DateTime<Utc>,
@@ -24,6 +26,7 @@ pub struct GetPartitionKeyRangesResponse {
     pub activity_id: uuid::Uuid,
     pub gateway_version: String,
     pub date: DateTime<Utc>,
+    pub partition_key_ranges: Vec<PartitionKeyRange>,
 }
 
 impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetPartitionKeyRangesResponse {
@@ -32,11 +35,22 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetPartitionKeyRangesRespons
         let headers = value.0;
         let body = value.1;
 
-        println!("body == {}", std::str::from_utf8(body)?);
+        debug!("body == {}", std::str::from_utf8(body)?);
 
-        println!("headers == {:#?}", headers);
+        debug!("headers == {:#?}", headers);
+
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            #[serde(rename = "_rid")]
+            pub rid: String,
+            #[serde(rename = "PartitionKeyRanges")]
+            pub partition_key_ranges: Vec<PartitionKeyRange>,
+        }
+
+        let r: Response = serde_json::from_slice(body)?;
 
         Ok(Self {
+            rid: r.rid,
             content_location: content_location_from_headers(headers)?.to_owned(),
             server: server_from_headers(headers)?.to_owned(),
             last_state_change: last_state_change_from_headers(headers)?,
@@ -55,6 +69,7 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for GetPartitionKeyRangesRespons
             session_token: session_token_from_headers(headers)?,
             gateway_version: gateway_version_from_headers(headers)?.to_owned(),
             date: date_from_headers(headers)?,
+            partition_key_ranges: r.partition_key_ranges,
         })
     }
 }
