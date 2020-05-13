@@ -1,11 +1,4 @@
-#[macro_use]
-extern crate serde_derive;
-// Using the prelude module of the Cosmos crate makes easier to use the Rust Azure SDK for Cosmos
-// DB.
-use azure_sdk_core::prelude::*;
 use azure_sdk_cosmos::prelude::*;
-use azure_sdk_cosmos::responses::GetDocumentResponse;
-use std::borrow::Cow;
 use std::error::Error;
 
 #[tokio::main]
@@ -27,6 +20,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client = client.with_collection(&collection);
 
     let resp = client.get_partition_key_ranges().execute().await?;
+    println!("resp == {:#?}", resp);
 
     Ok(())
 }

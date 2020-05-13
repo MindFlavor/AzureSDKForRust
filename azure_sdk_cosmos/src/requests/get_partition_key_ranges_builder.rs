@@ -215,9 +215,10 @@ where
                 self.collection_client.collection_name().name()
             ),
             hyper::Method::GET,
-            ResourceType::Collections,
+            ResourceType::PartitionKeyRanges,
         );
 
+        let request = request.header(hyper::header::CONTENT_LENGTH, "0");
         let request = IfMatchConditionOption::add_header(self, request);
         let request = IfModifiedSinceOption::add_header(self, request);
         let request = UserAgentOption::add_header(self, request);
