@@ -609,6 +609,7 @@ where
         stored_procedure_name: &'c dyn StoredProcedureName,
     ) -> StoredProcedureClient<'c, CUB>;
     fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB>;
+    fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, CUB>;
     fn with_document<'c>(
         &'c self,
         document_name: &'c dyn DocumentName,
