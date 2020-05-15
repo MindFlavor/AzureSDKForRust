@@ -56,11 +56,11 @@ where
         self.user_defined_function_name
     }
 
-    //fn create_user_defined_function(
-    //    &self,
-    //) -> requests::CreateUserDefinedFunctionBuilder<'_, CUB, No> {
-    //    requests::CreateUserDefinedFunctionBuilder::new(self)
-    //}
+    fn create_user_defined_function(
+        &self,
+    ) -> requests::CreateUserDefinedFunctionBuilder<'_, CUB, No> {
+        requests::CreateUserDefinedFunctionBuilder::new(self)
+    }
 
     //fn replace_user_defined_function(
     //    &self,
@@ -68,25 +68,41 @@ where
     //    requests::ReplaceUserDefinedFunctionBuilder::new(self)
     //}
 
-    //fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB> {
-    //    requests::DeleteUserDefinedFunctionBuilder::new(self)
-    //}
+    fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB> {
+        requests::DeleteUserDefinedFunctionBuilder::new(self)
+    }
 }
 
 impl<'a, CUB> UserDefinedFunctionBuilderTrait<'a, CUB> for UserDefinedFunctionClient<'a, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
-        self.main_client().prepare_request(
-            &format!(
-                "dbs/{}/colls/{}/udfs/{}",
-                self.database_name().name(),
-                self.collection_name().name(),
-                self.user_defined_function_name().name()
-            ),
-            method,
-            ResourceType::UserDefinedFunctions,
-        )
+    fn prepare_request(
+        &self,
+        method: hyper::Method,
+        specify_user_defined_function_name: bool,
+    ) -> http::request::Builder {
+        if specify_user_defined_function_name {
+            self.main_client().prepare_request(
+                &format!(
+                    "dbs/{}/colls/{}/udfs/{}",
+                    self.database_name().name(),
+                    self.collection_name().name(),
+                    self.user_defined_function_name().name()
+                ),
+                method,
+                ResourceType::UserDefinedFunctions,
+            )
+        } else {
+            self.main_client().prepare_request(
+                &format!(
+                    "dbs/{}/colls/{}/udfs",
+                    self.database_name().name(),
+                    self.collection_name().name(),
+                ),
+                method,
+                ResourceType::UserDefinedFunctions,
+            )
+        }
     }
 }

@@ -1,8 +1,9 @@
-use crate::clients::{CosmosUriBuilder, ResourceType};
+use crate::clients::CosmosUriBuilder;
 use crate::prelude::*;
 use crate::responses::CreateUserDefinedFunctionResponse;
 use crate::UserDefinedFunctionClient;
 use crate::UserDefinedFunctionClientRequired;
+use crate::{UserDefinedFunctionBuilderTrait, UserDefinedFunctionTrait};
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
 use azure_sdk_core::{No, ToAssign, Yes};
@@ -182,13 +183,49 @@ where
     }
 }
 
-// methods callable regardless
-impl<'a, CUB, BodySet> CreateUserDefinedFunctionBuilder<'a, CUB, BodySet>
+// methods callable only when every mandatory field has been filled
+impl<'a, CUB> CreateUserDefinedFunctionBuilder<'a, CUB, Yes>
 where
-    BodySet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-}
+    pub async fn execute(&self) -> Result<CreateUserDefinedFunctionResponse, AzureError> {
+        trace!("CreateUserDefinedFunctionBuilder::execute called");
 
-// methods callable only when every mandatory field has been filled
-impl<'a, CUB> CreateUserDefinedFunctionBuilder<'a, CUB, Yes> where CUB: CosmosUriBuilder {}
+        let req = self
+            .user_defined_function_client
+            .prepare_request(hyper::Method::POST, false);
+
+        // add trait headers
+        let req = UserAgentOption::add_header(self, req);
+        let req = ActivityIdOption::add_header(self, req);
+        let req = ConsistencyLevelOption::add_header(self, req);
+
+        let req = req.header(http::header::CONTENT_TYPE, "application/json");
+
+        #[derive(Debug, Serialize)]
+        struct Request<'a> {
+            body: &'a str,
+            id: &'a str,
+        }
+        let request = Request {
+            body: self.body(),
+            id: self
+                .user_defined_function_client
+                .user_defined_function_name()
+                .name(),
+        };
+
+        let request = serde_json::to_string(&request)?;
+        let request = req.body(hyper::Body::from(request))?;
+
+        let (headers, body) = check_status_extract_headers_and_body(
+            self.user_defined_function_client()
+                .hyper_client()
+                .request(request),
+            StatusCode::CREATED,
+        )
+        .await?;
+
+        Ok((&headers, &body as &[u8]).try_into()?)
+    }
+}

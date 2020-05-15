@@ -1,11 +1,13 @@
 use crate::clients::{
     Client, CosmosUriBuilder, DatabaseClient, DocumentClient, ResourceType, StoredProcedureClient,
+    UserDefinedFunctionClient,
 };
 use crate::collection::CollectionName;
 use crate::database::DatabaseName;
 use crate::document::DocumentName;
 use crate::requests;
 use crate::stored_procedure::StoredProcedureName;
+use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{CollectionBuilderTrait, CollectionTrait, DatabaseTrait, PartitionKeys};
 use azure_sdk_core::No;
 use serde::Serialize;
@@ -95,6 +97,13 @@ where
         stored_procedure_name: &'c dyn StoredProcedureName,
     ) -> StoredProcedureClient<'c, CUB> {
         StoredProcedureClient::new(&self, stored_procedure_name)
+    }
+
+    fn with_user_defined_function<'c>(
+        &'c self,
+        user_defined_function_name: &'c dyn UserDefinedFunctionName,
+    ) -> UserDefinedFunctionClient<'c, CUB> {
+        UserDefinedFunctionClient::new(&self, user_defined_function_name)
     }
 
     fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB> {

@@ -1,18 +1,16 @@
 {
-	"name": "CreateUserDefinedFunctionBuilder",
+	"name": "DeleteUserDefinedFunctionBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
 			"crate::clients::{CosmosUriBuilder}",
 			"crate::prelude::*",
 			"crate::UserDefinedFunctionClient",
 			"crate::UserDefinedFunctionClientRequired",
-			"crate::{UserDefinedFunctionBuilderTrait, UserDefinedFunctionTrait}",
+			"crate::{UserDefinedFunctionBuilderTrait}",
 			"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 			"azure_sdk_core::prelude::*",
-			"azure_sdk_core::{Yes,No,ToAssign}",
-			"std::marker::PhantomData",
 			"hyper::StatusCode",
-			"crate::responses::CreateUserDefinedFunctionResponse",
+			"crate::responses::DeleteUserDefinedFunctionResponse",
 			"std::convert::TryInto"
 	],
 	"inline": true,
@@ -26,14 +24,6 @@
 		}
 	],
 	"fields": [
-		{
-			"name": "body",
-			"field_type": "&'a str",
-			"builder_type": "BodySet",
-			"optional": false,
-			"trait_get": "UserDefinedFunctionBodyRequired<'a>",
-			"trait_set": "UserDefinedFunctionBodySupport<'a>"
-		},
 		{
 			"name": "user_agent",
 			"field_type": "&'a str",

@@ -628,6 +628,10 @@ where
         &'c self,
         stored_procedure_name: &'c dyn StoredProcedureName,
     ) -> StoredProcedureClient<'c, CUB>;
+    fn with_user_defined_function<'c>(
+        &'c self,
+        user_defined_function_name: &'c dyn UserDefinedFunctionName,
+    ) -> UserDefinedFunctionClient<'c, CUB>;
     fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB>;
     fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, CUB>;
     fn with_document<'c>(
@@ -696,13 +700,13 @@ where
     fn database_name(&self) -> &'a dyn DatabaseName;
     fn collection_name(&self) -> &'a dyn CollectionName;
     fn user_defined_function_name(&self) -> &'a dyn UserDefinedFunctionName;
-    //fn create_user_defined_function(
-    //    &self,
-    //) -> requests::CreateUserDefinedFunctionBuilder<'_, CUB, No>;
+    fn create_user_defined_function(
+        &self,
+    ) -> requests::CreateUserDefinedFunctionBuilder<'_, CUB, No>;
     //fn replace_user_defined_function(
     //    &self,
     //) -> requests::ReplaceUserDefinedFunctionBuilder<'_, CUB, No>;
-    //fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB>;
+    fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB>;
 }
 
 pub(crate) trait UserDefinedFunctionBuilderTrait<'a, CUB>:
@@ -710,7 +714,11 @@ pub(crate) trait UserDefinedFunctionBuilderTrait<'a, CUB>:
 where
     CUB: CosmosUriBuilder,
 {
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
+    fn prepare_request(
+        &self,
+        method: hyper::Method,
+        specify_user_defined_function_name: bool,
+    ) -> http::request::Builder;
 }
 
 pub trait AttachmentTrait<'a, CUB>
