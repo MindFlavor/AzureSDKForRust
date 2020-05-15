@@ -6,6 +6,7 @@ mod create_reference_attachment_builder;
 mod create_slug_attachment_builder;
 mod create_stored_procedure_builder;
 mod create_user_builder;
+mod create_user_defined_function_builder;
 mod delete_attachment_builder;
 mod delete_collection_builder;
 mod delete_database_builder;
@@ -44,6 +45,7 @@ pub use self::create_reference_attachment_builder::CreateReferenceAttachmentBuil
 pub use self::create_slug_attachment_builder::CreateSlugAttachmentBuilder;
 pub use self::create_stored_procedure_builder::CreateStoredProcedureBuilder;
 pub use self::create_user_builder::CreateUserBuilder;
+pub use self::create_user_defined_function_builder::CreateUserDefinedFunctionBuilder;
 pub use self::delete_attachment_builder::DeleteAttachmentBuilder;
 pub use self::delete_collection_builder::DeleteCollectionBuilder;
 pub use self::delete_database_builder::DeleteDatabaseBuilder;

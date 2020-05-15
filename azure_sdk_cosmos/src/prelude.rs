@@ -23,6 +23,7 @@ pub use crate::{
     PermissionClientRequired, PermissionModeRequired, PermissionModeSupport, PermissionTrait,
     QueryCrossPartitionOption, QueryCrossPartitionSupport, QueryRequired, QuerySupport,
     StoredProcedureBodyRequired, StoredProcedureBodySupport, StoredProcedureNameRequired,
-    StoredProcedureNameSupport, StoredProcedureTrait, UserClientRequired, UserName,
-    UserNameRequired, UserNameSupport, UserTrait,
+    StoredProcedureNameSupport, StoredProcedureTrait, UserClientRequired,
+    UserDefinedFunctionBodyRequired, UserDefinedFunctionBodySupport, UserName, UserNameRequired,
+    UserNameSupport, UserTrait,
 };
