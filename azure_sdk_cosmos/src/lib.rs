@@ -633,6 +633,8 @@ where
         user_defined_function_name: &'c dyn UserDefinedFunctionName,
     ) -> UserDefinedFunctionClient<'c, CUB>;
     fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB>;
+    fn list_user_defined_functions(&self)
+        -> requests::ListUserDefinedFunctionsBuilder<'_, '_, CUB>;
     fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, CUB>;
     fn with_document<'c>(
         &'c self,

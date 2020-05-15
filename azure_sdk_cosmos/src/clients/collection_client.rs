@@ -110,6 +110,12 @@ where
         requests::ListStoredProceduresBuilder::new(self)
     }
 
+    fn list_user_defined_functions(
+        &self,
+    ) -> requests::ListUserDefinedFunctionsBuilder<'_, '_, CUB> {
+        requests::ListUserDefinedFunctionsBuilder::new(self)
+    }
+
     fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, CUB> {
         requests::GetPartitionKeyRangesBuilder::new(self)
     }

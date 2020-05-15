@@ -1,4 +1,5 @@
 use azure_sdk_cosmos::prelude::*;
+use futures::stream::StreamExt;
 use std::error::Error;
 
 #[tokio::main]
@@ -17,11 +18,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let authorization_token = AuthorizationToken::new_master(&master_key)?;
 
     let client = ClientBuilder::new(account, authorization_token)?;
+    let database_client = client.with_database(&database);
+    let collection_client = database_client.with_collection(&collection);
 
-    let ret = client
-        .with_database(&database)
-        .with_collection(&collection)
-        .with_user_defined_function(&"test2")
+    let ret = collection_client
+        .with_user_defined_function(&"test9")
         .create_user_defined_function()
         .with_body("body")
         .execute()
@@ -29,10 +30,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("Response object:\n{:#?}", ret);
 
-    let ret = client
-        .with_database(&database)
-        .with_collection(&collection)
-        .with_user_defined_function(&"test2")
+    let stream = collection_client
+        .list_user_defined_functions()
+        .with_max_item_count(3)
+        .with_consistency_level((&ret).into());
+    let mut stream = Box::pin(stream.stream());
+    while let Some(ret) = stream.next().await {
+        let ret = ret.unwrap();
+        println!("Received {} items. Object:\n{:#?}", ret.item_count, ret);
+    }
+
+    let ret = collection_client
+        .with_user_defined_function(&"test9")
         .delete_user_defined_function()
         .with_consistency_level((&ret).into())
         .execute()

@@ -2,7 +2,7 @@ use crate::responses::{
     CreateDocumentResponse, CreateReferenceAttachmentResponse, CreateSlugAttachmentResponse,
     CreateUserDefinedFunctionResponse, DeleteDocumentResponse, DeleteUserDefinedFunctionResponse,
     ExecuteStoredProcedureResponse, GetDocumentResponse, ListDocumentsResponse,
-    QueryDocumentsResponse, ReplaceDocumentResponse,
+    ListUserDefinedFunctionsResponse, QueryDocumentsResponse, ReplaceDocumentResponse,
 };
 use serde::de::DeserializeOwned;
 use std::borrow::Cow;
@@ -120,5 +120,11 @@ impl<'a> From<&'a CreateUserDefinedFunctionResponse> for ConsistencyLevel<'a> {
 impl<'a> From<&'a DeleteUserDefinedFunctionResponse> for ConsistencyLevel<'a> {
     fn from(delete_user_defined_response: &'a DeleteUserDefinedFunctionResponse) -> Self {
         ConsistencyLevel::Session(Cow::from(&delete_user_defined_response.session_token))
+    }
+}
+
+impl<'a> From<&'a ListUserDefinedFunctionsResponse> for ConsistencyLevel<'a> {
+    fn from(list_user_defined_response: &'a ListUserDefinedFunctionsResponse) -> Self {
+        ConsistencyLevel::Session(Cow::from(&list_user_defined_response.session_token))
     }
 }
