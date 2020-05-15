@@ -24,6 +24,6 @@ pub use crate::{
     QueryCrossPartitionOption, QueryCrossPartitionSupport, QueryRequired, QuerySupport,
     StoredProcedureBodyRequired, StoredProcedureBodySupport, StoredProcedureNameRequired,
     StoredProcedureNameSupport, StoredProcedureTrait, UserClientRequired,
-    UserDefinedFunctionBodyRequired, UserDefinedFunctionBodySupport, UserName, UserNameRequired,
-    UserNameSupport, UserTrait,
+    UserDefinedFunctionBodyRequired, UserDefinedFunctionBodySupport, UserDefinedFunctionTrait,
+    UserName, UserNameRequired, UserNameSupport, UserTrait,
 };
