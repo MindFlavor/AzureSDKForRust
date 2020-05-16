@@ -12,14 +12,14 @@ use serde_json::Value;
 use std::convert::TryInto;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct QueryResult<T> {
+pub struct DocumentQueryResult<T> {
     #[serde(flatten)]
     pub document_attributes: DocumentAttributes,
     #[serde(flatten)]
     pub result: T,
 }
 
-impl<T> std::convert::TryFrom<(&HeaderMap, &[u8])> for QueryResult<T>
+impl<T> std::convert::TryFrom<(&HeaderMap, &[u8])> for DocumentQueryResult<T>
 where
     T: DeserializeOwned,
 {
@@ -48,6 +48,12 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for QueryResponseMeta {
 
         Ok(serde_json::from_slice(body)?)
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum QueryResult<T> {
+    DocumentQueryResult(DocumentQueryResult<T>),
+    Raw(T),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -91,19 +97,29 @@ where
         let body = value.1;
 
         debug!("headers == {:#?}", headers);
-        println!("body == {}", std::str::from_utf8(body)?);
+        debug!("body == {}", std::str::from_utf8(body)?);
 
         let inner: Value = serde_json::from_slice(body)?;
         let mut results = Vec::new();
         if let Value::Array(documents) = &inner["Documents"] {
             for doc in documents {
-                let document_attributes: DocumentAttributes =
-                    serde_json::from_value(doc.to_owned())?;
                 let result: T = serde_json::from_value(doc.to_owned())?;
-                results.push(QueryResult {
-                    document_attributes,
-                    result,
-                });
+                // If we have all the necessary fields to construct a
+                // DocumentQueryResult we use it, otherwise we just add a raw
+                // struct.
+                // If I can ascertain that we receive *either* QueryResults
+                // or a raw documents - but not a mix of the two -
+                // we might want to avoid a discriminated union
+                // to be handled at runtime.
+                match serde_json::from_value(doc.to_owned()) {
+                    Ok(document_attributes) => {
+                        results.push(QueryResult::DocumentQueryResult(DocumentQueryResult {
+                            document_attributes,
+                            result,
+                        }))
+                    }
+                    Err(_) => results.push(QueryResult::Raw(result)),
+                }
             }
         }
 
