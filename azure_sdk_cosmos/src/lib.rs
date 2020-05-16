@@ -620,7 +620,7 @@ where
     fn create_document<T>(&self) -> requests::CreateDocumentBuilder<'_, '_, T, CUB, No, No>
     where
         T: Serialize;
-    fn replace_document<T>(&self) -> requests::ReplaceDocumentBuilder<'_, '_, T, CUB, No, No>
+    fn replace_document<T>(&self) -> requests::ReplaceDocumentBuilder<'_, '_, T, CUB, No, No, No>
     where
         T: Serialize;
     fn query_documents(&self) -> requests::QueryDocumentsBuilder<'_, '_, CUB, No>;

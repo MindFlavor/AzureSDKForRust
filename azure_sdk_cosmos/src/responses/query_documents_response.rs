@@ -118,7 +118,10 @@ where
                             result,
                         }))
                     }
-                    Err(_) => results.push(QueryResult::Raw(result)),
+                    Err(error) => {
+                        println!("{:#?}", error);
+                        results.push(QueryResult::Raw(result));
+                    }
                 }
             }
         }

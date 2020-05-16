@@ -81,7 +81,7 @@ where
         requests::CreateDocumentBuilder::new(self)
     }
 
-    fn replace_document<T>(&self) -> requests::ReplaceDocumentBuilder<'_, '_, T, CUB, No, No>
+    fn replace_document<T>(&self) -> requests::ReplaceDocumentBuilder<'_, '_, T, CUB, No, No, No>
     where
         T: Serialize,
     {

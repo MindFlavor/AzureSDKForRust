@@ -13,6 +13,7 @@ use std::error::Error;
 // work (you can create with this SDK too, check the examples folder for that task).
 #[derive(Serialize, Deserialize, Debug)]
 struct MySampleStruct<'a> {
+    id: Cow<'a, str>,
     a_string: Cow<'a, str>,
     a_number: u64,
     a_timestamp: i64,
@@ -56,14 +57,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("Inserting 10 documents...");
     for i in 0..10 {
         // define the document.
-        let document_to_insert = Document::new(
-            format!("unique_id{}", i), // this is the primary key, AKA "/id".
-            MySampleStruct {
-                a_string: Cow::Borrowed("Something here"),
-                a_number: i * 100, // this is the partition key
-                a_timestamp: chrono::Utc::now().timestamp(),
-            },
-        );
+        let document_to_insert = Document::new(MySampleStruct {
+            id: Cow::Owned(format!("unique_id{}", i)),
+            a_string: Cow::Borrowed("Something here"),
+            a_number: i * 100, // this is the partition key
+            a_timestamp: chrono::Utc::now().timestamp(),
+        });
 
         // insert it!
         collection_client
@@ -109,25 +108,31 @@ async fn main() -> Result<(), Box<dyn Error>> {
     query_documents_response
         .results
         .iter()
-        .for_each(|document| println!("number ==> {}", document.result.a_number));
+        .for_each(|document| {
+            if let QueryResult::DocumentQueryResult(document) = document {
+                println!("number ==> {}", document.result.a_number);
+            }
+        });
 
     // TASK 4
     for ref document in query_documents_response.results {
-        println!(
-            "deleting id == {}, a_number == {}.",
-            document.document_attributes.id, document.result.a_number
-        );
+        if let QueryResult::DocumentQueryResult(document) = document {
+            println!(
+                "deleting id == {}, a_number == {}.",
+                document.result.id, document.result.a_number
+            );
 
-        // to spice the delete a little we use optimistic concurreny
-        collection_client
-            .with_document(
-                &document.document_attributes.id,
-                PartitionKeys::new().push(&document.result.a_number)?,
-            )
-            .delete_document()
-            .with_if_match_condition((&document.document_attributes).into())
-            .execute()
-            .await?;
+            // to spice the delete a little we use optimistic concurreny
+            collection_client
+                .with_document(
+                    &document.result.id,
+                    PartitionKeys::new().push(&document.result.a_number)?,
+                )
+                .delete_document()
+                .with_if_match_condition((&document.document_attributes).into())
+                .execute()
+                .await?;
+        }
     }
 
     // TASK 5
