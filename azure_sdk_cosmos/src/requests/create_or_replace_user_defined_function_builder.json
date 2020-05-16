@@ -1,5 +1,5 @@
 {
-	"name": "CreateUserDefinedFunctionBuilder",
+	"name": "CreateOrReplaceUserDefinedFunctionBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
 			"crate::clients::{CosmosUriBuilder}",
@@ -23,6 +23,10 @@
 			"name": "user_defined_function_client",
 			"field_type": "&'a UserDefinedFunctionClient<'a, CUB>",
 			"trait_get": "UserDefinedFunctionClientRequired<'a, CUB>"
+		},
+		{
+			"name": "is_create",
+			"field_type": "bool"
 		}
 	],
 	"fields": [

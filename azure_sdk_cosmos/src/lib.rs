@@ -704,10 +704,10 @@ where
     fn user_defined_function_name(&self) -> &'a dyn UserDefinedFunctionName;
     fn create_user_defined_function(
         &self,
-    ) -> requests::CreateUserDefinedFunctionBuilder<'_, CUB, No>;
-    //fn replace_user_defined_function(
-    //    &self,
-    //) -> requests::ReplaceUserDefinedFunctionBuilder<'_, CUB, No>;
+    ) -> requests::CreateOrReplaceUserDefinedFunctionBuilder<'_, CUB, No>;
+    fn replace_user_defined_function(
+        &self,
+    ) -> requests::CreateOrReplaceUserDefinedFunctionBuilder<'_, CUB, No>;
     fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB>;
 }
 

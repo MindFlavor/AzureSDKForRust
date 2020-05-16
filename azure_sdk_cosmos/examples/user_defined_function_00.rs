@@ -20,15 +20,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client = ClientBuilder::new(account, authorization_token)?;
     let database_client = client.with_database(&database);
     let collection_client = database_client.with_collection(&collection);
+    let user_defined_function_client = collection_client.with_user_defined_function(&"test9");
 
-    let ret = collection_client
-        .with_user_defined_function(&"test9")
+    let ret = user_defined_function_client
         .create_user_defined_function()
         .with_body("body")
         .execute()
         .await?;
-
-    println!("Response object:\n{:#?}", ret);
+    println!("Creeate response object:\n{:#?}", ret);
 
     let stream = collection_client
         .list_user_defined_functions()
@@ -37,17 +36,27 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut stream = Box::pin(stream.stream());
     while let Some(ret) = stream.next().await {
         let ret = ret.unwrap();
-        println!("Received {} items. Object:\n{:#?}", ret.item_count, ret);
+        println!(
+            "List loop received {} items. Object:\n{:#?}",
+            ret.item_count, ret
+        );
     }
 
-    let ret = collection_client
-        .with_user_defined_function(&"test9")
+    let ret = user_defined_function_client
+        .replace_user_defined_function()
+        .with_consistency_level((&ret).into())
+        .with_body("new body")
+        .execute()
+        .await?;
+    println!("Replace response object:\n{:#?}", ret);
+
+    let ret = user_defined_function_client
         .delete_user_defined_function()
         .with_consistency_level((&ret).into())
         .execute()
         .await?;
 
-    println!("Response object:\n{:#?}", ret);
+    println!("Delete response object:\n{:#?}", ret);
 
     Ok(())
 }

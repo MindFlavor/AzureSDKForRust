@@ -58,15 +58,15 @@ where
 
     fn create_user_defined_function(
         &self,
-    ) -> requests::CreateUserDefinedFunctionBuilder<'_, CUB, No> {
-        requests::CreateUserDefinedFunctionBuilder::new(self)
+    ) -> requests::CreateOrReplaceUserDefinedFunctionBuilder<'_, CUB, No> {
+        requests::CreateOrReplaceUserDefinedFunctionBuilder::new(self, true)
     }
 
-    //fn replace_user_defined_function(
-    //    &self,
-    //) -> requests::ReplaceUserDefinedFunctionBuilder<'_, CUB, No> {
-    //    requests::ReplaceUserDefinedFunctionBuilder::new(self)
-    //}
+    fn replace_user_defined_function(
+        &self,
+    ) -> requests::CreateOrReplaceUserDefinedFunctionBuilder<'_, CUB, No> {
+        requests::CreateOrReplaceUserDefinedFunctionBuilder::new(self, false)
+    }
 
     fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB> {
         requests::DeleteUserDefinedFunctionBuilder::new(self)
