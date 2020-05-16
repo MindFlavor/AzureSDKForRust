@@ -52,7 +52,7 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for QueryResponseMeta {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum QueryResult<T> {
-    DocumentQueryResult(DocumentQueryResult<T>),
+    Document(DocumentQueryResult<T>),
     Raw(T),
 }
 
@@ -113,7 +113,7 @@ where
                 // to be handled at runtime.
                 match serde_json::from_value(doc.to_owned()) {
                     Ok(document_attributes) => {
-                        results.push(QueryResult::DocumentQueryResult(DocumentQueryResult {
+                        results.push(QueryResult::Document(DocumentQueryResult {
                             document_attributes,
                             result,
                         }))
