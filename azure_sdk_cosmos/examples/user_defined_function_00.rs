@@ -33,7 +33,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client = ClientBuilder::new(account, authorization_token)?;
     let database_client = client.with_database(&database);
     let collection_client = database_client.with_collection(&collection);
-    let user_defined_function_client = collection_client.with_user_defined_function(&"test13");
+    let user_defined_function_client = collection_client.with_user_defined_function(&"test14");
 
     let ret = user_defined_function_client
         .create_user_defined_function()
@@ -67,8 +67,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .query_documents()
         .with_query(&"SELECT udf.test12(100)".into())
         .with_consistency_level((&ret).into())
-        .with_query_cross_partition(true)
-        .with_parallelize_cross_partition_query(true)
         .with_max_item_count(2)
         .execute()
         .await?;
