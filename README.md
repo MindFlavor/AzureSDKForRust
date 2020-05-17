@@ -42,7 +42,7 @@ You can find examples in the [```examples```](https://github.com/MindFlavor/Azur
 ```rust
 #[macro_use]
 extern crate serde_derive;
-// Using the prelude module of the Cosmos crate makes easier to use the Rust Azure SDK for Cosmos
+// Using the prelude module of the CosmosDB crate makes easier to use the Rust Azure SDK for Cosmos
 // DB.
 use azure_sdk_core::prelude::*;
 use azure_sdk_cosmos::prelude::*;
@@ -55,6 +55,7 @@ use std::error::Error;
 // work (you can create with this SDK too, check the examples folder for that task).
 #[derive(Serialize, Deserialize, Debug)]
 struct MySampleStruct<'a> {
+    id: Cow<'a, str>,
     a_string: Cow<'a, str>,
     a_number: u64,
     a_timestamp: i64,
@@ -98,14 +99,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("Inserting 10 documents...");
     for i in 0..10 {
         // define the document.
-        let document_to_insert = Document::new(
-            format!("unique_id{}", i), // this is the primary key, AKA "/id".
-            MySampleStruct {
-                a_string: Cow::Borrowed("Something here"),
-                a_number: i * 100, // this is the partition key
-                a_timestamp: chrono::Utc::now().timestamp(),
-            },
-        );
+        let document_to_insert = Document::new(MySampleStruct {
+            id: Cow::Owned(format!("unique_id{}", i)),
+            a_string: Cow::Borrowed("Something here"),
+            a_number: i * 100, // this is the partition key
+            a_timestamp: chrono::Utc::now().timestamp(),
+        });
 
         // insert it!
         collection_client
@@ -138,10 +137,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("\nQuerying documents");
     let query_documents_response = collection_client
         .query_documents()
-        .with_query(&("SELECT * FROM A WHERE A.a_number < 600".into()))
+        .with_query(&("SELECT * FROM A WHERE A.a_number < 600".into())) // there are other ways to construct a query, this is the simplest.
         .with_query_cross_partition(true) // this will perform a cross partition query! notice how simple it is!
-        .execute::<MySampleStruct>()
-        .await?;
+        .execute::<MySampleStruct>() // This will make sure the result is our custom struct!
+        .await?
+        .into_documents() // queries can return Documents or Raw json (ie without etag, _rid, etc...). Since our query return docs we convert with this function.
+        .unwrap(); // we know in advance that the conversion to Document will not fail since we SELECT'ed * FROM table
 
     println!(
         "Received {} documents!",
@@ -151,19 +152,22 @@ async fn main() -> Result<(), Box<dyn Error>> {
     query_documents_response
         .results
         .iter()
-        .for_each(|document| println!("number ==> {}", document.result.a_number));
+        .for_each(|document| {
+            println!("number ==> {}", document.result.a_number);
+        });
 
     // TASK 4
     for ref document in query_documents_response.results {
+        // From our query above we are sure to receive a Document.
         println!(
             "deleting id == {}, a_number == {}.",
-            document.document_attributes.id, document.result.a_number
+            document.result.id, document.result.a_number
         );
 
         // to spice the delete a little we use optimistic concurreny
         collection_client
             .with_document(
-                &document.document_attributes.id,
+                &document.result.id,
                 PartitionKeys::new().push(&document.result.a_number)?,
             )
             .delete_document()
