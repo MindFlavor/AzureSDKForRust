@@ -95,10 +95,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("\nQuerying documents");
     let query_documents_response = collection_client
         .query_documents()
-        .with_query(&("SELECT * FROM A WHERE A.a_number < 600".into()))
+        .with_query(&("SELECT * FROM A WHERE A.a_number < 600".into())) // there are other ways to construct a query, this is the simplest.
         .with_query_cross_partition(true) // this will perform a cross partition query! notice how simple it is!
-        .execute::<MySampleStruct>()
-        .await?;
+        .execute::<MySampleStruct>() // This will make sure the result is our custom struct!
+        .await?
+        .into_documents() // queries can return Documents or Raw json (ie without etag, _rid, etc...). Since our query return docs we convert with this function.
+        .unwrap(); // we know in advance that the conversion to Document will not fail since we SELECT'ed * FROM table
 
     println!(
         "Received {} documents!",
@@ -109,41 +111,27 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .results
         .iter()
         .for_each(|document| {
-            // we can either receive a Document (with etag, rid and so on)
-            // or we can recevie a "raw" answer (for example if we query
-            // a function) that does not have etag, rid, self, etc...
-            // From our query above we are sure to receive a Document
-            // but we handle every possibility here since we do not
-            // care abount the extra fields.
-            let document = match document {
-                QueryResult::Document(document) => &document.result,
-                QueryResult::Raw(document) => document,
-            };
-            println!("number ==> {}", document.a_number);
+            println!("number ==> {}", document.result.a_number);
         });
 
     // TASK 4
     for ref document in query_documents_response.results {
         // From our query above we are sure to receive a Document.
-        if let QueryResult::Document(document) = document {
-            println!(
-                "deleting id == {}, a_number == {}.",
-                document.result.id, document.result.a_number
-            );
+        println!(
+            "deleting id == {}, a_number == {}.",
+            document.result.id, document.result.a_number
+        );
 
-            // to spice the delete a little we use optimistic concurreny
-            collection_client
-                .with_document(
-                    &document.result.id,
-                    PartitionKeys::new().push(&document.result.a_number)?,
-                )
-                .delete_document()
-                .with_if_match_condition((&document.document_attributes).into())
-                .execute()
-                .await?;
-        } else {
-            panic!("expected a document, received a raw response");
-        }
+        // to spice the delete a little we use optimistic concurreny
+        collection_client
+            .with_document(
+                &document.result.id,
+                PartitionKeys::new().push(&document.result.a_number)?,
+            )
+            .delete_document()
+            .with_if_match_condition((&document.document_attributes).into())
+            .execute()
+            .await?;
     }
 
     // TASK 5

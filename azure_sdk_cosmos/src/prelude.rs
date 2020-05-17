@@ -5,7 +5,7 @@ pub use crate::collection::{
 pub use crate::database::DatabaseName;
 pub use crate::document::Document;
 pub use crate::query::Query;
-pub use crate::responses::QueryResult;
+pub use crate::responses::{QueryDocumentsResponse, QueryResult};
 pub use crate::{
     AIMOption, AIMSupport, AllowTentativeWritesOption, AllowTentativeWritesSupport,
     AttachmentTrait, AuthorizationToken, ClientRequired, CollectionClientRequired,
