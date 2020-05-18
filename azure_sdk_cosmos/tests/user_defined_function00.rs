@@ -95,13 +95,14 @@ async fn user_defined_function00() -> Result<(), Box<dyn Error>> {
 
     let query_stmt = format!("SELECT udf.{}(100)", USER_DEFINED_FUNCTION_NAME);
 
-    let ret: QueryDocumentsResponse<serde_json::Value> = collection_client
+    let ret: QueryDocumentsResponseRaw<serde_json::Value> = collection_client
         .query_documents()
         .with_query(&(&query_stmt as &str).into())
         .with_consistency_level((&ret).into())
         .with_max_item_count(2)
         .execute()
-        .await?;
+        .await?
+        .into_raw();
 
     let _ret = user_defined_function_client
         .delete_user_defined_function()

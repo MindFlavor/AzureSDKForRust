@@ -2,7 +2,8 @@ use crate::responses::{
     CreateDocumentResponse, CreateReferenceAttachmentResponse, CreateSlugAttachmentResponse,
     CreateUserDefinedFunctionResponse, DeleteDocumentResponse, DeleteUserDefinedFunctionResponse,
     ExecuteStoredProcedureResponse, GetDocumentResponse, ListDocumentsResponse,
-    ListUserDefinedFunctionsResponse, QueryDocumentsResponse, ReplaceDocumentResponse,
+    ListUserDefinedFunctionsResponse, QueryDocumentsResponse, QueryDocumentsResponseDocuments,
+    QueryDocumentsResponseRaw, ReplaceDocumentResponse,
 };
 use serde::de::DeserializeOwned;
 use std::borrow::Cow;
@@ -62,6 +63,18 @@ impl<'a, T> From<&'a ListDocumentsResponse<T>> for ConsistencyLevel<'a> {
 impl<'a, T> From<&'a QueryDocumentsResponse<T>> for ConsistencyLevel<'a> {
     fn from(query_documents_response: &'a QueryDocumentsResponse<T>) -> Self {
         ConsistencyLevel::Session(Cow::from(&query_documents_response.session_token))
+    }
+}
+
+impl<'a, T> From<&'a QueryDocumentsResponseRaw<T>> for ConsistencyLevel<'a> {
+    fn from(query_documents_response_raw: &'a QueryDocumentsResponseRaw<T>) -> Self {
+        ConsistencyLevel::Session(Cow::from(&query_documents_response_raw.session_token))
+    }
+}
+
+impl<'a, T> From<&'a QueryDocumentsResponseDocuments<T>> for ConsistencyLevel<'a> {
+    fn from(query_documents_response_documents: &'a QueryDocumentsResponseDocuments<T>) -> Self {
+        ConsistencyLevel::Session(Cow::from(&query_documents_response_documents.session_token))
     }
 }
 

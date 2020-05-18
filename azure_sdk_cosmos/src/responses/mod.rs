@@ -70,7 +70,8 @@ pub use self::list_stored_procedures_response::ListStoredProceduresResponse;
 pub use self::list_user_defined_functions_response::ListUserDefinedFunctionsResponse;
 pub use self::list_users_response::ListUsersResponse;
 pub use self::query_documents_response::{
-    QueryDocumentsResponse, QueryDocumentsResponseRaw, QueryResponseMeta, QueryResult,
+    QueryDocumentsResponse, QueryDocumentsResponseDocuments, QueryDocumentsResponseRaw,
+    QueryResponseMeta, QueryResult,
 };
 pub use self::replace_document_response::ReplaceDocumentResponse;
 pub use self::replace_permission_response::ReplacePermissionResponse;
