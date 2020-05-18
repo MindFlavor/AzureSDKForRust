@@ -16,6 +16,7 @@ mod setup;
 // specified in the Document struct below.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct MySampleStruct<'a> {
+    id: Cow<'a, str>,
     a_string: Cow<'a, str>,
     a_number: u64,
     a_timestamp: i64,
@@ -73,26 +74,24 @@ async fn attachment() -> Result<(), Box<dyn Error>> {
 
     let id = format!("unique_id{}", 100);
 
-    let doc = Document::new(
-        id.clone(),
-        MySampleStruct {
-            a_string: Cow::Borrowed("Something here"),
-            a_number: 100,
-            a_timestamp: chrono::Utc::now().timestamp(),
-        },
-    );
+    let doc = Document::new(MySampleStruct {
+        id: Cow::Borrowed(&id),
+        a_string: Cow::Borrowed("Something here"),
+        a_number: 100,
+        a_timestamp: chrono::Utc::now().timestamp(),
+    });
 
     // let's add an entity.
     let session_token: ConsistencyLevel = collection_client
         .create_document()
         .with_document(&doc)
-        .with_partition_keys(PartitionKeys::new().push(doc.document_attributes.id())?)
+        .with_partition_keys(PartitionKeys::new().push(&doc.document.id)?)
         .execute()
         .await?
         .into();
 
     let mut partition_keys = PartitionKeys::new();
-    partition_keys.push(doc.document_attributes.id())?;
+    partition_keys.push(doc.document.id)?;
     let document_client = collection_client.with_document(&id, &partition_keys);
 
     // list attachments, there must be none.
