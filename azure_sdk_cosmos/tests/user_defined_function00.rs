@@ -94,7 +94,6 @@ async fn user_defined_function00() -> Result<(), Box<dyn Error>> {
         .await?;
 
     let query_stmt = format!("SELECT udf.{}(100)", USER_DEFINED_FUNCTION_NAME);
-
     let ret: QueryDocumentsResponseRaw<serde_json::Value> = collection_client
         .query_documents()
         .with_query(&(&query_stmt as &str).into())
@@ -103,6 +102,35 @@ async fn user_defined_function00() -> Result<(), Box<dyn Error>> {
         .execute()
         .await?
         .into_raw();
+
+    assert_eq!(ret.item_count, 1);
+
+    let fn_return = ret.results[0].as_object().unwrap();
+    let value = fn_return.iter().take(1).next().unwrap().1.as_f64().unwrap();
+    assert_eq!(value, 10.0);
+
+    let query_stmt = format!("SELECT udf.{}(10000)", USER_DEFINED_FUNCTION_NAME);
+    let ret: QueryDocumentsResponseRaw<serde_json::Value> = collection_client
+        .query_documents()
+        .with_query(&(&query_stmt as &str).into())
+        .with_consistency_level((&ret).into())
+        .with_max_item_count(2)
+        .execute()
+        .await?
+        .into_raw();
+
+    assert_eq!(ret.item_count, 1);
+
+    let fn_return = ret.results[0].as_object().unwrap();
+    let value = fn_return
+        .into_iter()
+        .take(1)
+        .next()
+        .unwrap()
+        .1
+        .as_f64()
+        .unwrap();
+    assert_eq!(value, 4000.0);
 
     let _ret = user_defined_function_client
         .delete_user_defined_function()
