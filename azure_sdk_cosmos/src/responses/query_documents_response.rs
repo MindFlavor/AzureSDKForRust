@@ -132,7 +132,7 @@ where
                         }))
                     }
                     Err(error) => {
-                        println!("{:#?}", error);
+                        warn!("{:#?}", error);
                         results.push(QueryResult::Raw(result));
                     }
                 }
