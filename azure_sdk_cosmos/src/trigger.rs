@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 create_enum!(
     Operation,
     (All, "All"),
@@ -10,10 +8,10 @@ create_enum!(
 
 create_enum!(Type, (Pre, "Pre"), (Post, "Post"));
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Trigger<'a> {
-    pub id: Cow<'a, str>,
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+pub struct Trigger {
+    pub id: String,
     pub operation: Operation,
     pub r#type: Type,
-    pub body: Cow<'a, str>,
+    pub body: String,
 }
