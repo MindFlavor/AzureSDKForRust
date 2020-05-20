@@ -6,6 +6,8 @@ extern crate log;
 extern crate serde_derive;
 #[macro_use]
 extern crate failure;
+#[macro_use]
+extern crate azure_sdk_core;
 
 pub mod attachment;
 mod authorization_token;
@@ -33,6 +35,7 @@ mod resource_quota;
 pub mod responses;
 pub mod stored_procedure;
 mod to_json_vector;
+pub mod trigger;
 mod user;
 mod user_defined_function;
 
@@ -53,6 +56,7 @@ pub use self::query::{Param, ParamDef, Query};
 pub use self::requests::*;
 pub use self::resource::Resource;
 pub use self::resource_quota::ResourceQuota;
+pub use self::trigger::Trigger;
 use crate::clients::{
     AttachmentClient, Client, CollectionClient, CosmosUriBuilder, DatabaseClient, DocumentClient,
     PermissionClient, StoredProcedureClient, UserClient, UserDefinedFunctionClient,
