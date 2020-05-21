@@ -56,10 +56,10 @@ pub use self::query::{Param, ParamDef, Query};
 pub use self::requests::*;
 pub use self::resource::Resource;
 pub use self::resource_quota::ResourceQuota;
-pub use self::trigger::Trigger;
+pub use self::trigger::{Trigger, TriggerName};
 use crate::clients::{
     AttachmentClient, Client, CollectionClient, CosmosUriBuilder, DatabaseClient, DocumentClient,
-    PermissionClient, StoredProcedureClient, UserClient, UserDefinedFunctionClient,
+    PermissionClient, StoredProcedureClient, TriggerClient, UserClient, UserDefinedFunctionClient,
 };
 use crate::collection::Collection;
 use crate::collection::CollectionName;
@@ -306,6 +306,24 @@ pub trait PartitionKeysSupport<'a> {
     fn with_partition_keys(self, partition_keys: &'a PartitionKeys) -> Self::O;
 }
 
+pub trait TriggerOperationRequired {
+    fn trigger_operation(&self) -> self::trigger::Operation;
+}
+
+pub trait TriggerOperationSupport {
+    type O;
+    fn with_trigger_operation(self, a: self::trigger::Operation) -> Self::O;
+}
+
+pub trait TriggerTypeRequired {
+    fn trigger_type(&self) -> self::trigger::Type;
+}
+
+pub trait TriggerTypeSupport {
+    type O;
+    fn with_trigger_type(self, a: self::trigger::Type) -> Self::O;
+}
+
 pub(crate) fn add_partition_keys_header(
     partition_keys: &PartitionKeys,
     builder: Builder,
@@ -360,6 +378,15 @@ pub trait UserDefinedFunctionBodyRequired<'a> {
 }
 
 pub trait UserDefinedFunctionBodySupport<'a> {
+    type O;
+    fn with_body(self, body: &'a str) -> Self::O;
+}
+
+pub trait TriggerBodyRequired<'a> {
+    fn body(&self) -> &'a str;
+}
+
+pub trait TriggerBodySupport<'a> {
     type O;
     fn with_body(self, body: &'a str) -> Self::O;
 }
@@ -420,6 +447,13 @@ where
     CUB: CosmosUriBuilder,
 {
     fn user_defined_function_client(&self) -> &'a UserDefinedFunctionClient<'a, CUB>;
+}
+
+pub trait TriggerClientRequired<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn trigger_client(&self) -> &'a TriggerClient<'a, CUB>;
 }
 
 pub trait UserClientRequired<'a, CUB>
@@ -724,6 +758,29 @@ where
         &self,
         method: hyper::Method,
         specify_user_defined_function_name: bool,
+    ) -> http::request::Builder;
+}
+
+pub trait TriggerTrait<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn database_name(&self) -> &'a dyn DatabaseName;
+    fn collection_name(&self) -> &'a dyn CollectionName;
+    fn trigger_name(&self) -> &'a dyn TriggerName;
+    fn create_trigger(&self) -> requests::CreateTriggerBuilder<'_, CUB, No, No, No>;
+    //fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No>;
+    //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB>;
+}
+
+pub(crate) trait TriggerBuilderTrait<'a, CUB>: TriggerTrait<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn prepare_request(
+        &self,
+        method: hyper::Method,
+        specify_trigger_name: bool,
     ) -> http::request::Builder;
 }
 
