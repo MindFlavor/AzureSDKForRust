@@ -10,9 +10,19 @@ create_enum!(Type, (Pre, "Pre"), (Post, "Post"));
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Trigger {
+    #[serde(rename = "_rid")]
+    pub rid: String,
+    #[serde(rename = "_ts")]
+    pub ts: u64,
+    pub _self: String,
+    #[serde(rename = "_etag")]
+    pub etag: String,
+
     pub id: String,
-    pub operation: Operation,
-    pub r#type: Type,
+    #[serde(rename = "triggerOperation")]
+    pub trigger_operation: Operation,
+    #[serde(rename = "triggerType")]
+    pub trigger_type: Type,
     pub body: String,
 }
 

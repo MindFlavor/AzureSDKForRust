@@ -1,5 +1,5 @@
 use crate::from_headers::*;
-use crate::user_defined_function::UserDefinedFunction;
+use crate::trigger::Trigger;
 use crate::ResourceQuota;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::etag_from_headers;
@@ -9,7 +9,7 @@ use http::HeaderMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CreateTriggerResponse {
-    pub user_defined_function: UserDefinedFunction,
+    pub trigger: Trigger,
     pub server: String,
     pub last_state_change: DateTime<Utc>,
     pub etag: String,
@@ -46,7 +46,7 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for CreateTriggerResponse {
         println!("{:#?}", std::str::from_utf8(body));
 
         Ok(Self {
-            user_defined_function: serde_json::from_slice(body)?,
+            trigger: serde_json::from_slice(body)?,
             server: server_from_headers(headers)?.to_owned(),
             last_state_change: last_state_change_from_headers(headers)?,
             etag: etag_from_headers(headers)?,

@@ -670,6 +670,7 @@ where
         &'c self,
         user_defined_function_name: &'c dyn UserDefinedFunctionName,
     ) -> UserDefinedFunctionClient<'c, CUB>;
+    fn with_trigger<'c>(&'c self, trigger_name: &'c dyn TriggerName) -> TriggerClient<'c, CUB>;
     fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB>;
     fn list_user_defined_functions(&self)
         -> requests::ListUserDefinedFunctionsBuilder<'_, '_, CUB>;

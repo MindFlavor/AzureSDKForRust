@@ -312,16 +312,51 @@ where
     }
 }
 
-// methods callable regardless
-impl<'a, CUB, TriggerOperationSet, TriggerTypeSet, BodySet>
-    CreateTriggerBuilder<'a, CUB, TriggerOperationSet, TriggerTypeSet, BodySet>
+// methods callable only when every mandatory field has been filled
+impl<'a, CUB> CreateTriggerBuilder<'a, CUB, Yes, Yes, Yes>
 where
-    TriggerOperationSet: ToAssign,
-    TriggerTypeSet: ToAssign,
-    BodySet: ToAssign,
     CUB: CosmosUriBuilder,
 {
-}
+    pub async fn execute(&self) -> Result<CreateTriggerResponse, AzureError> {
+        trace!("CreateTriggerBuilder::execute called");
 
-// methods callable only when every mandatory field has been filled
-impl<'a, CUB> CreateTriggerBuilder<'a, CUB, Yes, Yes, Yes> where CUB: CosmosUriBuilder {}
+        let req = self
+            .trigger_client
+            .prepare_request(hyper::Method::POST, false);
+
+        // add trait headers
+        let req = UserAgentOption::add_header(self, req);
+        let req = ActivityIdOption::add_header(self, req);
+        let req = ConsistencyLevelOption::add_header(self, req);
+
+        let req = req.header(http::header::CONTENT_TYPE, "application/json");
+
+        #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+        struct _Request<'a> {
+            pub id: &'a str,
+            #[serde(rename = "triggerOperation")]
+            pub trigger_operation: Operation,
+            #[serde(rename = "triggerType")]
+            pub trigger_type: Type,
+            pub body: &'a str,
+        }
+
+        let request = _Request {
+            id: self.trigger_client.trigger_name().name(),
+            trigger_operation: self.trigger_operation(),
+            trigger_type: self.trigger_type(),
+            body: self.body(),
+        };
+
+        let request = serde_json::to_string(&request)?;
+        let request = req.body(hyper::Body::from(request))?;
+
+        let (headers, body) = check_status_extract_headers_and_body(
+            self.trigger_client().hyper_client().request(request),
+            StatusCode::CREATED,
+        )
+        .await?;
+
+        Ok((&headers, &body as &[u8]).try_into()?)
+    }
+}
