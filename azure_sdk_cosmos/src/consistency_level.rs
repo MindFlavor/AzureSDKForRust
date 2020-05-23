@@ -1,8 +1,8 @@
 use crate::responses::{
     CreateDocumentResponse, CreateReferenceAttachmentResponse, CreateSlugAttachmentResponse,
-    CreateUserDefinedFunctionResponse, DeleteAttachmentResponse, DeleteDocumentResponse,
-    DeleteUserDefinedFunctionResponse, ExecuteStoredProcedureResponse, GetAttachmentResponse,
-    GetDocumentResponse, ListAttachmentsResponse, ListDocumentsResponse,
+    CreateTriggerResponse, CreateUserDefinedFunctionResponse, DeleteAttachmentResponse,
+    DeleteDocumentResponse, DeleteUserDefinedFunctionResponse, ExecuteStoredProcedureResponse,
+    GetAttachmentResponse, GetDocumentResponse, ListAttachmentsResponse, ListDocumentsResponse,
     ListUserDefinedFunctionsResponse, QueryDocumentsResponse, QueryDocumentsResponseDocuments,
     QueryDocumentsResponseRaw, ReplaceDocumentResponse, ReplaceReferenceAttachmentResponse,
 };
@@ -72,6 +72,7 @@ implement_from!(DeleteDocumentResponse);
 implement_from!(CreateUserDefinedFunctionResponse);
 implement_from!(DeleteUserDefinedFunctionResponse);
 implement_from!(ListUserDefinedFunctionsResponse);
+implement_from!(CreateTriggerResponse);
 implement_from!(ListDocumentsResponse, T);
 implement_from!(QueryDocumentsResponse, T);
 implement_from!(QueryDocumentsResponseRaw, T);

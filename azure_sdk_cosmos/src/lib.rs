@@ -769,8 +769,8 @@ where
     fn database_name(&self) -> &'a dyn DatabaseName;
     fn collection_name(&self) -> &'a dyn CollectionName;
     fn trigger_name(&self) -> &'a dyn TriggerName;
-    fn create_trigger(&self) -> requests::CreateTriggerBuilder<'_, CUB, No, No, No>;
-    //fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No>;
+    fn create_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No>;
+    fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No>;
     //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB>;
 }
 

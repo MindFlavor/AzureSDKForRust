@@ -1,6 +1,6 @@
 use azure_sdk_cosmos::prelude::*;
 use azure_sdk_cosmos::trigger::*;
-use futures::stream::StreamExt;
+//use futures::stream::StreamExt;
 use std::error::Error;
 
 const TRIGGER_BODY: &str = r#"
@@ -60,10 +60,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .create_trigger()
         .with_trigger_type(TriggerType::Post)
         .with_trigger_operation(TriggerOperation::All)
-        .with_body(&TRIGGER_BODY)
+        .with_body(&"something")
         .execute()
         .await?;
     println!("Creeate response object:\n{:#?}", ret);
+
+    let ret = trigger_client
+        .replace_trigger()
+        .with_consistency_level(ret.into())
+        .with_trigger_type(TriggerType::Post)
+        .with_trigger_operation(TriggerOperation::All)
+        .with_body(&TRIGGER_BODY)
+        .execute()
+        .await?;
+    println!("Replace response object:\n{:#?}", ret);
 
     Ok(())
 }

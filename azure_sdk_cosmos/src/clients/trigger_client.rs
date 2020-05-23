@@ -56,13 +56,13 @@ where
         self.trigger_name
     }
 
-    fn create_trigger(&self) -> requests::CreateTriggerBuilder<'_, CUB, No, No, No> {
-        requests::CreateTriggerBuilder::new(self)
+    fn create_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No> {
+        requests::CreateOrReplaceTriggerBuilder::new(self, true)
     }
 
-    //fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No> {
-    //    requests::CreateOrReplaceTriggerBuilder::new(self, false)
-    //}
+    fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No> {
+        requests::CreateOrReplaceTriggerBuilder::new(self, false)
+    }
 
     //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB> {
     //    requests::DeleteTriggerBuilder::new(self)

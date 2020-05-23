@@ -1,5 +1,5 @@
 {
-	"name": "CreateTriggerBuilder",
+	"name": "CreateOrReplaceTriggerBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
 			"crate::clients::{CosmosUriBuilder}",
@@ -24,6 +24,10 @@
 			"name": "trigger_client",
 			"field_type": "&'a TriggerClient<'a, CUB>",
 			"trait_get": "TriggerClientRequired<'a, CUB>"
+		},
+		{
+			"name": "is_create",
+			"field_type": "bool"
 		}
 	],
 	"fields": [
