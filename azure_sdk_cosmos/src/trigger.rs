@@ -1,12 +1,12 @@
 create_enum!(
-    Operation,
+    TriggerOperation,
     (All, "All"),
     (Create, "Create"),
     (Replace, "Replace"),
     (Delete, "Delete")
 );
 
-create_enum!(Type, (Pre, "Pre"), (Post, "Post"));
+create_enum!(TriggerType, (Pre, "Pre"), (Post, "Post"));
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Trigger {
@@ -20,9 +20,9 @@ pub struct Trigger {
 
     pub id: String,
     #[serde(rename = "triggerOperation")]
-    pub trigger_operation: Operation,
+    pub trigger_operation: TriggerOperation,
     #[serde(rename = "triggerType")]
-    pub trigger_type: Type,
+    pub trigger_type: TriggerType,
     pub body: String,
 }
 

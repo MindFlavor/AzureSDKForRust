@@ -29,19 +29,19 @@
 	"fields": [
 		{
 			"name": "trigger_operation",
-			"field_type": "Operation",
+			"field_type": "TriggerOperation",
 			"builder_type": "TriggerOperationSet",
 			"optional": false,
-			"initializer": "Operation::All",
+			"initializer": "TriggerOperation::All",
 			"trait_get": "TriggerOperationRequired",
 			"trait_set": "TriggerOperationSupport"
 		},
 		{
 			"name": "trigger_type",
-			"field_type": "Type",
+			"field_type": "TriggerType",
 			"builder_type": "TriggerTypeSet",
 			"optional": false,
-			"initializer": "Type::Pre",
+			"initializer": "TriggerType::Pre",
 			"trait_get": "TriggerTypeRequired",
 			"trait_set": "TriggerTypeSupport"
 		},

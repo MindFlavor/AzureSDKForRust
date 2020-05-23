@@ -42,8 +42,8 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for CreateTriggerResponse {
         let headers = value.0;
         let body = value.1;
 
-        println!("{:#?}", headers);
-        println!("{:#?}", std::str::from_utf8(body));
+        debug!("{:#?}", headers);
+        debug!("{:#?}", std::str::from_utf8(body));
 
         Ok(Self {
             trigger: serde_json::from_slice(body)?,

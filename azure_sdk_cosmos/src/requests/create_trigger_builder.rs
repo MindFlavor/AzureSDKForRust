@@ -24,8 +24,8 @@ where
     p_trigger_operation: PhantomData<TriggerOperationSet>,
     p_trigger_type: PhantomData<TriggerTypeSet>,
     p_body: PhantomData<BodySet>,
-    trigger_operation: Operation,
-    trigger_type: Type,
+    trigger_operation: TriggerOperation,
+    trigger_type: TriggerType,
     body: Option<&'a str>,
     user_agent: Option<&'a str>,
     activity_id: Option<&'a str>,
@@ -43,9 +43,9 @@ where
         CreateTriggerBuilder {
             trigger_client,
             p_trigger_operation: PhantomData {},
-            trigger_operation: Operation::All,
+            trigger_operation: TriggerOperation::All,
             p_trigger_type: PhantomData {},
-            trigger_type: Type::Pre,
+            trigger_type: TriggerType::Pre,
             p_body: PhantomData {},
             body: None,
             user_agent: None,
@@ -80,7 +80,7 @@ where
     CUB: CosmosUriBuilder,
 {
     #[inline]
-    fn trigger_operation(&self) -> Operation {
+    fn trigger_operation(&self) -> TriggerOperation {
         self.trigger_operation
     }
 }
@@ -93,7 +93,7 @@ where
     CUB: CosmosUriBuilder,
 {
     #[inline]
-    fn trigger_type(&self) -> Type {
+    fn trigger_type(&self) -> TriggerType {
         self.trigger_type
     }
 }
@@ -163,7 +163,7 @@ where
     type O = CreateTriggerBuilder<'a, CUB, Yes, TriggerTypeSet, BodySet>;
 
     #[inline]
-    fn with_trigger_operation(self, trigger_operation: Operation) -> Self::O {
+    fn with_trigger_operation(self, trigger_operation: TriggerOperation) -> Self::O {
         CreateTriggerBuilder {
             trigger_client: self.trigger_client,
             p_trigger_operation: PhantomData {},
@@ -189,7 +189,7 @@ where
     type O = CreateTriggerBuilder<'a, CUB, TriggerOperationSet, Yes, BodySet>;
 
     #[inline]
-    fn with_trigger_type(self, trigger_type: Type) -> Self::O {
+    fn with_trigger_type(self, trigger_type: TriggerType) -> Self::O {
         CreateTriggerBuilder {
             trigger_client: self.trigger_client,
             p_trigger_operation: PhantomData {},
@@ -335,9 +335,9 @@ where
         struct _Request<'a> {
             pub id: &'a str,
             #[serde(rename = "triggerOperation")]
-            pub trigger_operation: Operation,
+            pub trigger_operation: TriggerOperation,
             #[serde(rename = "triggerType")]
-            pub trigger_type: Type,
+            pub trigger_type: TriggerType,
             pub body: &'a str,
         }
 

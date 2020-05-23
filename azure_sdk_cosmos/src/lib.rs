@@ -307,21 +307,21 @@ pub trait PartitionKeysSupport<'a> {
 }
 
 pub trait TriggerOperationRequired {
-    fn trigger_operation(&self) -> self::trigger::Operation;
+    fn trigger_operation(&self) -> self::trigger::TriggerOperation;
 }
 
 pub trait TriggerOperationSupport {
     type O;
-    fn with_trigger_operation(self, a: self::trigger::Operation) -> Self::O;
+    fn with_trigger_operation(self, a: self::trigger::TriggerOperation) -> Self::O;
 }
 
 pub trait TriggerTypeRequired {
-    fn trigger_type(&self) -> self::trigger::Type;
+    fn trigger_type(&self) -> self::trigger::TriggerType;
 }
 
 pub trait TriggerTypeSupport {
     type O;
-    fn with_trigger_type(self, a: self::trigger::Type) -> Self::O;
+    fn with_trigger_type(self, a: self::trigger::TriggerType) -> Self::O;
 }
 
 pub(crate) fn add_partition_keys_header(
