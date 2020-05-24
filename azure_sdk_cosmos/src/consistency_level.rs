@@ -24,12 +24,15 @@ impl<'a> ConsistencyLevel<'a> {
     }
 }
 
-impl<'a, T> From<T> for ConsistencyLevel<'a>
-where
-    T: Into<&'a str>,
-{
-    fn from(session_token: T) -> Self {
-        ConsistencyLevel::Session(Cow::from(session_token.into()))
+impl From<String> for ConsistencyLevel<'_> {
+    fn from(session_token: String) -> Self {
+        ConsistencyLevel::Session(Cow::from(session_token))
+    }
+}
+
+impl<'a> From<&'a str> for ConsistencyLevel<'a> {
+    fn from(session_token: &'a str) -> Self {
+        ConsistencyLevel::Session(Cow::from(session_token))
     }
 }
 
