@@ -75,6 +75,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?;
     println!("Replace response object:\n{:#?}", ret);
 
+    let mut last_session_token = None;
+
     let stream = collection_client
         .list_triggers()
         .with_max_item_count(3)
@@ -86,7 +88,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
             "List loop received {} items. Object:\n{:#?}",
             ret.item_count, ret
         );
+        last_session_token = Some(ret.session_token);
     }
+
+    let ret = trigger_client
+        .delete_trigger()
+        .with_consistency_level((&last_session_token.unwrap() as &str).into())
+        .execute()
+        .await?;
+    println!("Delete response object:\n{:#?}", ret);
 
     Ok(())
 }

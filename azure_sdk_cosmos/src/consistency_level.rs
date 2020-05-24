@@ -1,11 +1,4 @@
-use crate::responses::{
-    CreateDocumentResponse, CreateReferenceAttachmentResponse, CreateSlugAttachmentResponse,
-    CreateTriggerResponse, CreateUserDefinedFunctionResponse, DeleteAttachmentResponse,
-    DeleteDocumentResponse, DeleteUserDefinedFunctionResponse, ExecuteStoredProcedureResponse,
-    GetAttachmentResponse, GetDocumentResponse, ListAttachmentsResponse, ListDocumentsResponse,
-    ListUserDefinedFunctionsResponse, QueryDocumentsResponse, QueryDocumentsResponseDocuments,
-    QueryDocumentsResponseRaw, ReplaceDocumentResponse, ReplaceReferenceAttachmentResponse,
-};
+use crate::responses::*;
 use serde::de::DeserializeOwned;
 use std::borrow::Cow;
 use std::convert::From;
@@ -28,6 +21,15 @@ impl<'a> ConsistencyLevel<'a> {
             Self::ConsistentPrefix => "Prefix", //this is guessed since it's missing here: https://docs.microsoft.com/en-us/rest/api/cosmos-db/common-cosmosdb-rest-request-headers
             Self::Eventual => "Eventual",
         }
+    }
+}
+
+impl<'a, T> From<T> for ConsistencyLevel<'a>
+where
+    T: Into<&'a str>,
+{
+    fn from(session_token: T) -> Self {
+        ConsistencyLevel::Session(Cow::from(session_token.into()))
     }
 }
 
@@ -73,6 +75,8 @@ implement_from!(CreateUserDefinedFunctionResponse);
 implement_from!(DeleteUserDefinedFunctionResponse);
 implement_from!(ListUserDefinedFunctionsResponse);
 implement_from!(CreateTriggerResponse);
+implement_from!(ListTriggersResponse);
+implement_from!(DeleteTriggerResponse);
 implement_from!(ListDocumentsResponse, T);
 implement_from!(QueryDocumentsResponse, T);
 implement_from!(QueryDocumentsResponseRaw, T);

@@ -772,7 +772,7 @@ where
     fn trigger_name(&self) -> &'a dyn TriggerName;
     fn create_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No>;
     fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No>;
-    //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB>;
+    fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB>;
 }
 
 pub(crate) trait TriggerBuilderTrait<'a, CUB>: TriggerTrait<'a, CUB>

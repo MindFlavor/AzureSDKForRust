@@ -64,9 +64,9 @@ where
         requests::CreateOrReplaceTriggerBuilder::new(self, false)
     }
 
-    //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB> {
-    //    requests::DeleteTriggerBuilder::new(self)
-    //}
+    fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB> {
+        requests::DeleteTriggerBuilder::new(self)
+    }
 }
 
 impl<'a, CUB> TriggerBuilderTrait<'a, CUB> for TriggerClient<'a, CUB>
