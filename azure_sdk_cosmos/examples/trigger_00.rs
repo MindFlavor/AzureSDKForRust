@@ -1,6 +1,6 @@
 use azure_sdk_cosmos::prelude::*;
 use azure_sdk_cosmos::trigger::*;
-//use futures::stream::StreamExt;
+use futures::stream::StreamExt;
 use std::error::Error;
 
 const TRIGGER_BODY: &str = r#"
@@ -74,6 +74,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .execute()
         .await?;
     println!("Replace response object:\n{:#?}", ret);
+
+    let stream = collection_client
+        .list_triggers()
+        .with_max_item_count(3)
+        .with_consistency_level((&ret).into());
+    let mut stream = Box::pin(stream.stream());
+    while let Some(ret) = stream.next().await {
+        let ret = ret.unwrap();
+        println!(
+            "List loop received {} items. Object:\n{:#?}",
+            ret.item_count, ret
+        );
+    }
 
     Ok(())
 }
