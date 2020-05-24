@@ -121,6 +121,10 @@ where
         requests::ListUserDefinedFunctionsBuilder::new(self)
     }
 
+    fn list_triggers(&self) -> requests::ListTriggersBuilder<'_, '_, CUB> {
+        requests::ListTriggersBuilder::new(self)
+    }
+
     fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, CUB> {
         requests::GetPartitionKeyRangesBuilder::new(self)
     }
