@@ -1,4 +1,4 @@
-use crate::clients::DatabaseClient;
+//use crate::clients::DatabaseClient;
 use crate::database::DatabaseName;
 use crate::headers::*;
 use crate::requests;
@@ -186,20 +186,20 @@ impl<CUB> CosmosTrait<CUB> for Client<CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    fn list_databases(&self) -> ListDatabasesBuilder<'_, CUB> {
-        ListDatabasesBuilder::new(self)
-    }
+    //fn list_databases(&self) -> ListDatabasesBuilder<'_, CUB> {
+    //    ListDatabasesBuilder::new(self)
+    //}
 
-    fn with_database<'a>(&'a self, database_name: &'a dyn DatabaseName) -> DatabaseClient<'a, CUB> {
-        DatabaseClient::new(self, database_name)
-    }
+    //fn with_database<'a>(&'a self, database_name: &'a dyn DatabaseName) -> DatabaseClient<'a, CUB> {
+    //    DatabaseClient::new(self, database_name)
+    //}
 
-    fn create_database<DB>(&self) -> requests::CreateDatabaseBuilder<'_, CUB, DB, No>
-    where
-        DB: DatabaseName,
-    {
-        CreateDatabaseBuilder::new(self)
-    }
+    //fn create_database<DB>(&self) -> requests::CreateDatabaseBuilder<'_, CUB, DB, No>
+    //where
+    //    DB: DatabaseName,
+    //{
+    //    CreateDatabaseBuilder::new(self)
+    //}
 }
 
 impl<CUB> Client<CUB>
