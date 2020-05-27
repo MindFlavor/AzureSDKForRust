@@ -23,7 +23,7 @@ const TIME_FORMAT: &str = "%a, %d %h %Y %T GMT";
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum ResourceType {
+pub enum ResourceType {
     Databases,
     Collections,
     Documents,
