@@ -72,11 +72,11 @@ use azure_sdk_core::No;
 use http::request::Builder;
 use serde::Serialize;
 
-pub trait ClientRequired<'a, CUB>
+pub trait CosmosClientRequired<'a, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    fn client(&self) -> &'a Client<CUB>;
+    fn cosmos(&self) -> &'a CosmosStruct<CUB>;
 }
 
 pub trait DatabaseRequired<'a> {

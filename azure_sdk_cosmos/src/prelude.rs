@@ -1,4 +1,4 @@
-pub use crate::clients::{Client, ClientBuilder};
+pub use crate::clients::{ClientBuilder, CosmosStruct};
 pub use crate::collection::{
     Collection, DataType, IncludedPath, IncludedPathIndex, IndexingMode, IndexingPolicy, KeyKind,
 };
@@ -8,10 +8,10 @@ pub use crate::query::Query;
 pub use crate::responses::{QueryDocumentsResponse, QueryDocumentsResponseRaw, QueryResult};
 pub use crate::{
     AIMOption, AIMSupport, AllowTentativeWritesOption, AllowTentativeWritesSupport,
-    AttachmentTrait, AuthorizationToken, ClientRequired, CollectionClientRequired,
-    CollectionNameRequired, CollectionNameSupport, CollectionRequired, CollectionSupport,
-    CollectionTrait, ConsistencyLevel, ConsistencyLevelOption, ConsistencyLevelSupport,
-    ContinuationOption, ContinuationSupport, CosmosTrait, DatabaseClientRequired,
+    AttachmentTrait, AuthorizationToken, CollectionClientRequired, CollectionNameRequired,
+    CollectionNameSupport, CollectionRequired, CollectionSupport, CollectionTrait,
+    ConsistencyLevel, ConsistencyLevelOption, ConsistencyLevelSupport, ContinuationOption,
+    ContinuationSupport, CosmosClientRequired, CosmosTrait, DatabaseClientRequired,
     DatabaseNameRequired, DatabaseNameSupport, DatabaseTrait, DocumentIdRequired,
     DocumentIdSupport, DocumentRequired, DocumentSupport, DocumentTrait, ExpirySecondsOption,
     ExpirySecondsSupport, IndexingDirective, IndexingDirectiveOption, IndexingDirectiveSupport,

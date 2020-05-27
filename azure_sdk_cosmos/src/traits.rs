@@ -1,5 +1,6 @@
 use crate::attachment::AttachmentName;
 use crate::clients::CosmosUriBuilder;
+use crate::clients::ResourceType;
 use crate::collection::CollectionName;
 use crate::database::DatabaseName;
 use crate::document::DocumentName;
@@ -9,6 +10,66 @@ use crate::trigger::TriggerName;
 use crate::user::UserName;
 use crate::user_defined_function::UserDefinedFunctionName;
 use crate::PartitionKeys;
+use http::request::Builder;
+use hyper_rustls::HttpsConnector;
+
+pub trait HasHyperClient {
+    fn hyper(&self) -> &hyper::Client<HttpsConnector<hyper::client::HttpConnector>>;
+}
+
+pub trait CosmosClient: HasHyperClient {
+    fn prepare_request(
+        &self,
+        uri_path: &str,
+        http_method: hyper::Method,
+        resource_type: ResourceType,
+    ) -> Builder;
+}
+
+pub trait HasCosmosClient<C>
+where
+    C: CosmosClient,
+{
+    fn cosmos_client(&self) -> &C;
+}
+
+pub trait DatabaseClient<C>: HasCosmosClient<C>
+where
+    C: CosmosClient,
+{
+    fn database_name(&self) -> &str;
+}
+
+pub trait HasDatabaseClient<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn database_client(&self) -> &D;
+}
+
+pub trait IntoDatabaseClient<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn with_database(self, database_name: String) -> D;
+}
+
+pub(crate) trait DatabaseClientRequestPreparer<C>: DatabaseClient<C>
+where
+    C: CosmosClient,
+{
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
+}
+
+pub trait CollectionClient<C, D>: HasDatabaseClient<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn collection_name(&self) -> &str;
+}
 
 //// New implementation
 pub trait CosmosTrait<CUB>
@@ -37,13 +98,6 @@ where
     //) -> CollectionClient<'c, CUB>;
     //fn with_user<'c>(&'c self, user_name: &'c dyn UserName) -> UserClient<'c, CUB>;
     //fn list_users(&self) -> requests::ListUsersBuilder<'_, CUB>;
-}
-
-pub(crate) trait DatabaseBuilderTrait<'a, CUB>: DatabaseTrait<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
 }
 
 pub trait CollectionTrait<'a, CUB>
