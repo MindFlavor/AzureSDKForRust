@@ -2,7 +2,7 @@
 	"name": "ListCollectionsBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::clients::{CosmosUriBuilder, DatabaseClient, ResourceType}",
+		"crate::clients::ResourceType",
 		"crate::responses::ListCollectionsResponse",
 		"azure_sdk_core::prelude::*",
 		"crate::prelude::*",
@@ -13,13 +13,13 @@
 		"hyper::StatusCode",
 		"std::convert::TryInto"
 	],
-	"extra_types": [ "'a", "CUB" ],
-	"extra_wheres": ["CUB: CosmosUriBuilder" ],
+	"extra_types": [ "'a", "C" ],
+	"extra_wheres": ["C: CosmosClient" ],
 	"constructor_fields": [
 		{
 			"name": "database_client",
-			"field_type": "&'a DatabaseClient<'a, CUB>",
-			"trait_get": "DatabaseClientRequired<'a, CUB>"
+			"field_type": "&'a DatabaseClient<C>",
+			"trait_get": "DatabaseClientRequired<'a, C>"
 		}
 	],
 	"fields": [
@@ -42,7 +42,8 @@
 			"field_type": "ConsistencyLevel<'a>",
 			"optional": true,
 			"trait_get": "ConsistencyLevelOption<'a>",
-			"trait_set": "ConsistencyLevelSupport<'a>"
+			"trait_set": "ConsistencyLevelSupport<'a>",
+			"get_via_clone": true
 		},
 		{
 			"name": "continuation",

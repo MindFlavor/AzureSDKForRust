@@ -404,11 +404,11 @@ pub trait ExpirySecondsSupport {
     fn with_expiry_seconds(self, expiry_seconds: u64) -> Self::O;
 }
 
-pub trait DatabaseClientRequired<'a, CUB>
+pub trait DatabaseClientRequired<'a, C>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
 {
-    //    fn database_client(&self) -> &'a DatabaseClient<'a, CUB>;
+    fn database_client(&self) -> &'a DatabaseClient<C>;
 }
 
 pub trait DatabaseSupport<'a> {

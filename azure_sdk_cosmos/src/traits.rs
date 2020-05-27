@@ -12,9 +12,10 @@ use crate::user_defined_function::UserDefinedFunctionName;
 use crate::PartitionKeys;
 use http::request::Builder;
 use hyper_rustls::HttpsConnector;
+use std::fmt::Debug;
 
-pub trait HasHyperClient {
-    fn hyper(&self) -> &hyper::Client<HttpsConnector<hyper::client::HttpConnector>>;
+pub trait HasHyperClient: Debug {
+    fn hyper_client(&self) -> &hyper::Client<HttpsConnector<hyper::client::HttpConnector>>;
 }
 
 pub trait CosmosClient: HasHyperClient {
@@ -26,7 +27,7 @@ pub trait CosmosClient: HasHyperClient {
     ) -> Builder;
 }
 
-pub trait HasCosmosClient<C>
+pub trait HasCosmosClient<C>: Debug
 where
     C: CosmosClient,
 {
@@ -38,9 +39,10 @@ where
     C: CosmosClient,
 {
     fn database_name(&self) -> &str;
+    fn list_collections(&self) -> crate::requests::ListCollectionsBuilder<'_, C>;
 }
 
-pub trait HasDatabaseClient<C, D>
+pub trait HasDatabaseClient<C, D>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
@@ -48,7 +50,7 @@ where
     fn database_client(&self) -> &D;
 }
 
-pub trait IntoDatabaseClient<C, D>
+pub trait IntoDatabaseClient<C, D>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,

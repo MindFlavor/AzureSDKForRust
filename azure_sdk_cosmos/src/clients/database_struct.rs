@@ -43,9 +43,9 @@ where
         &self.database_name
     }
 
-    //fn list_collections(&self) -> requests::ListCollectionsBuilder<'_, CUB> {
-    //    requests::ListCollectionsBuilder::new(self)
-    //}
+    fn list_collections(&self) -> requests::ListCollectionsBuilder<'_, C> {
+        requests::ListCollectionsBuilder::new(self)
+    }
 
     //fn get_database(&self) -> requests::GetDatabaseBuilder<'_, CUB> {
     //    requests::GetDatabaseBuilder::new(self)

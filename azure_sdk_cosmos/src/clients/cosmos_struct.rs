@@ -19,6 +19,7 @@ use hyper::{
 use hyper_rustls::HttpsConnector;
 use ring::hmac;
 use std::borrow::Cow;
+use std::fmt::Debug;
 use url::form_urlencoded;
 
 const AZURE_VERSION: &str = "2018-12-31";
@@ -191,17 +192,17 @@ impl ClientBuilder {
 
 impl<CUB> HasHyperClient for CosmosStruct<CUB>
 where
-    CUB: CosmosUriBuilder,
+    CUB: CosmosUriBuilder + Debug,
 {
     #[inline]
-    fn hyper(&self) -> &hyper::Client<HttpsConnector<hyper::client::HttpConnector>> {
+    fn hyper_client(&self) -> &hyper::Client<HttpsConnector<hyper::client::HttpConnector>> {
         &self.hyper_client
     }
 }
 
 impl<CUB> CosmosClient for CosmosStruct<CUB>
 where
-    CUB: CosmosUriBuilder,
+    CUB: CosmosUriBuilder + Debug,
 {
     #[inline]
     fn prepare_request(
@@ -228,7 +229,7 @@ where
 
 impl<CUB> IntoDatabaseClient<Self, DatabaseStruct<Self>> for CosmosStruct<CUB>
 where
-    CUB: CosmosUriBuilder,
+    CUB: CosmosUriBuilder + Debug,
 {
     fn with_database(self, database_name: String) -> DatabaseStruct<Self> {
         DatabaseStruct::new(self, database_name)
@@ -257,7 +258,7 @@ where
 
 impl<CUB> CosmosStruct<CUB>
 where
-    CUB: CosmosUriBuilder,
+    CUB: CosmosUriBuilder + Debug,
 {
     #[inline]
     fn prepare_request_with_signature(
