@@ -1,6 +1,7 @@
+use crate::clients::CollectionStruct;
 use crate::database::DatabaseName;
 use crate::traits::*;
-use crate::{requests, CosmosClient, DatabaseClientRequestPreparer, ResourceType, UserName};
+use crate::{requests, CosmosClient, ResourceType, UserName};
 use crate::{CollectionName, DatabaseTrait};
 use azure_sdk_core::No;
 
@@ -89,15 +90,11 @@ where
     //}
 }
 
-impl<C> DatabaseClientRequestPreparer for DatabaseStruct<C>
+impl<C> IntoCollectionClient<C, Self, CollectionStruct<C, Self>> for DatabaseStruct<C>
 where
     C: CosmosClient,
 {
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
-        self.cosmos_client().prepare_request(
-            &format!("dbs/{}", self.database_name),
-            method,
-            ResourceType::Databases,
-        )
+    fn with_collection(self, collection_name: String) -> CollectionStruct<C, Self> {
+        CollectionStruct::new(self, collection_name)
     }
 }

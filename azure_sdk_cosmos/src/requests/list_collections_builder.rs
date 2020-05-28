@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use crate::responses::ListCollectionsResponse;
-use crate::{DatabaseClientRequired, DatabaseTrait, ResourceType};
+use crate::{DatabaseClientRequired, ResourceType};
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
 use futures::stream::{unfold, Stream};
@@ -12,7 +12,7 @@ pub struct ListCollectionsBuilder<'a, C>
 where
     C: CosmosClient,
 {
-    database_client: &'a DatabaseClient<C>,
+    database_client: &'a dyn DatabaseClient<C>,
     user_agent: Option<&'a str>,
     activity_id: Option<&'a str>,
     consistency_level: Option<ConsistencyLevel<'a>>,
@@ -40,7 +40,7 @@ impl<'a, C> ListCollectionsBuilder<'a, C>
 where
     C: CosmosClient,
 {
-    pub(crate) fn new(database_client: &'a DatabaseClient<C>) -> ListCollectionsBuilder<'a, C> {
+    pub(crate) fn new(database_client: &'a dyn DatabaseClient<C>) -> ListCollectionsBuilder<'a, C> {
         ListCollectionsBuilder {
             database_client,
             user_agent: None,
@@ -56,7 +56,7 @@ impl<'a, C> DatabaseClientRequired<'a, C> for ListCollectionsBuilder<'a, C>
 where
     C: CosmosClient,
 {
-    fn database_client(&self) -> &'a DatabaseClient<C> {
+    fn database_client(&self) -> &'a dyn DatabaseClient<C> {
         self.database_client
     }
 }
@@ -199,9 +199,6 @@ where
     }
 }
 
-// methods callable regardless
-impl<'a, C> ListCollectionsBuilder<'a, C> where C: CosmosClient {}
-
 // methods callable only when every mandatory field has been filled
 impl<'a, C> ListCollectionsBuilder<'a, C>
 where
@@ -225,11 +222,7 @@ where
 
         trace!("request prepared == {:?}", request);
 
-        let future_response = self
-            .database_client
-            .cosmos_client()
-            .hyper_client()
-            .request(request);
+        let future_response = self.database_client.hyper_client().request(request);
         let (headers, body) =
             check_status_extract_headers_and_body(future_response, StatusCode::OK).await?;
         Ok((&headers, &body as &[u8]).try_into()?)

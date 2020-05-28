@@ -13,7 +13,7 @@ where
     C: CosmosClient,
     D: DatabaseClient<C>,
 {
-    collection_client: &'a CollectionClient<C, D>,
+    collection_client: &'a dyn CollectionClient<C, D>,
     user_agent: Option<&'a str>,
     activity_id: Option<&'a str>,
     consistency_level: Option<ConsistencyLevel<'a>>,
@@ -26,7 +26,7 @@ where
 {
     #[inline]
     pub(crate) fn new(
-        collection_client: &'a CollectionClient<C, D>,
+        collection_client: &'a dyn CollectionClient<C, D>,
     ) -> GetCollectionBuilder<'a, C, D> {
         GetCollectionBuilder {
             collection_client,
@@ -43,7 +43,7 @@ where
     D: DatabaseClient<C>,
 {
     #[inline]
-    fn collection_client(&self) -> &'a CollectionClient<C, D> {
+    fn collection_client(&self) -> &'a dyn CollectionClient<C, D> {
         self.collection_client
     }
 }
@@ -157,17 +157,7 @@ where
 
         let request = self
             .collection_client()
-            .database_client()
-            .cosmos_client()
-            .prepare_request(
-                &format!(
-                    "dbs/{}/colls/{}",
-                    self.collection_client.database_client().database_name(),
-                    self.collection_client.collection_name()
-                ),
-                hyper::Method::GET,
-                ResourceType::Collections,
-            );
+            .prepare_request_with_collection_name(hyper::Method::GET);
 
         let request = UserAgentOption::add_header(self, request);
         let request = ActivityIdOption::add_header(self, request);

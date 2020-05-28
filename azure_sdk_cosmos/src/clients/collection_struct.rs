@@ -7,9 +7,8 @@ use crate::stored_procedure::StoredProcedureName;
 use crate::trigger::TriggerName;
 use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{
-    CollectionBuilderTrait, CollectionClient, CollectionClientRequestPreparer, CollectionTrait,
-    CosmosClient, DatabaseClient, DatabaseTrait, HasCosmosClient, HasDatabaseClient,
-    HasHyperClient, PartitionKeys, ResourceType,
+    CollectionBuilderTrait, CollectionClient, CollectionTrait, CosmosClient, DatabaseClient,
+    DatabaseTrait, HasCosmosClient, HasDatabaseClient, HasHyperClient, PartitionKeys, ResourceType,
 };
 use azure_sdk_core::No;
 use serde::Serialize;
@@ -86,9 +85,9 @@ where
         &self.collection_name
     }
 
-    //fn get_collection(&self) -> requests::GetCollectionBuilder<'_, CUB> {
-    //    requests::GetCollectionBuilder::new(self)
-    //}
+    fn get_collection(&self) -> requests::GetCollectionBuilder<'_, C, D> {
+        requests::GetCollectionBuilder::new(self)
+    }
 
     //fn delete_collection(&self) -> requests::DeleteCollectionBuilder<'_, CUB> {
     //    requests::DeleteCollectionBuilder::new(self)
@@ -163,22 +162,4 @@ where
     //) -> DocumentClient<'c, CUB> {
     //    DocumentClient::new(&self, document_name, partition_keys)
     //}
-}
-
-impl<C, D> CollectionClientRequestPreparer for CollectionStruct<C, D>
-where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-{
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
-        self.database_client().cosmos_client().prepare_request(
-            &format!(
-                "dbs/{}/colls/{}",
-                self.database_client().database_name(),
-                self.collection_name()
-            ),
-            method,
-            ResourceType::Collections,
-        )
-    }
 }

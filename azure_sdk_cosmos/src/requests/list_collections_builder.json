@@ -4,7 +4,7 @@
 	"uses": [
 		"crate::responses::ListCollectionsResponse",
 		"azure_sdk_core::prelude::*",
-		"crate::{DatabaseClientRequired, DatabaseTrait, ResourceType}",
+		"crate::{DatabaseClientRequired, ResourceType}",
 		"crate::prelude::*",
 		"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 		"futures::stream::{unfold, Stream}",
@@ -16,7 +16,7 @@
 	"constructor_fields": [
 		{
 			"name": "database_client",
-			"field_type": "&'a DatabaseClient<C>",
+			"field_type": "&'a dyn DatabaseClient<C>",
 			"trait_get": "DatabaseClientRequired<'a, C>"
 		}
 	],

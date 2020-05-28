@@ -4,6 +4,7 @@ use crate::collection::CollectionName;
 use crate::database::DatabaseName;
 use crate::document::DocumentName;
 use crate::permission::PermissionName;
+use crate::requests;
 use crate::stored_procedure::StoredProcedureName;
 use crate::trigger::TriggerName;
 use crate::user::UserName;
@@ -39,6 +40,18 @@ where
 {
     fn database_name(&self) -> &str;
     fn list_collections(&self) -> crate::requests::ListCollectionsBuilder<'_, C>;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client()
+            .prepare_request("dbs", method, ResourceType::Databases)
+    }
+    fn prepare_request_with_database_name(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!("dbs/{}", self.database_name()),
+            method,
+            ResourceType::Databases,
+        )
+    }
 }
 
 pub trait HasDatabaseClient<C, D>: HasCosmosClient<C>
@@ -57,19 +70,38 @@ where
     fn with_database(self, database_name: String) -> D;
 }
 
-pub(crate) trait DatabaseClientRequestPreparer {
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
-}
-
 pub trait CollectionClient<C, D>: HasDatabaseClient<C, D>
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
 {
     fn collection_name(&self) -> &str;
+    fn get_collection(&self) -> requests::GetCollectionBuilder<'_, C, D>;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.database_client().cosmos_client().prepare_request(
+            &format!("dbs/{}/colls", self.database_client().database_name()),
+            method,
+            ResourceType::Collections,
+        )
+    }
+    fn prepare_request_with_collection_name(
+        &self,
+        method: hyper::Method,
+    ) -> http::request::Builder {
+        self.database_client().cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}",
+                self.database_client().database_name(),
+                self.collection_name()
+            ),
+            method,
+            ResourceType::Collections,
+        )
+    }
 }
 
-pub trait HasCollectionClient<C, D, COLL>: Debug
+pub trait HasCollectionClient<C, D, COLL>: HasDatabaseClient<C, D>
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
@@ -85,10 +117,6 @@ where
     COLL: CollectionClient<C, D>,
 {
     fn with_collection(self, collection_name: String) -> COLL;
-}
-
-pub(crate) trait CollectionClientRequestPreparer {
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
 }
 
 //// New implementation

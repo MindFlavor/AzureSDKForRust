@@ -17,7 +17,7 @@
 	"constructor_fields": [
 		{
 			"name": "collection_client",
-			"field_type": "&'a CollectionClient<C, D>", 
+			"field_type": "&'a dyn CollectionClient<C, D>", 
 			"trait_get": "CollectionClientRequired<'a, C, D>"
 		}
 	],

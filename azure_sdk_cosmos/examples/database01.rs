@@ -22,6 +22,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let collections = database_client.list_collections().execute().await?;
     println!("collections == {:#?}", collections);
 
+    let collection_client = database_client.with_collection("cnt".to_owned());
+    let collection = collection_client.get_collection().execute().await?;
+    println!("collection == {:#?}", collection);
+
     //let collection_client = database_client.with_collection(&"cnt");
 
     Ok(())
