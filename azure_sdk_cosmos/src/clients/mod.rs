@@ -2,7 +2,7 @@
 mod collection_struct;
 mod cosmos_struct;
 mod database_struct;
-//mod document_client;
+mod document_struct;
 //mod permission_client;
 //mod stored_procedure_client;
 //mod trigger_client;
@@ -12,7 +12,7 @@ mod database_struct;
 pub use collection_struct::CollectionStruct;
 pub use cosmos_struct::*;
 pub use database_struct::DatabaseStruct;
-//pub use document_client::DocumentClient;
+pub use document_struct::DocumentStruct;
 //pub use permission_client::PermissionClient;
 //pub use stored_procedure_client::StoredProcedureClient;
 //pub use trigger_client::TriggerClient;

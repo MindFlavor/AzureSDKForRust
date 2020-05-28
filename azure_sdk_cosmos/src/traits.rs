@@ -79,7 +79,7 @@ where
     fn get_collection(&self) -> requests::GetCollectionBuilder<'_, C, D>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
-        self.database_client().cosmos_client().prepare_request(
+        self.cosmos_client().prepare_request(
             &format!("dbs/{}/colls", self.database_client().database_name()),
             method,
             ResourceType::Collections,
@@ -89,7 +89,7 @@ where
         &self,
         method: hyper::Method,
     ) -> http::request::Builder {
-        self.database_client().cosmos_client().prepare_request(
+        self.cosmos_client().prepare_request(
             &format!(
                 "dbs/{}/colls/{}",
                 self.database_client().database_name(),
@@ -117,6 +117,59 @@ where
     COLL: CollectionClient<C, D>,
 {
     fn with_collection(self, collection_name: String) -> COLL;
+}
+
+pub trait DocumentClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn document_name(&self) -> &str;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/docs",
+                self.database_client().database_name(),
+                self.collection_client().collection_name()
+            ),
+            method,
+            ResourceType::Documents,
+        )
+    }
+    fn prepare_request_with_document_name(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/docs/{}",
+                self.database_client().database_name(),
+                self.collection_client().collection_name(),
+                self.document_name()
+            ),
+            method,
+            ResourceType::Documents,
+        )
+    }
+}
+
+pub trait HasDocumentClient<C, D, COLL, DOC>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+{
+    fn document_client(&self) -> &DOC;
+}
+
+pub trait IntoDocumentClient<C, D, COLL, DOC>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+{
+    fn with_document(self, document_name: String) -> DOC;
 }
 
 //// New implementation
