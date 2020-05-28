@@ -1,6 +1,5 @@
 use crate::attachment::AttachmentName;
 use crate::clients::CosmosUriBuilder;
-use crate::clients::ResourceType;
 use crate::collection::CollectionName;
 use crate::database::DatabaseName;
 use crate::document::DocumentName;
@@ -9,7 +8,7 @@ use crate::stored_procedure::StoredProcedureName;
 use crate::trigger::TriggerName;
 use crate::user::UserName;
 use crate::user_defined_function::UserDefinedFunctionName;
-use crate::PartitionKeys;
+use crate::{PartitionKeys, ResourceType};
 use http::request::Builder;
 use hyper_rustls::HttpsConnector;
 use std::fmt::Debug;

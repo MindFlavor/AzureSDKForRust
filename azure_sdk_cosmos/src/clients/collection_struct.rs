@@ -9,7 +9,7 @@ use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{
     CollectionBuilderTrait, CollectionClient, CollectionClientRequestPreparer, CollectionTrait,
     CosmosClient, DatabaseClient, DatabaseTrait, HasCosmosClient, HasDatabaseClient,
-    HasHyperClient, PartitionKeys,
+    HasHyperClient, PartitionKeys, ResourceType,
 };
 use azure_sdk_core::No;
 use serde::Serialize;

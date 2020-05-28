@@ -72,6 +72,21 @@ use azure_sdk_core::No;
 use http::request::Builder;
 use serde::Serialize;
 
+#[allow(dead_code)]
+#[derive(Debug, Clone, Copy)]
+pub enum ResourceType {
+    Databases,
+    Collections,
+    Documents,
+    StoredProcedures,
+    Users,
+    Permissions,
+    Attachments,
+    PartitionKeyRanges,
+    UserDefinedFunctions,
+    Triggers,
+}
+
 pub trait CosmosClientRequired<'a, CUB>
 where
     CUB: CosmosUriBuilder,

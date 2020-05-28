@@ -2,12 +2,10 @@
 	"name": "ListCollectionsBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::clients::ResourceType",
 		"crate::responses::ListCollectionsResponse",
 		"azure_sdk_core::prelude::*",
+		"crate::{DatabaseClientRequired, DatabaseTrait, ResourceType}",
 		"crate::prelude::*",
-		"crate::DatabaseClientRequired",
-		"crate::DatabaseTrait",
 		"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 		"futures::stream::{unfold, Stream}",
 		"hyper::StatusCode",

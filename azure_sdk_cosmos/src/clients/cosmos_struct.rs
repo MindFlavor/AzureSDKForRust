@@ -5,7 +5,7 @@ use crate::headers::*;
 use crate::requests;
 use crate::{
     requests::*, AuthorizationToken, CosmosClient, CosmosTrait, DatabaseClient, HasHyperClient,
-    IntoDatabaseClient,
+    IntoDatabaseClient, ResourceType,
 };
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::No;
@@ -25,21 +25,6 @@ use url::form_urlencoded;
 const AZURE_VERSION: &str = "2018-12-31";
 const VERSION: &str = "1.0";
 const TIME_FORMAT: &str = "%a, %d %h %Y %T GMT";
-
-#[allow(dead_code)]
-#[derive(Debug, Clone, Copy)]
-pub enum ResourceType {
-    Databases,
-    Collections,
-    Documents,
-    StoredProcedures,
-    Users,
-    Permissions,
-    Attachments,
-    PartitionKeyRanges,
-    UserDefinedFunctions,
-    Triggers,
-}
 
 pub trait CosmosUriBuilder {
     fn build_base_uri(&self) -> &str;

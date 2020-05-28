@@ -1,7 +1,6 @@
-use crate::clients::{CosmosUriBuilder, ResourceType};
 use crate::database::DatabaseName;
 use crate::traits::*;
-use crate::{requests, CosmosClient, DatabaseClientRequestPreparer, UserName};
+use crate::{requests, CosmosClient, DatabaseClientRequestPreparer, ResourceType, UserName};
 use crate::{CollectionName, DatabaseTrait};
 use azure_sdk_core::No;
 

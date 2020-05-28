@@ -2,8 +2,7 @@
 	"name": "GetCollectionBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::clients::ResourceType",
-		"crate::{CosmosClient, DatabaseClient, CollectionClient}",
+		"crate::{ResourceType, CosmosClient, DatabaseClient, CollectionClient}",
 		"crate::prelude::*",
 		"crate::responses::GetCollectionResponse",
 		"crate::CollectionClientRequired",

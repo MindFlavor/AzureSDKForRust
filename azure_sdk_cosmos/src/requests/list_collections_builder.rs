@@ -1,8 +1,6 @@
-use crate::clients::ResourceType;
 use crate::prelude::*;
 use crate::responses::ListCollectionsResponse;
-use crate::DatabaseClientRequired;
-use crate::DatabaseTrait;
+use crate::{DatabaseClientRequired, DatabaseTrait, ResourceType};
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
 use futures::stream::{unfold, Stream};
