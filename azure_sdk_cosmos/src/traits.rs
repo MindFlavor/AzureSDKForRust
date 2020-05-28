@@ -27,7 +27,7 @@ pub trait CosmosClient: HasHyperClient {
     ) -> Builder;
 }
 
-pub trait HasCosmosClient<C>: Debug
+pub trait HasCosmosClient<C>: HasHyperClient
 where
     C: CosmosClient,
 {
@@ -42,7 +42,7 @@ where
     fn list_collections(&self) -> crate::requests::ListCollectionsBuilder<'_, C>;
 }
 
-pub trait HasDatabaseClient<C, D>: Debug
+pub trait HasDatabaseClient<C, D>: HasCosmosClient<C>
 where
     C: CosmosClient,
     D: DatabaseClient<C>,

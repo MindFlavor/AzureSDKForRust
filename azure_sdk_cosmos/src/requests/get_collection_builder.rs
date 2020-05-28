@@ -1,31 +1,34 @@
-use crate::clients::{CollectionClient, CosmosUriBuilder, ResourceType};
+use crate::clients::ResourceType;
 use crate::prelude::*;
 use crate::responses::GetCollectionResponse;
 use crate::CollectionClientRequired;
+use crate::{CollectionClient, CosmosClient, DatabaseClient};
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
 use hyper::StatusCode;
 use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
-pub struct GetCollectionBuilder<'a, CUB>
+pub struct GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
-    collection_client: &'a CollectionClient<'a, CUB>,
+    collection_client: &'a CollectionClient<C, D>,
     user_agent: Option<&'a str>,
     activity_id: Option<&'a str>,
     consistency_level: Option<ConsistencyLevel<'a>>,
 }
 
-impl<'a, CUB> GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
     #[inline]
     pub(crate) fn new(
-        collection_client: &'a CollectionClient<'a, CUB>,
-    ) -> GetCollectionBuilder<'a, CUB> {
+        collection_client: &'a CollectionClient<C, D>,
+    ) -> GetCollectionBuilder<'a, C, D> {
         GetCollectionBuilder {
             collection_client,
             user_agent: None,
@@ -35,12 +38,13 @@ where
     }
 }
 
-impl<'a, CUB> CollectionClientRequired<'a, CUB> for GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> CollectionClientRequired<'a, C, D> for GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
     #[inline]
-    fn collection_client(&self) -> &'a CollectionClient<'a, CUB> {
+    fn collection_client(&self) -> &'a CollectionClient<C, D> {
         self.collection_client
     }
 }
@@ -48,9 +52,10 @@ where
 //get mandatory no traits methods
 
 //set mandatory no traits methods
-impl<'a, CUB> UserAgentOption<'a> for GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> UserAgentOption<'a> for GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
     #[inline]
     fn user_agent(&self) -> Option<&'a str> {
@@ -58,9 +63,10 @@ where
     }
 }
 
-impl<'a, CUB> ActivityIdOption<'a> for GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> ActivityIdOption<'a> for GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
     #[inline]
     fn activity_id(&self) -> Option<&'a str> {
@@ -68,9 +74,10 @@ where
     }
 }
 
-impl<'a, CUB> ConsistencyLevelOption<'a> for GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> ConsistencyLevelOption<'a> for GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
     #[inline]
     fn consistency_level(&self) -> Option<ConsistencyLevel<'a>> {
@@ -78,11 +85,12 @@ where
     }
 }
 
-impl<'a, CUB> UserAgentSupport<'a> for GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> UserAgentSupport<'a> for GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
-    type O = GetCollectionBuilder<'a, CUB>;
+    type O = GetCollectionBuilder<'a, C, D>;
 
     #[inline]
     fn with_user_agent(self, user_agent: &'a str) -> Self::O {
@@ -95,11 +103,12 @@ where
     }
 }
 
-impl<'a, CUB> ActivityIdSupport<'a> for GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> ActivityIdSupport<'a> for GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
-    type O = GetCollectionBuilder<'a, CUB>;
+    type O = GetCollectionBuilder<'a, C, D>;
 
     #[inline]
     fn with_activity_id(self, activity_id: &'a str) -> Self::O {
@@ -112,11 +121,12 @@ where
     }
 }
 
-impl<'a, CUB> ConsistencyLevelSupport<'a> for GetCollectionBuilder<'a, CUB>
+impl<'a, C, D> ConsistencyLevelSupport<'a> for GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
-    type O = GetCollectionBuilder<'a, CUB>;
+    type O = GetCollectionBuilder<'a, C, D>;
 
     #[inline]
     fn with_consistency_level(self, consistency_level: ConsistencyLevel<'a>) -> Self::O {
@@ -129,23 +139,36 @@ where
     }
 }
 
-// methods callable only when every mandatory field has been filled
-impl<'a, CUB> GetCollectionBuilder<'a, CUB>
+// methods callable regardless
+impl<'a, C, D> GetCollectionBuilder<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+}
+
+// methods callable only when every mandatory field has been filled
+impl<'a, C, D> GetCollectionBuilder<'a, C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
     pub async fn execute(&self) -> Result<GetCollectionResponse, AzureError> {
         trace!("GetCollectionResponse::execute called");
 
-        let request = self.collection_client().main_client().prepare_request(
-            &format!(
-                "dbs/{}/colls/{}",
-                self.collection_client.database_name().name(),
-                self.collection_client.collection_name().name()
-            ),
-            hyper::Method::GET,
-            ResourceType::Collections,
-        );
+        let request = self
+            .collection_client()
+            .database_client()
+            .cosmos_client()
+            .prepare_request(
+                &format!(
+                    "dbs/{}/colls/{}",
+                    self.collection_client.database_client().database_name(),
+                    self.collection_client.collection_name()
+                ),
+                hyper::Method::GET,
+                ResourceType::Collections,
+            );
 
         let request = UserAgentOption::add_header(self, request);
         let request = ActivityIdOption::add_header(self, request);

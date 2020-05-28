@@ -8,7 +8,8 @@ use crate::trigger::TriggerName;
 use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{
     CollectionBuilderTrait, CollectionClient, CollectionClientRequestPreparer, CollectionTrait,
-    CosmosClient, DatabaseClient, DatabaseTrait, HasDatabaseClient, PartitionKeys,
+    CosmosClient, DatabaseClient, DatabaseTrait, HasCosmosClient, HasDatabaseClient,
+    HasHyperClient, PartitionKeys,
 };
 use azure_sdk_core::No;
 use serde::Serialize;
@@ -37,6 +38,30 @@ where
             database_client,
             collection_name,
         }
+    }
+}
+
+impl<C, D> HasHyperClient for CollectionStruct<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    #[inline]
+    fn hyper_client(
+        &self,
+    ) -> &hyper::Client<hyper_rustls::HttpsConnector<hyper::client::HttpConnector>> {
+        self.cosmos_client().hyper_client()
+    }
+}
+
+impl<C, D> HasCosmosClient<C> for CollectionStruct<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    #[inline]
+    fn cosmos_client(&self) -> &C {
+        self.database_client.cosmos_client()
     }
 }
 

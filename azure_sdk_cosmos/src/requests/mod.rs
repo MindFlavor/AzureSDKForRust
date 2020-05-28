@@ -19,7 +19,7 @@
 //mod delete_user_defined_function_builder;
 //mod execute_stored_procedure_builder;
 //mod get_attachment_builder;
-//mod get_collection_builder;
+mod get_collection_builder;
 //mod get_database_builder;
 //mod get_document_builder;
 //mod get_partition_key_ranges_builder;
@@ -63,7 +63,7 @@ mod list_collections_builder;
 //pub use self::delete_user_defined_function_builder::DeleteUserDefinedFunctionBuilder;
 //pub use self::execute_stored_procedure_builder::ExecuteStoredProcedureBuilder;
 //pub use self::get_attachment_builder::GetAttachmentBuilder;
-//pub use self::get_collection_builder::GetCollectionBuilder;
+pub use self::get_collection_builder::GetCollectionBuilder;
 //pub use self::get_database_builder::GetDatabaseBuilder;
 //pub use self::get_document_builder::GetDocumentBuilder;
 //pub use self::get_partition_key_ranges_builder::GetPartitionKeyRangesBuilder;

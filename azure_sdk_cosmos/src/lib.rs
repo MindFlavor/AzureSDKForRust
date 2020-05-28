@@ -408,7 +408,7 @@ pub trait DatabaseClientRequired<'a, C>
 where
     C: CosmosClient,
 {
-    fn database_client(&self) -> &'a DatabaseClient<C>;
+    fn database_client(&self) -> &'a dyn DatabaseClient<C>;
 }
 
 pub trait DatabaseSupport<'a> {
@@ -416,11 +416,12 @@ pub trait DatabaseSupport<'a> {
     fn with_database(self, database: &'a str) -> Self::O;
 }
 
-pub trait CollectionClientRequired<'a, CUB>
+pub trait CollectionClientRequired<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
-    //    fn collection_client(&self) -> &'a CollectionClient<'a, CUB>;
+    fn collection_client(&self) -> &'a dyn CollectionClient<C, D>;
 }
 
 //pub trait CollectionRequired<'a> {

@@ -27,6 +27,18 @@ where
     }
 }
 
+impl<C> HasHyperClient for DatabaseStruct<C>
+where
+    C: CosmosClient,
+{
+    #[inline]
+    fn hyper_client(
+        &self,
+    ) -> &hyper::Client<hyper_rustls::HttpsConnector<hyper::client::HttpConnector>> {
+        self.cosmos_client().hyper_client()
+    }
+}
+
 impl<C> HasCosmosClient<C> for DatabaseStruct<C>
 where
     C: CosmosClient,
