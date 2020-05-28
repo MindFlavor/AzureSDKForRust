@@ -18,6 +18,7 @@ impl<C> DatabaseStruct<C>
 where
     C: CosmosClient,
 {
+    #[inline]
     pub(crate) fn new(cosmos_client: C, database_name: String) -> Self {
         DatabaseStruct {
             cosmos_client,
@@ -30,6 +31,7 @@ impl<C> HasCosmosClient<C> for DatabaseStruct<C>
 where
     C: CosmosClient,
 {
+    #[inline]
     fn cosmos_client(&self) -> &C {
         &self.cosmos_client
     }
@@ -39,6 +41,7 @@ impl<C> DatabaseClient<C> for DatabaseStruct<C>
 where
     C: CosmosClient,
 {
+    #[inline]
     fn database_name(&self) -> &str {
         &self.database_name
     }
@@ -75,7 +78,7 @@ where
     //}
 }
 
-impl<C> DatabaseClientRequestPreparer<C> for DatabaseStruct<C>
+impl<C> DatabaseClientRequestPreparer for DatabaseStruct<C>
 where
     C: CosmosClient,
 {

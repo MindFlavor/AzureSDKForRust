@@ -58,10 +58,7 @@ where
     fn with_database(self, database_name: String) -> D;
 }
 
-pub(crate) trait DatabaseClientRequestPreparer<C>: DatabaseClient<C>
-where
-    C: CosmosClient,
-{
+pub(crate) trait DatabaseClientRequestPreparer {
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
 }
 
@@ -71,6 +68,28 @@ where
     D: DatabaseClient<C>,
 {
     fn collection_name(&self) -> &str;
+}
+
+pub trait HasCollectionClient<C, D, COLL>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn collection_client(&self) -> &COLL;
+}
+
+pub trait IntoCollectionClient<C, D, COLL>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn with_collection(self, collection_name: String) -> COLL;
+}
+
+pub(crate) trait CollectionClientRequestPreparer {
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
 }
 
 //// New implementation

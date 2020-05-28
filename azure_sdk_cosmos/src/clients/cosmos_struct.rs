@@ -114,6 +114,7 @@ pub struct CustomCosmosUri {
 }
 
 impl CosmosUriBuilder for CustomCosmosUri {
+    #[inline]
     fn build_base_uri(&self) -> &str {
         &self.uri
     }
