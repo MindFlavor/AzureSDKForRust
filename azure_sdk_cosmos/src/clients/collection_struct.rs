@@ -1,17 +1,10 @@
 use crate::clients::*;
-use crate::collection::CollectionName;
-use crate::database::DatabaseName;
-use crate::document::DocumentName;
 use crate::requests;
-use crate::stored_procedure::StoredProcedureName;
-use crate::trigger::TriggerName;
-use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{
-    CollectionClient, CollectionTrait, CosmosClient, DatabaseClient, DatabaseTrait,
-    HasCosmosClient, HasDatabaseClient, HasHyperClient, PartitionKeys, ResourceType,
+    CollectionClient, CosmosClient, DatabaseClient, HasCosmosClient, HasDatabaseClient,
+    HasHyperClient, IntoDocumentClient, PartitionKeys,
 };
 use azure_sdk_core::No;
-use serde::Serialize;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
@@ -20,9 +13,9 @@ where
     C: CosmosClient,
     D: DatabaseClient<C>,
 {
-    p_c: PhantomData<C>,
     database_client: D,
     collection_name: String,
+    p_c: PhantomData<C>,
 }
 
 impl<C, D> CollectionStruct<C, D>
@@ -33,9 +26,9 @@ where
     #[inline]
     pub(crate) fn new(database_client: D, collection_name: String) -> Self {
         Self {
-            p_c: PhantomData {},
             database_client,
             collection_name,
+            p_c: PhantomData {},
         }
     }
 }
@@ -162,4 +155,18 @@ where
     //) -> DocumentClient<'c, CUB> {
     //    DocumentClient::new(&self, document_name, partition_keys)
     //}
+}
+
+impl<C, D> IntoDocumentClient<C, D, Self, DocumentStruct<C, D, Self>> for CollectionStruct<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn with_document(
+        self,
+        document_name: String,
+        partition_keys: PartitionKeys,
+    ) -> DocumentStruct<C, D, Self> {
+        DocumentStruct::new(self, document_name, partition_keys)
+    }
 }

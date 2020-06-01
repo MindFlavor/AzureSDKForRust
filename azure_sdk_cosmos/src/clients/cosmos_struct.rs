@@ -4,7 +4,7 @@ use crate::database::DatabaseName;
 use crate::headers::*;
 use crate::requests;
 use crate::{
-    requests::*, AuthorizationToken, CosmosClient, CosmosTrait, DatabaseClient, HasHyperClient,
+    requests::*, AuthorizationToken, CosmosClient, DatabaseClient, HasHyperClient,
     IntoDatabaseClient, ResourceType,
 };
 use azure_sdk_core::errors::AzureError;

@@ -1,4 +1,4 @@
-//mod attachment_client;
+mod attachment_struct;
 mod collection_struct;
 mod cosmos_struct;
 mod database_struct;
@@ -8,7 +8,7 @@ mod document_struct;
 //mod trigger_client;
 //mod user_client;
 //mod user_defined_function_client;
-//pub use attachment_client::AttachmentClient;
+pub use attachment_struct::AttachmentStruct;
 pub use collection_struct::CollectionStruct;
 pub use cosmos_struct::*;
 pub use database_struct::DatabaseStruct;

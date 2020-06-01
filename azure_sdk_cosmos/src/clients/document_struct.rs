@@ -1,13 +1,8 @@
-use crate::attachment::AttachmentName;
-use crate::collection::CollectionName;
-use crate::database::DatabaseName;
-use crate::document::DocumentName;
 use crate::requests;
-use crate::CollectionTrait;
 use crate::{
-    CollectionClient, CosmosClient, DatabaseClient, DocumentClient, DocumentTrait,
-    HasCollectionClient, HasCosmosClient, HasDatabaseClient, HasHyperClient, PartitionKeys,
-    ResourceType,
+    AttachmentStruct, CollectionClient, CosmosClient, DatabaseClient, DocumentClient,
+    HasCollectionClient, HasCosmosClient, HasDatabaseClient, HasHyperClient, IntoAttachmentClient,
+    PartitionKeys,
 };
 use std::marker::PhantomData;
 
@@ -127,5 +122,17 @@ where
 
     fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, C, D, COLL> {
         requests::ListAttachmentsBuilder::new(self)
+    }
+}
+
+impl<C, D, COLL> IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<C, D, COLL, Self>>
+    for DocumentStruct<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn with_attachment(self, attachment_name: String) -> AttachmentStruct<C, D, COLL, Self> {
+        AttachmentStruct::new(self, attachment_name)
     }
 }

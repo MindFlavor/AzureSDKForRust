@@ -1,113 +1,142 @@
-use crate::attachment::AttachmentName;
-use crate::clients::{Client, CosmosUriBuilder, DocumentClient, ResourceType};
-use crate::collection::CollectionName;
-use crate::database::DatabaseName;
-use crate::document::DocumentName;
 use crate::requests;
-use crate::DocumentTrait;
-use crate::{AttachmentBuilderTrait, AttachmentTrait};
+use crate::traits::*;
 use azure_sdk_core::No;
+use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
 pub struct AttachmentStruct<C, D, COLL, DOC>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
 {
-    document_client: &'a DocumentClient<'a, CUB>,
-    attachment_name: &'a dyn AttachmentName,
+    document_client: DOC,
+    attachment_name: String,
+    p_c: PhantomData<C>,
+    p_d: PhantomData<D>,
+    p_coll: PhantomData<COLL>,
 }
 
-impl<'a, CUB> AttachmentStruct<C, D, COLL, DOC>
+impl<C, D, COLL, DOC> AttachmentStruct<C, D, COLL, DOC>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
 {
-    pub(crate) fn new(
-        document_client: &'a DocumentClient<'a, CUB>,
-        attachment_name: &'a dyn AttachmentName,
-    ) -> Self {
-        AttachmentClient {
+    pub(crate) fn new(document_client: DOC, attachment_name: String) -> Self {
+        Self {
             document_client,
             attachment_name,
+            p_c: PhantomData {},
+            p_d: PhantomData {},
+            p_coll: PhantomData {},
         }
     }
+}
 
-    pub(crate) fn main_client(&self) -> &Client<CUB> {
-        self.document_client.main_client()
-    }
-
-    pub(crate) fn document_client(&self) -> &'a DocumentClient<'a, CUB> {
-        &self.document_client
-    }
-
-    pub(crate) fn hyper_client(
+impl<C, D, COLL, DOC> HasHyperClient for AttachmentStruct<C, D, COLL, DOC>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+{
+    #[inline]
+    fn hyper_client(
         &self,
     ) -> &hyper::Client<hyper_rustls::HttpsConnector<hyper::client::HttpConnector>> {
-        self.main_client().hyper_client()
+        self.document_client().hyper_client()
     }
 }
 
-impl<'a, CUB> AttachmentTrait<'a, CUB> for AttachmentStruct<C, D, COLL, DOC>
+impl<C, D, COLL, DOC> HasCosmosClient<C> for AttachmentStruct<C, D, COLL, DOC>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
 {
-    fn database_name(&self) -> &'a dyn DatabaseName {
-        self.document_client.database_name()
-    }
-
-    fn collection_name(&self) -> &'a dyn CollectionName {
-        self.document_client.collection_name()
-    }
-
-    fn document_name(&self) -> &'a dyn DocumentName {
-        self.document_client.document_name()
-    }
-
-    fn attachment_name(&self) -> &'a dyn AttachmentName {
-        self.attachment_name
-    }
-
-    fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No, No> {
-        requests::CreateSlugAttachmentBuilder::new(self)
-    }
-
-    fn replace_slug(&self) -> requests::ReplaceSlugAttachmentBuilder<'_, '_, CUB, No, No> {
-        requests::ReplaceSlugAttachmentBuilder::new(self)
-    }
-
-    fn create_reference(&self) -> requests::CreateReferenceAttachmentBuilder<'_, '_, CUB, No, No> {
-        requests::CreateReferenceAttachmentBuilder::new(self)
-    }
-
-    fn replace_reference(
-        &self,
-    ) -> requests::ReplaceReferenceAttachmentBuilder<'_, '_, CUB, No, No> {
-        requests::ReplaceReferenceAttachmentBuilder::new(self)
-    }
-
-    fn delete(&self) -> requests::DeleteAttachmentBuilder<'_, '_, CUB> {
-        requests::DeleteAttachmentBuilder::new(self)
-    }
-
-    fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB> {
-        requests::GetAttachmentBuilder::new(self)
+    #[inline]
+    fn cosmos_client(&self) -> &C {
+        self.document_client().cosmos_client()
     }
 }
 
-impl<'a, CUB> AttachmentBuilderTrait<'a, CUB> for AttachmentStruct<C, D, COLL, DOC>
+impl<C, D, COLL, DOC> HasDatabaseClient<C, D> for AttachmentStruct<C, D, COLL, DOC>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
 {
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
-        self.main_client().prepare_request(
-            &format!(
-                "dbs/{}/colls/{}/docs/{}/attachments/{}",
-                self.database_name().name(),
-                self.collection_name().name(),
-                self.document_name().name(),
-                self.attachment_name().name()
-            ),
-            method,
-            ResourceType::Attachments,
-        )
+    #[inline]
+    fn database_client(&self) -> &D {
+        self.document_client().database_client()
     }
+}
+
+impl<C, D, COLL, DOC> HasCollectionClient<C, D, COLL> for AttachmentStruct<C, D, COLL, DOC>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+{
+    #[inline]
+    fn collection_client(&self) -> &COLL {
+        self.document_client().collection_client()
+    }
+}
+
+impl<C, D, COLL, DOC> HasDocumentClient<C, D, COLL, DOC> for AttachmentStruct<C, D, COLL, DOC>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+{
+    #[inline]
+    fn document_client(&self) -> &DOC {
+        &self.document_client
+    }
+}
+
+impl<C, D, COLL, DOC> AttachmentClient<C, D, COLL, DOC> for AttachmentStruct<C, D, COLL, DOC>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+{
+    fn attachment_name(&self) -> &str {
+        &self.attachment_name
+    }
+
+    //fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No, No> {
+    //    requests::CreateSlugAttachmentBuilder::new(self)
+    //}
+
+    //fn replace_slug(&self) -> requests::ReplaceSlugAttachmentBuilder<'_, '_, CUB, No, No> {
+    //    requests::ReplaceSlugAttachmentBuilder::new(self)
+    //}
+
+    //fn create_reference(&self) -> requests::CreateReferenceAttachmentBuilder<'_, '_, CUB, No, No> {
+    //    requests::CreateReferenceAttachmentBuilder::new(self)
+    //}
+
+    //fn replace_reference(
+    //    &self,
+    //) -> requests::ReplaceReferenceAttachmentBuilder<'_, '_, CUB, No, No> {
+    //    requests::ReplaceReferenceAttachmentBuilder::new(self)
+    //}
+
+    //fn delete(&self) -> requests::DeleteAttachmentBuilder<'_, '_, CUB> {
+    //    requests::DeleteAttachmentBuilder::new(self)
+    //}
+
+    //fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB> {
+    //    requests::GetAttachmentBuilder::new(self)
+    //}
 }
