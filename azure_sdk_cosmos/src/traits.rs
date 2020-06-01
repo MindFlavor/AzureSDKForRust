@@ -130,6 +130,7 @@ where
 
     fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, C, D, COLL>;
     fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, C, D, COLL>;
+    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, C, D, COLL>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

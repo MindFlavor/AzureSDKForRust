@@ -125,7 +125,7 @@ where
     //    AttachmentClient::new(&self, attachment_name)
     //}
 
-    //fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, CUB> {
-    //    requests::ListAttachmentsBuilder::new(self)
-    //}
+    fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, C, D, COLL> {
+        requests::ListAttachmentsBuilder::new(self)
+    }
 }
