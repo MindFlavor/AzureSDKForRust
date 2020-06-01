@@ -21,7 +21,7 @@
 //mod get_attachment_builder;
 mod get_collection_builder;
 //mod get_database_builder;
-//mod get_document_builder;
+mod get_document_builder;
 //mod get_partition_key_ranges_builder;
 //mod get_permission_builer;
 //mod get_user_builder;
@@ -65,7 +65,7 @@ mod list_collections_builder;
 //pub use self::get_attachment_builder::GetAttachmentBuilder;
 pub use self::get_collection_builder::GetCollectionBuilder;
 //pub use self::get_database_builder::GetDatabaseBuilder;
-//pub use self::get_document_builder::GetDocumentBuilder;
+pub use self::get_document_builder::GetDocumentBuilder;
 //pub use self::get_partition_key_ranges_builder::GetPartitionKeyRangesBuilder;
 //pub use self::get_permission_builer::GetPermissionBuilder;
 //pub use self::get_user_builder::GetUserBuilder;

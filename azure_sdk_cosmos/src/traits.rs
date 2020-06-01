@@ -126,6 +126,9 @@ where
     COLL: CollectionClient<C, D>,
 {
     fn document_name(&self) -> &str;
+    fn partition_keys(&self) -> &PartitionKeys;
+
+    fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, C, D, COLL>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

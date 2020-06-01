@@ -106,13 +106,13 @@ where
         &self.document_name
     }
 
-    //fn partition_keys(&self) -> &'a PartitionKeys {
-    //    self.partition_keys
-    //}
+    fn partition_keys(&self) -> &PartitionKeys {
+        &self.partition_keys
+    }
 
-    //fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, CUB> {
-    //    requests::GetDocumentBuilder::new(self)
-    //}
+    fn get_document(&self) -> requests::GetDocumentBuilder<'_, '_, C, D, COLL> {
+        requests::GetDocumentBuilder::new(self)
+    }
 
     //fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB> {
     //    requests::DeleteDocumentBuilder::new(self)
@@ -129,23 +129,3 @@ where
     //    requests::ListAttachmentsBuilder::new(self)
     //}
 }
-
-//impl<C, D, COLL> DocumentBuilderTrait<C, D, COLL> for DocumentStruct<C, D, COLL>
-//where
-//    C: CosmosClient,
-//    D: DatabaseClient<C>,
-//    COLL: CollectionClient<C, D>,
-//{
-//    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
-//        self.main_client().prepare_request(
-//            &format!(
-//                "dbs/{}/colls/{}/docs/{}",
-//                self.database_name().name(),
-//                self.collection_name().name(),
-//                self.document_name().name()
-//            ),
-//            method,
-//            ResourceType::Documents,
-//        )
-//    }
-//}

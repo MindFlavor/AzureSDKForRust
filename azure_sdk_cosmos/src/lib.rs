@@ -487,11 +487,13 @@ pub trait StoredProcedureNameSupport<'a> {
     fn with_stored_procedure_name(self, stored_procedure_name: &'a str) -> Self::O;
 }
 
-pub trait DocumentClientRequired<'a, CUB>
+pub trait DocumentClientRequired<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    //    fn document_client(&self) -> &'a DocumentClient<'a, CUB>;
+    fn document_client(&'a self) -> &'a DocumentClient<C, D, COLL>;
 }
 
 pub trait PermissionClientRequired<'a, CUB>

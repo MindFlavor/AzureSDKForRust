@@ -13,7 +13,7 @@
 	],
 	"inline": true,
 	"extra_types": [ "'a", "C", "D" ],
-	"extra_wheres": ["C: CosmosClient", "D: DatabaseClient<C>" ],
+	"extra_wheres": [ "C: CosmosClient", "D: DatabaseClient<C>" ],
 	"constructor_fields": [
 		{
 			"name": "collection_client",
