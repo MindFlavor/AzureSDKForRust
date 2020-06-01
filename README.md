@@ -9,7 +9,7 @@
 
 [![GitHub contributors](https://img.shields.io/github/contributors/MindFlavor/AzureSDKForRust.svg)](https://github.com/MindFlavor/AzureSDKForRust/graphs/contributors)
 
-Crate | Docs | Crates.io | Downloads | Downloads@Latest |
+Crate repo | Docs | Crates.io | Downloads | Downloads@Latest |
 -- | -- | -- | -- | -- |
 [azure_sdk_auth_aad](https://github.com/MindFlavor/AzureSDKForRust/tree/master/azure_sdk_auth_aad) | [![docs](https://docs.rs/azure_sdk_auth_aad/badge.svg)](https://docs.rs/azure_sdk_auth_aad) | [![Crate](https://img.shields.io/crates/v/azure_sdk_auth_aad.svg)](https://crates.io/crates/azure_sdk_auth_aad) | [![cratedown](https://img.shields.io/crates/d/azure_sdk_auth_aad.svg)](https://crates.io/crates/azure_sdk_auth_aad) | [![cratelastdown](https://img.shields.io/crates/dv/azure_sdk_auth_aad.svg)](https://crates.io/crates/azure_sdk_auth_aad)
 [azure_sdk_core](https://github.com/MindFlavor/AzureSDKForRust/tree/master/azure_sdk_core) | [![docs](https://docs.rs/azure_sdk_core/badge.svg)](https://docs.rs/azure_sdk_core) | [![Crate](https://img.shields.io/crates/v/azure_sdk_core.svg)](https://crates.io/crates/azure_sdk_core) | [![cratedown](https://img.shields.io/crates/d/azure_sdk_core.svg)](https://crates.io/crates/azure_sdk_core) | [![cratelastdown](https://img.shields.io/crates/dv/azure_sdk_core.svg)](https://crates.io/crates/azure_sdk_core)
@@ -22,11 +22,11 @@ Crate | Docs | Crates.io | Downloads | Downloads@Latest |
 
 #### Ancillary crates
 
-Ancillary crates are maintained in a separated GitHub repo by other members of the community. If you have a crate that you want to list here do not hesitate to drop a line/RP.
+Ancillary crates are maintained in a separated GitHub repo by other members of the community. If you have a crate that you want to list here do not hesitate to drop a line/PR.
 
-Crate | Maintainer | Docs | Crates.io | Downloads | Downloads@Latest | Contributors
--- | -- | -- | -- | -- | -- | 
-[azure-sdk-keyvault](https://github.com/guywaldman/azure-sdk-keyvault) | [Guy Waldman](https://github.com/guywaldman) | [![docs](https://docs.rs/azure_sdk_keyvault/badge.svg)](https://docs.rs/azure_sdk_keyvault) | [![Crate](https://img.shields.io/crates/v/azure_sdk_keyvault.svg)](https://crates.io/crates/azure_sdk_keyvault) | [![cratedown](https://img.shields.io/crates/d/azure_sdk_keyvault.svg)](https://crates.io/crates/azure_sdk_keyvault) | [![cratelastdown](https://img.shields.io/crates/dv/azure_sdk_keyvault.svg)](https://crates.io/crates/azure_sdk_keyvault) | [![GitHub contributors](https://img.shields.io/github/contributors/guywaldman/azure-sdk-keyvault.svg)](https://github.com/guywaldman/azure-sdk-keyvault/graphs/contributors)
+Crate repo | Maintainer | Docs | Crates.io | Downloads | Downloads@Latest | Contributors
+-- | -- | -- | -- | -- | -- | -- |
+[azure-sdk-keyvault](https://github.com/guywaldman/azure-sdk-keyvault) | [Guy Waldman](https://github.com/guywaldman) | [![docs](https://docs.rs/azure-sdk-keyvault/badge.svg)](https://docs.rs/azure-sdk-keyvault) | [![Crate](https://img.shields.io/crates/v/azure_sdk_keyvault.svg)](https://crates.io/crates/azure_sdk_keyvault) | [![cratedown](https://img.shields.io/crates/d/azure_sdk_keyvault.svg)](https://crates.io/crates/azure_sdk_keyvault) | [![cratelastdown](https://img.shields.io/crates/dv/azure_sdk_keyvault.svg)](https://crates.io/crates/azure_sdk_keyvault) | [![GitHub contributors](https://img.shields.io/github/contributors/guywaldman/azure-sdk-keyvault.svg)](https://github.com/guywaldman/azure-sdk-keyvault/graphs/contributors)
 
 ## Introduction
 Microsoft Azure exposes its technologies via REST API. These APIs are easily consumable from any language (good) but are weakly typed. With this library and its related [crate](https://crates.io/crates/azure_sdk_for_rust/) you can exploit the power of Microsoft Azure from Rust in a idiomatic way.
