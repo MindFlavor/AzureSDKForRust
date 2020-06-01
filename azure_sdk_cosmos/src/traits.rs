@@ -189,6 +189,17 @@ where
 
     fn create_slug(&self)
         -> requests::CreateSlugAttachmentBuilder<'_, '_, C, D, COLL, DOC, No, No>;
+    fn replace_slug(
+        &self,
+    ) -> requests::ReplaceSlugAttachmentBuilder<'_, '_, C, D, COLL, DOC, No, No>;
+    fn create_reference(
+        &self,
+    ) -> requests::CreateReferenceAttachmentBuilder<'_, '_, C, D, COLL, DOC, No, No>;
+    fn replace_reference(
+        &self,
+    ) -> requests::ReplaceReferenceAttachmentBuilder<'_, '_, C, D, COLL, DOC, No, No>;
+    fn delete(&self) -> requests::DeleteAttachmentBuilder<'_, '_, C, D, COLL, DOC>;
+    fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, C, D, COLL, DOC>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
