@@ -9,7 +9,7 @@ use crate::{AttachmentBuilderTrait, AttachmentTrait};
 use azure_sdk_core::No;
 
 #[derive(Debug, Clone)]
-pub struct AttachmentClient<'a, CUB>
+pub struct AttachmentStruct<C, D, COLL, DOC>
 where
     CUB: CosmosUriBuilder,
 {
@@ -17,7 +17,7 @@ where
     attachment_name: &'a dyn AttachmentName,
 }
 
-impl<'a, CUB> AttachmentClient<'a, CUB>
+impl<'a, CUB> AttachmentStruct<C, D, COLL, DOC>
 where
     CUB: CosmosUriBuilder,
 {
@@ -46,7 +46,7 @@ where
     }
 }
 
-impl<'a, CUB> AttachmentTrait<'a, CUB> for AttachmentClient<'a, CUB>
+impl<'a, CUB> AttachmentTrait<'a, CUB> for AttachmentStruct<C, D, COLL, DOC>
 where
     CUB: CosmosUriBuilder,
 {
@@ -93,7 +93,7 @@ where
     }
 }
 
-impl<'a, CUB> AttachmentBuilderTrait<'a, CUB> for AttachmentClient<'a, CUB>
+impl<'a, CUB> AttachmentBuilderTrait<'a, CUB> for AttachmentStruct<C, D, COLL, DOC>
 where
     CUB: CosmosUriBuilder,
 {

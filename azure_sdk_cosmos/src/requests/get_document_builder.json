@@ -11,7 +11,6 @@
 		"azure_sdk_core::{IfMatchConditionOption, IfMatchConditionSupport}",
 		"chrono::{DateTime, Utc}",
 		"hyper::StatusCode",
-		"crate::DocumentBuilderTrait",
 		"serde::de::DeserializeOwned",
 		"std::convert::TryFrom"
 	],

@@ -1,6 +1,5 @@
 use crate::prelude::*;
 use crate::responses::GetDocumentResponse;
-use crate::DocumentBuilderTrait;
 use crate::DocumentClientRequired;
 use azure_sdk_core::errors::{extract_status_headers_and_body, AzureError, UnexpectedHTTPResult};
 use azure_sdk_core::modify_conditions::IfMatchCondition;

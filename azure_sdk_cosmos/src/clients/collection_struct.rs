@@ -7,8 +7,8 @@ use crate::stored_procedure::StoredProcedureName;
 use crate::trigger::TriggerName;
 use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{
-    CollectionBuilderTrait, CollectionClient, CollectionTrait, CosmosClient, DatabaseClient,
-    DatabaseTrait, HasCosmosClient, HasDatabaseClient, HasHyperClient, PartitionKeys, ResourceType,
+    CollectionClient, CollectionTrait, CosmosClient, DatabaseClient, DatabaseTrait,
+    HasCosmosClient, HasDatabaseClient, HasHyperClient, PartitionKeys, ResourceType,
 };
 use azure_sdk_core::No;
 use serde::Serialize;

@@ -177,7 +177,11 @@ where
     fn with_document(self, document_name: String) -> DOC;
 }
 
-//// New implementation
+/////////////////////////////////////////////
+////
+// Old implementation
+////
+/////////////////////////////////////////////
 pub trait CosmosTrait<CUB>
 where
     CUB: CosmosUriBuilder,
@@ -244,13 +248,6 @@ where
     //) -> DocumentClient<'c, CUB>;
 }
 
-pub(crate) trait CollectionBuilderTrait<'a, CUB>: CollectionTrait<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
-}
-
 pub trait DocumentTrait<'a, CUB>
 where
     CUB: CosmosUriBuilder,
@@ -268,13 +265,6 @@ where
     //) -> AttachmentClient<'_, CUB>;
 }
 
-pub(crate) trait DocumentBuilderTrait<'a, CUB>: DocumentTrait<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
-}
-
 pub trait StoredProcedureTrait<'a, CUB>
 where
     CUB: CosmosUriBuilder,
@@ -286,14 +276,6 @@ where
     //fn replace_stored_procedure(&self) -> requests::ReplaceStoredProcedureBuilder<'_, CUB, No>;
     //fn execute_stored_procedure(&self) -> requests::ExecuteStoredProcedureBuilder<'_, '_, CUB>;
     //fn delete_stored_procedure(&self) -> requests::DeleteStoredProcedureBuilder<'_, CUB>;
-}
-
-pub(crate) trait StoredProcedureBuilderTrait<'a, CUB>:
-    StoredProcedureTrait<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
 }
 
 pub trait UserDefinedFunctionTrait<'a, CUB>
@@ -312,18 +294,6 @@ where
     //fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB>;
 }
 
-pub(crate) trait UserDefinedFunctionBuilderTrait<'a, CUB>:
-    UserDefinedFunctionTrait<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn prepare_request(
-        &self,
-        method: hyper::Method,
-        specify_user_defined_function_name: bool,
-    ) -> http::request::Builder;
-}
-
 pub trait TriggerTrait<'a, CUB>
 where
     CUB: CosmosUriBuilder,
@@ -334,17 +304,6 @@ where
     //fn create_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No>;
     //fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No>;
     //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB>;
-}
-
-pub(crate) trait TriggerBuilderTrait<'a, CUB>: TriggerTrait<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn prepare_request(
-        &self,
-        method: hyper::Method,
-        specify_trigger_name: bool,
-    ) -> http::request::Builder;
 }
 
 pub trait AttachmentTrait<'a, CUB>
@@ -362,13 +321,6 @@ where
     //    -> requests::ReplaceReferenceAttachmentBuilder<'_, '_, CUB, No, No>;
     //fn delete(&self) -> requests::DeleteAttachmentBuilder<'_, '_, CUB>;
     //fn get(&self) -> requests::GetAttachmentBuilder<'_, '_, CUB>;
-}
-
-pub(crate) trait AttachmentBuilderTrait<'a, CUB>: AttachmentTrait<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder;
 }
 
 pub trait UserTrait<'a, CUB>

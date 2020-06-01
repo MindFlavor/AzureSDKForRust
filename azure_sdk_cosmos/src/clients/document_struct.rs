@@ -5,9 +5,9 @@ use crate::document::DocumentName;
 use crate::requests;
 use crate::CollectionTrait;
 use crate::{
-    CollectionClient, CosmosClient, DatabaseClient, DocumentBuilderTrait, DocumentClient,
-    DocumentTrait, HasCollectionClient, HasCosmosClient, HasDatabaseClient, HasHyperClient,
-    PartitionKeys, ResourceType,
+    CollectionClient, CosmosClient, DatabaseClient, DocumentClient, DocumentTrait,
+    HasCollectionClient, HasCosmosClient, HasDatabaseClient, HasHyperClient, PartitionKeys,
+    ResourceType,
 };
 use std::marker::PhantomData;
 

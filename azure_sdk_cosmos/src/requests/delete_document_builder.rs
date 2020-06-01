@@ -1,6 +1,5 @@
 use crate::prelude::*;
 use crate::responses::DeleteDocumentResponse;
-use crate::DocumentBuilderTrait;
 use crate::DocumentClientRequired;
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::modify_conditions::IfMatchCondition;
@@ -17,7 +16,7 @@ where
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
 {
-    document_client: &'a DocumentClient<C, D, COLL>,
+    document_client: &'a dyn DocumentClient<C, D, COLL>,
     if_match_condition: Option<IfMatchCondition<'a>>,
     if_modified_since: Option<&'a DateTime<Utc>>,
     user_agent: Option<&'a str>,
@@ -34,7 +33,7 @@ where
 {
     #[inline]
     pub(crate) fn new(
-        document_client: &'a DocumentClient<C, D, COLL>,
+        document_client: &'a dyn DocumentClient<C, D, COLL>,
     ) -> DeleteDocumentBuilder<'a, C, D, COLL> {
         DeleteDocumentBuilder {
             document_client,
@@ -56,7 +55,7 @@ where
     COLL: CollectionClient<C, D>,
 {
     #[inline]
-    fn document_client(&self) -> &'a DocumentClient<C, D, COLL> {
+    fn document_client(&self) -> &'a dyn DocumentClient<C, D, COLL> {
         self.document_client
     }
 }
