@@ -114,9 +114,9 @@ where
         requests::GetDocumentBuilder::new(self)
     }
 
-    //fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, CUB> {
-    //    requests::DeleteDocumentBuilder::new(self)
-    //}
+    fn delete_document(&self) -> requests::DeleteDocumentBuilder<'_, C, D, COLL> {
+        requests::DeleteDocumentBuilder::new(self)
+    }
 
     //fn with_attachment(
     //    &'a self,

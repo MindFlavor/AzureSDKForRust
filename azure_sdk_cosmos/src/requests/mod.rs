@@ -11,7 +11,7 @@
 //mod delete_attachment_builder;
 //mod delete_collection_builder;
 //mod delete_database_builder;
-//mod delete_document_builder;
+mod delete_document_builder;
 //mod delete_permission_builder;
 //mod delete_stored_procedure_builder;
 //mod delete_trigger_builder;
@@ -55,7 +55,7 @@ mod list_collections_builder;
 //pub use self::delete_attachment_builder::DeleteAttachmentBuilder;
 //pub use self::delete_collection_builder::DeleteCollectionBuilder;
 //pub use self::delete_database_builder::DeleteDatabaseBuilder;
-//pub use self::delete_document_builder::DeleteDocumentBuilder;
+pub use self::delete_document_builder::DeleteDocumentBuilder;
 //pub use self::delete_permission_builder::DeletePermissionsBuilder;
 //pub use self::delete_stored_procedure_builder::DeleteStoredProcedureBuilder;
 //pub use self::delete_trigger_builder::DeleteTriggerBuilder;

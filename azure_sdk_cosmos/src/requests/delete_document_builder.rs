@@ -1,4 +1,3 @@
-use crate::clients::{CosmosUriBuilder, DocumentClient};
 use crate::prelude::*;
 use crate::responses::DeleteDocumentResponse;
 use crate::DocumentBuilderTrait;
@@ -12,11 +11,13 @@ use hyper::StatusCode;
 use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
-pub struct DeleteDocumentBuilder<'a, CUB>
+pub struct DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    document_client: &'a DocumentClient<'a, CUB>,
+    document_client: &'a DocumentClient<C, D, COLL>,
     if_match_condition: Option<IfMatchCondition<'a>>,
     if_modified_since: Option<&'a DateTime<Utc>>,
     user_agent: Option<&'a str>,
@@ -25,14 +26,16 @@ where
     allow_tentative_writes: bool,
 }
 
-impl<'a, CUB> DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
     pub(crate) fn new(
-        document_client: &'a DocumentClient<'a, CUB>,
-    ) -> DeleteDocumentBuilder<'a, CUB> {
+        document_client: &'a DocumentClient<C, D, COLL>,
+    ) -> DeleteDocumentBuilder<'a, C, D, COLL> {
         DeleteDocumentBuilder {
             document_client,
             if_match_condition: None,
@@ -45,12 +48,15 @@ where
     }
 }
 
-impl<'a, CUB> DocumentClientRequired<'a, CUB> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> DocumentClientRequired<'a, C, D, COLL>
+    for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
-    fn document_client(&self) -> &'a DocumentClient<'a, CUB> {
+    fn document_client(&self) -> &'a DocumentClient<C, D, COLL> {
         self.document_client
     }
 }
@@ -58,9 +64,11 @@ where
 //get mandatory no traits methods
 
 //set mandatory no traits methods
-impl<'a, CUB> IfMatchConditionOption<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> IfMatchConditionOption<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
     fn if_match_condition(&self) -> Option<IfMatchCondition<'a>> {
@@ -68,9 +76,11 @@ where
     }
 }
 
-impl<'a, CUB> IfModifiedSinceOption<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> IfModifiedSinceOption<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
     fn if_modified_since(&self) -> Option<&'a DateTime<Utc>> {
@@ -78,9 +88,11 @@ where
     }
 }
 
-impl<'a, CUB> UserAgentOption<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> UserAgentOption<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
     fn user_agent(&self) -> Option<&'a str> {
@@ -88,9 +100,11 @@ where
     }
 }
 
-impl<'a, CUB> ActivityIdOption<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> ActivityIdOption<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
     fn activity_id(&self) -> Option<&'a str> {
@@ -98,9 +112,11 @@ where
     }
 }
 
-impl<'a, CUB> ConsistencyLevelOption<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> ConsistencyLevelOption<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
     fn consistency_level(&self) -> Option<ConsistencyLevel<'a>> {
@@ -108,9 +124,11 @@ where
     }
 }
 
-impl<'a, CUB> AllowTentativeWritesOption for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> AllowTentativeWritesOption for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     #[inline]
     fn allow_tentative_writes(&self) -> bool {
@@ -118,11 +136,13 @@ where
     }
 }
 
-impl<'a, CUB> IfMatchConditionSupport<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> IfMatchConditionSupport<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    type O = DeleteDocumentBuilder<'a, CUB>;
+    type O = DeleteDocumentBuilder<'a, C, D, COLL>;
 
     #[inline]
     fn with_if_match_condition(self, if_match_condition: IfMatchCondition<'a>) -> Self::O {
@@ -138,11 +158,13 @@ where
     }
 }
 
-impl<'a, CUB> IfModifiedSinceSupport<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> IfModifiedSinceSupport<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    type O = DeleteDocumentBuilder<'a, CUB>;
+    type O = DeleteDocumentBuilder<'a, C, D, COLL>;
 
     #[inline]
     fn with_if_modified_since(self, if_modified_since: &'a DateTime<Utc>) -> Self::O {
@@ -158,11 +180,13 @@ where
     }
 }
 
-impl<'a, CUB> UserAgentSupport<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> UserAgentSupport<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    type O = DeleteDocumentBuilder<'a, CUB>;
+    type O = DeleteDocumentBuilder<'a, C, D, COLL>;
 
     #[inline]
     fn with_user_agent(self, user_agent: &'a str) -> Self::O {
@@ -178,11 +202,13 @@ where
     }
 }
 
-impl<'a, CUB> ActivityIdSupport<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> ActivityIdSupport<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    type O = DeleteDocumentBuilder<'a, CUB>;
+    type O = DeleteDocumentBuilder<'a, C, D, COLL>;
 
     #[inline]
     fn with_activity_id(self, activity_id: &'a str) -> Self::O {
@@ -198,11 +224,13 @@ where
     }
 }
 
-impl<'a, CUB> ConsistencyLevelSupport<'a> for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> ConsistencyLevelSupport<'a> for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    type O = DeleteDocumentBuilder<'a, CUB>;
+    type O = DeleteDocumentBuilder<'a, C, D, COLL>;
 
     #[inline]
     fn with_consistency_level(self, consistency_level: ConsistencyLevel<'a>) -> Self::O {
@@ -218,11 +246,13 @@ where
     }
 }
 
-impl<'a, CUB> AllowTentativeWritesSupport for DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> AllowTentativeWritesSupport for DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    type O = DeleteDocumentBuilder<'a, CUB>;
+    type O = DeleteDocumentBuilder<'a, C, D, COLL>;
 
     #[inline]
     fn with_allow_tentative_writes(self, allow_tentative_writes: bool) -> Self::O {
@@ -239,9 +269,11 @@ where
 }
 
 // methods callable only when every mandatory field has been filled
-impl<'a, CUB> DeleteDocumentBuilder<'a, CUB>
+impl<'a, C, D, COLL> DeleteDocumentBuilder<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
     pub async fn execute(&self) -> Result<DeleteDocumentResponse, AzureError> {
         trace!("DeleteDocumentBuilder::execute called");
