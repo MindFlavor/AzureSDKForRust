@@ -113,13 +113,6 @@ where
         requests::DeleteDocumentBuilder::new(self)
     }
 
-    //fn with_attachment(
-    //    &'a self,
-    //    attachment_name: &'a dyn AttachmentName,
-    //) -> AttachmentClient<'_, CUB> {
-    //    AttachmentClient::new(&self, attachment_name)
-    //}
-
     fn list_attachments(&self) -> requests::ListAttachmentsBuilder<'_, '_, C, D, COLL> {
         requests::ListAttachmentsBuilder::new(self)
     }

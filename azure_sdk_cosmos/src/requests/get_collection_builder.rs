@@ -1,7 +1,6 @@
 use crate::prelude::*;
 use crate::responses::GetCollectionResponse;
 use crate::CollectionClientRequired;
-use crate::{CollectionClient, CosmosClient, DatabaseClient, ResourceType};
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
 use hyper::StatusCode;

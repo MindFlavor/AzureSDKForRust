@@ -77,7 +77,9 @@ where
     D: DatabaseClient<C>,
 {
     fn collection_name(&self) -> &str;
+
     fn get_collection(&self) -> requests::GetCollectionBuilder<'_, C, D>;
+    fn delete_collection(&self) -> requests::DeleteCollectionBuilder<'_, C, D>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

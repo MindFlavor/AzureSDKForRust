@@ -82,9 +82,9 @@ where
         requests::GetCollectionBuilder::new(self)
     }
 
-    //fn delete_collection(&self) -> requests::DeleteCollectionBuilder<'_, CUB> {
-    //    requests::DeleteCollectionBuilder::new(self)
-    //}
+    fn delete_collection(&self) -> requests::DeleteCollectionBuilder<'_, C, D> {
+        requests::DeleteCollectionBuilder::new(self)
+    }
 
     //fn replace_collection(&self) -> requests::ReplaceCollectionBuilder<'_, CUB, No, No> {
     //    requests::ReplaceCollectionBuilder::new(self)

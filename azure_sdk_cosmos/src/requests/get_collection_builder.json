@@ -2,10 +2,8 @@
 	"name": "GetCollectionBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::{ResourceType, CosmosClient, DatabaseClient, CollectionClient}",
 		"crate::prelude::*",
 		"crate::responses::GetCollectionResponse",
-		"crate::CollectionClientRequired",
 		"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 		"hyper::StatusCode",
 		"azure_sdk_core::prelude::*",
