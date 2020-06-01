@@ -114,9 +114,11 @@ where
         &self.attachment_name
     }
 
-    //fn create_slug(&self) -> requests::CreateSlugAttachmentBuilder<'_, '_, CUB, No, No> {
-    //    requests::CreateSlugAttachmentBuilder::new(self)
-    //}
+    fn create_slug(
+        &self,
+    ) -> requests::CreateSlugAttachmentBuilder<'_, '_, C, D, COLL, DOC, No, No> {
+        requests::CreateSlugAttachmentBuilder::new(self)
+    }
 
     //fn replace_slug(&self) -> requests::ReplaceSlugAttachmentBuilder<'_, '_, CUB, No, No> {
     //    requests::ReplaceSlugAttachmentBuilder::new(self)

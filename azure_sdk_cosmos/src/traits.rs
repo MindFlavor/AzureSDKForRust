@@ -10,6 +10,7 @@ use crate::trigger::TriggerName;
 use crate::user::UserName;
 use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{PartitionKeys, ResourceType};
+use azure_sdk_core::No;
 use http::request::Builder;
 use hyper_rustls::HttpsConnector;
 use std::fmt::Debug;
@@ -185,6 +186,9 @@ where
     DOC: DocumentClient<C, D, COLL>,
 {
     fn attachment_name(&self) -> &str;
+
+    fn create_slug(&self)
+        -> requests::CreateSlugAttachmentBuilder<'_, '_, C, D, COLL, DOC, No, No>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

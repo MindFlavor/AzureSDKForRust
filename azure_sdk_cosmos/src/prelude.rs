@@ -8,10 +8,10 @@ pub use crate::query::Query;
 pub use crate::responses::{QueryDocumentsResponse, QueryDocumentsResponseRaw, QueryResult};
 pub use crate::{
     AIMOption, AIMSupport, AllowTentativeWritesOption, AllowTentativeWritesSupport,
-    AttachmentClient, AuthorizationToken, CollectionClient, CollectionClientRequired,
-    CollectionNameRequired, CollectionNameSupport, CollectionRequired, CollectionSupport,
-    ConsistencyLevel, ConsistencyLevelOption, ConsistencyLevelSupport, ContinuationOption,
-    ContinuationSupport, CosmosClient, CosmosClientRequired, DatabaseClient,
+    AttachmentClient, AttachmentClientRequired, AuthorizationToken, CollectionClient,
+    CollectionClientRequired, CollectionNameRequired, CollectionNameSupport, CollectionRequired,
+    CollectionSupport, ConsistencyLevel, ConsistencyLevelOption, ConsistencyLevelSupport,
+    ContinuationOption, ContinuationSupport, CosmosClient, CosmosClientRequired, DatabaseClient,
     DatabaseClientRequired, DatabaseNameRequired, DatabaseNameSupport, DocumentClient,
     DocumentIdRequired, DocumentIdSupport, DocumentRequired, DocumentSupport, ExpirySecondsOption,
     ExpirySecondsSupport, IndexingDirective, IndexingDirectiveOption, IndexingDirectiveSupport,
