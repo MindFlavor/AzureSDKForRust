@@ -94,12 +94,9 @@ where
     //    requests::ListDocumentsBuilder::new(self)
     //}
 
-    //fn create_document<T>(&self) -> requests::CreateDocumentBuilder<'_, '_, T, CUB, No, No>
-    //where
-    //    T: Serialize,
-    //{
-    //    requests::CreateDocumentBuilder::new(self)
-    //}
+    fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No> {
+        requests::CreateDocumentBuilder::new(self)
+    }
 
     //fn replace_document<T>(&self) -> requests::ReplaceDocumentBuilder<'_, '_, T, CUB, No, No, No>
     //where

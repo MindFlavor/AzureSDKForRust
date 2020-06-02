@@ -81,6 +81,8 @@ where
     fn get_collection(&self) -> requests::GetCollectionBuilder<'_, C, D>;
     fn delete_collection(&self) -> requests::DeleteCollectionBuilder<'_, C, D>;
 
+    fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No>;
+
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
             &format!("dbs/{}/colls", self.database_client().database_name()),
