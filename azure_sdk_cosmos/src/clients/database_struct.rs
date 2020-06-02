@@ -70,9 +70,9 @@ where
     //    requests::DeleteDatabaseBuilder::new(self)
     //}
 
-    //fn create_collection(&self) -> requests::CreateCollectionBuilder<'_, CUB, No, No, No, No> {
-    //    requests::CreateCollectionBuilder::new(self)
-    //}
+    fn create_collection(&self) -> requests::CreateCollectionBuilder<'_, C, No, No, No, No> {
+        requests::CreateCollectionBuilder::new(self)
+    }
 
     //fn with_collection<'c>(
     //    &'c self,

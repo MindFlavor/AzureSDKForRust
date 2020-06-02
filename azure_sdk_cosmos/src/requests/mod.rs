@@ -1,4 +1,4 @@
-//mod create_collection_builder;
+mod create_collection_builder;
 mod create_database_builder;
 mod create_document_builder;
 //mod create_or_replace_trigger_builder;
@@ -42,7 +42,7 @@ mod replace_reference_attachment_builder;
 mod replace_slug_attachment_builder;
 //mod replace_stored_procedure_builder;
 //mod replace_user_builder;
-//pub use self::create_collection_builder::CreateCollectionBuilder;
+pub use self::create_collection_builder::CreateCollectionBuilder;
 pub use self::create_database_builder::CreateDatabaseBuilder;
 pub use self::create_document_builder::CreateDocumentBuilder;
 //pub use self::create_or_replace_trigger_builder::CreateOrReplaceTriggerBuilder;

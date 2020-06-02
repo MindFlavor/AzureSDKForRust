@@ -43,6 +43,7 @@ where
 {
     fn database_name(&self) -> &str;
     fn list_collections(&self) -> crate::requests::ListCollectionsBuilder<'_, C>;
+    fn create_collection(&self) -> requests::CreateCollectionBuilder<'_, C, No, No, No, No>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client()
