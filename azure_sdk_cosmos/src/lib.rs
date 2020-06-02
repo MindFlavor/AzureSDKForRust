@@ -566,21 +566,6 @@ pub trait IndexingPolicySupport<'a> {
     fn with_indexing_policy(self, offer: &'a IndexingPolicy) -> Self::O;
 }
 
-pub trait DocumentRequired<'a, T>
-where
-    T: Serialize,
-{
-    fn document(&self) -> &'a Document<T>;
-}
-
-pub trait DocumentSupport<'a, T>
-where
-    T: Serialize,
-{
-    type O;
-    fn with_document(self, document: &'a Document<T>) -> Self::O;
-}
-
 //pub trait CollectionSupport<'a> {
 //    type O;
 //    fn with_collection(self, collection: &'a str) -> Self::O;
