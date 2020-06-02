@@ -190,6 +190,10 @@ impl<CUB> CosmosClient for CosmosStruct<CUB>
 where
     CUB: CosmosUriBuilder + Debug,
 {
+    fn create_database(&self) -> requests::CreateDatabaseBuilder<'_, No> {
+        requests::CreateDatabaseBuilder::new(self)
+    }
+
     #[inline]
     fn prepare_request(
         &self,

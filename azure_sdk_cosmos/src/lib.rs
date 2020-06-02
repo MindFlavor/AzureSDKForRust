@@ -87,11 +87,8 @@ pub enum ResourceType {
     Triggers,
 }
 
-pub trait CosmosClientRequired<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn cosmos(&self) -> &'a CosmosStruct<CUB>;
+pub trait CosmosClientRequired<'a> {
+    fn cosmos_client(&'a self) -> &'a dyn CosmosClient;
 }
 
 pub trait DatabaseRequired<'a> {
@@ -589,19 +586,13 @@ pub trait QuerySupport<'a> {
     fn with_query(self, query: &'a Query<'a>) -> Self::O;
 }
 
-pub trait DatabaseNameRequired<'a, DB>
-where
-    DB: DatabaseName,
-{
-    fn database_name(&self) -> &'a DB;
+pub trait DatabaseNameRequired<'a> {
+    fn database_name(&'a self) -> &'a dyn DatabaseName;
 }
 
-pub trait DatabaseNameSupport<'a, DB>
-where
-    DB: DatabaseName,
-{
+pub trait DatabaseNameSupport<'a> {
     type O;
-    fn with_database_name(self, database_name: &'a DB) -> Self::O;
+    fn with_database_name(self, database_name: &'a dyn DatabaseName) -> Self::O;
 }
 
 pub trait UserNameRequired<'a> {

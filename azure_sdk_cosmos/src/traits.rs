@@ -20,6 +20,8 @@ pub trait HasHyperClient: Debug {
 }
 
 pub trait CosmosClient: HasHyperClient {
+    fn create_database(&self) -> requests::CreateDatabaseBuilder<'_, No>;
+
     fn prepare_request(
         &self,
         uri_path: &str,
