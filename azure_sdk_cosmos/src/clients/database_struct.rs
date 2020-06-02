@@ -66,9 +66,9 @@ where
     //    requests::GetDatabaseBuilder::new(self)
     //}
 
-    //fn delete_database(&self) -> requests::DeleteDatabaseBuilder<'_, CUB> {
-    //    requests::DeleteDatabaseBuilder::new(self)
-    //}
+    fn delete_database(&self) -> requests::DeleteDatabaseBuilder<'_, C> {
+        requests::DeleteDatabaseBuilder::new(self)
+    }
 
     fn create_collection(&self) -> requests::CreateCollectionBuilder<'_, C, No, No, No, No> {
         requests::CreateCollectionBuilder::new(self)
