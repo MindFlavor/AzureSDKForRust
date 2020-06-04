@@ -78,6 +78,7 @@ where
     fn create_user(&self) -> requests::CreateUserBuilder<'_, '_, C, D>;
     fn delete_user(&self) -> requests::DeleteUserBuilder<'_, '_, C, D>;
     fn get_user(&self) -> requests::GetUserBuilder<'_, '_, C, D>;
+    fn replace_user(&self) -> requests::ReplaceUserBuilder<'_, '_, C, D, No>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

@@ -1,8 +1,8 @@
 //use crate::prelude::*;
 use crate::requests;
 use crate::traits::*;
+use azure_sdk_core::No;
 use std::marker::PhantomData;
-//use azure_sdk_core::No;
 
 #[derive(Debug, Clone)]
 pub struct UserStruct<C, D>
@@ -81,9 +81,9 @@ where
         requests::GetUserBuilder::new(self)
     }
 
-    //fn replace_user(&self) -> requests::ReplaceUserBuilder<'_, CUB, No> {
-    //    requests::ReplaceUserBuilder::new(self)
-    //}
+    fn replace_user(&self) -> requests::ReplaceUserBuilder<'_, '_, C, D, No> {
+        requests::ReplaceUserBuilder::new(self)
+    }
 
     fn delete_user(&self) -> requests::DeleteUserBuilder<'_, '_, C, D> {
         requests::DeleteUserBuilder::new(self)
