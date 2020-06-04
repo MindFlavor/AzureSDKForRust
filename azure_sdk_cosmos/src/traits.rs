@@ -68,6 +68,32 @@ where
     fn with_database(self, database_name: String) -> D;
 }
 
+pub trait UserClient<C, D>: HasDatabaseClient<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn user_name(&self) -> &str;
+}
+
+pub trait HasUserClient<C, D, USER>: HasCosmosClient<C>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
+{
+    fn user_client(&self) -> &USER;
+}
+
+pub trait IntoUserClient<C, D, USER>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
+{
+    fn with_user(self, user_name: String) -> USER;
+}
+
 pub trait CollectionClient<C, D>: HasDatabaseClient<C, D>
 where
     C: CosmosClient,

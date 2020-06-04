@@ -1,4 +1,4 @@
-use crate::clients::CollectionStruct;
+use crate::clients::{CollectionStruct, UserStruct};
 use crate::traits::*;
 use crate::{requests, CosmosClient};
 use azure_sdk_core::No;
@@ -72,17 +72,6 @@ where
         requests::CreateCollectionBuilder::new(self)
     }
 
-    //fn with_collection<'c>(
-    //    &'c self,
-    //    collection_name: &'c dyn CollectionName,
-    //) -> CollectionClient<'c, CUB> {
-    //    CollectionClient::new(self, collection_name)
-    //}
-
-    //fn with_user<'c>(&'c self, user_name: &'c dyn UserName) -> UserClient<'c, CUB> {
-    //    UserClient::new(&self, user_name)
-    //}
-
     //fn list_users(&self) -> requests::ListUsersBuilder<'_, CUB> {
     //    requests::ListUsersBuilder::new(self)
     //}
@@ -94,5 +83,14 @@ where
 {
     fn with_collection(self, collection_name: String) -> CollectionStruct<C, Self> {
         CollectionStruct::new(self, collection_name)
+    }
+}
+
+impl<C> IntoUserClient<C, Self, UserStruct<C, Self>> for DatabaseStruct<C>
+where
+    C: CosmosClient,
+{
+    fn with_user(self, user_name: String) -> UserStruct<C, Self> {
+        UserStruct::new(self, user_name)
     }
 }
