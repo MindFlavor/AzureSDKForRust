@@ -38,6 +38,7 @@ where
     fn list_collections(&self) -> crate::requests::ListCollectionsBuilder<'_, C>;
     fn create_collection(&self) -> requests::CreateCollectionBuilder<'_, C, No, No, No, No>;
     fn delete_database(&self) -> requests::DeleteDatabaseBuilder<'_, C>;
+    fn list_users(&self) -> requests::ListUsersBuilder<'_, '_, C>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client()

@@ -1,47 +1,212 @@
-use crate::clients::{CosmosUriBuilder, DatabaseClient, ResourceType};
+use crate::prelude::*;
 use crate::responses::ListUsersResponse;
-use crate::DatabaseClientRequired;
-use crate::DatabaseTrait;
+use crate::ResourceType;
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
+use azure_sdk_core::prelude::*;
 use hyper::StatusCode;
 use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
-pub struct ListUsersBuilder<'a, CUB>
+pub struct ListUsersBuilder<'a, 'b, C>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
 {
-    database_client: &'a DatabaseClient<'a, CUB>,
+    database_client: &'a dyn DatabaseClient<C>,
+    user_agent: Option<&'b str>,
+    activity_id: Option<&'b str>,
+    consistency_level: Option<ConsistencyLevel<'b>>,
+    continuation: Option<&'b str>,
+    max_item_count: i32,
 }
 
-impl<'a, CUB> ListUsersBuilder<'a, CUB>
+impl<'a, 'b, C> ListUsersBuilder<'a, 'b, C>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
 {
-    pub(crate) fn new(database_client: &'a DatabaseClient<'a, CUB>) -> ListUsersBuilder<'a, CUB> {
-        ListUsersBuilder { database_client }
+    #[inline]
+    pub(crate) fn new(database_client: &'a dyn DatabaseClient<C>) -> ListUsersBuilder<'a, 'b, C> {
+        ListUsersBuilder {
+            database_client,
+            user_agent: None,
+            activity_id: None,
+            consistency_level: None,
+            continuation: None,
+            max_item_count: -1,
+        }
     }
 }
 
-impl<'a, CUB> DatabaseClientRequired<'a, CUB> for ListUsersBuilder<'a, CUB>
+impl<'a, 'b, C> DatabaseClientRequired<'a, C> for ListUsersBuilder<'a, 'b, C>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
 {
-    fn database_client(&self) -> &'a DatabaseClient<'a, CUB> {
+    #[inline]
+    fn database_client(&self) -> &'a dyn DatabaseClient<C> {
         self.database_client
     }
 }
 
-// methods callable only when every mandatory field has been filled
-impl<'a, CUB> ListUsersBuilder<'a, CUB>
+//get mandatory no traits methods
+
+//set mandatory no traits methods
+impl<'a, 'b, C> UserAgentOption<'b> for ListUsersBuilder<'a, 'b, C>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+{
+    #[inline]
+    fn user_agent(&self) -> Option<&'b str> {
+        self.user_agent
+    }
+}
+
+impl<'a, 'b, C> ActivityIdOption<'b> for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    #[inline]
+    fn activity_id(&self) -> Option<&'b str> {
+        self.activity_id
+    }
+}
+
+impl<'a, 'b, C> ConsistencyLevelOption<'b> for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    #[inline]
+    fn consistency_level(&self) -> Option<ConsistencyLevel<'b>> {
+        self.consistency_level.clone()
+    }
+}
+
+impl<'a, 'b, C> ContinuationOption<'b> for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    #[inline]
+    fn continuation(&self) -> Option<&'b str> {
+        self.continuation
+    }
+}
+
+impl<'a, 'b, C> MaxItemCountOption for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    #[inline]
+    fn max_item_count(&self) -> i32 {
+        self.max_item_count
+    }
+}
+
+impl<'a, 'b, C> UserAgentSupport<'b> for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    type O = ListUsersBuilder<'a, 'b, C>;
+
+    #[inline]
+    fn with_user_agent(self, user_agent: &'b str) -> Self::O {
+        ListUsersBuilder {
+            database_client: self.database_client,
+            user_agent: Some(user_agent),
+            activity_id: self.activity_id,
+            consistency_level: self.consistency_level,
+            continuation: self.continuation,
+            max_item_count: self.max_item_count,
+        }
+    }
+}
+
+impl<'a, 'b, C> ActivityIdSupport<'b> for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    type O = ListUsersBuilder<'a, 'b, C>;
+
+    #[inline]
+    fn with_activity_id(self, activity_id: &'b str) -> Self::O {
+        ListUsersBuilder {
+            database_client: self.database_client,
+            user_agent: self.user_agent,
+            activity_id: Some(activity_id),
+            consistency_level: self.consistency_level,
+            continuation: self.continuation,
+            max_item_count: self.max_item_count,
+        }
+    }
+}
+
+impl<'a, 'b, C> ConsistencyLevelSupport<'b> for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    type O = ListUsersBuilder<'a, 'b, C>;
+
+    #[inline]
+    fn with_consistency_level(self, consistency_level: ConsistencyLevel<'b>) -> Self::O {
+        ListUsersBuilder {
+            database_client: self.database_client,
+            user_agent: self.user_agent,
+            activity_id: self.activity_id,
+            consistency_level: Some(consistency_level),
+            continuation: self.continuation,
+            max_item_count: self.max_item_count,
+        }
+    }
+}
+
+impl<'a, 'b, C> ContinuationSupport<'b> for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    type O = ListUsersBuilder<'a, 'b, C>;
+
+    #[inline]
+    fn with_continuation(self, continuation: &'b str) -> Self::O {
+        ListUsersBuilder {
+            database_client: self.database_client,
+            user_agent: self.user_agent,
+            activity_id: self.activity_id,
+            consistency_level: self.consistency_level,
+            continuation: Some(continuation),
+            max_item_count: self.max_item_count,
+        }
+    }
+}
+
+impl<'a, 'b, C> MaxItemCountSupport for ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
+{
+    type O = ListUsersBuilder<'a, 'b, C>;
+
+    #[inline]
+    fn with_max_item_count(self, max_item_count: i32) -> Self::O {
+        ListUsersBuilder {
+            database_client: self.database_client,
+            user_agent: self.user_agent,
+            activity_id: self.activity_id,
+            consistency_level: self.consistency_level,
+            continuation: self.continuation,
+            max_item_count,
+        }
+    }
+}
+
+// methods callable regardless
+impl<'a, 'b, C> ListUsersBuilder<'a, 'b, C> where C: CosmosClient {}
+
+// methods callable only when every mandatory field has been filled
+impl<'a, 'b, C> ListUsersBuilder<'a, 'b, C>
+where
+    C: CosmosClient,
 {
     pub async fn execute(&self) -> Result<ListUsersResponse, AzureError> {
         trace!("ListUsersBuilder::execute called");
 
-        let req = self.database_client.main_client().prepare_request(
-            &format!("dbs/{}/users", self.database_client.database_name().name()),
+        let req = self.database_client.cosmos_client().prepare_request(
+            &format!("dbs/{}/users", self.database_client.database_name()),
             hyper::Method::GET,
             ResourceType::Users,
         );

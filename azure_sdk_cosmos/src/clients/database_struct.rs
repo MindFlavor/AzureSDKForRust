@@ -72,9 +72,9 @@ where
         requests::CreateCollectionBuilder::new(self)
     }
 
-    //fn list_users(&self) -> requests::ListUsersBuilder<'_, CUB> {
-    //    requests::ListUsersBuilder::new(self)
-    //}
+    fn list_users(&self) -> requests::ListUsersBuilder<'_, '_, C> {
+        requests::ListUsersBuilder::new(self)
+    }
 }
 
 impl<C> IntoCollectionClient<C, Self, CollectionStruct<C, Self>> for DatabaseStruct<C>
