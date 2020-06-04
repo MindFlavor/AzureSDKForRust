@@ -135,6 +135,8 @@ where
     fn list_documents(&self) -> requests::ListDocumentsBuilder<'_, '_, C, D>;
     fn query_documents(&self) -> requests::QueryDocumentsBuilder<'_, '_, C, D, No>;
 
+    fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, C, D>;
+
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
             &format!("dbs/{}/colls", self.database_client().database_name()),

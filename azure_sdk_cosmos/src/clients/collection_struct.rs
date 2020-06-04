@@ -138,9 +138,9 @@ where
     //    requests::ListTriggersBuilder::new(self)
     //}
 
-    //fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, CUB> {
-    //    requests::GetPartitionKeyRangesBuilder::new(self)
-    //}
+    fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, C, D> {
+        requests::GetPartitionKeyRangesBuilder::new(self)
+    }
 }
 
 impl<C, D> IntoDocumentClient<C, D, Self, DocumentStruct<C, D, Self>> for CollectionStruct<C, D>
