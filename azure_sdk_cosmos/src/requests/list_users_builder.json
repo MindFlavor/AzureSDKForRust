@@ -8,7 +8,8 @@
 			"crate::responses::ListUsersResponse",
 			"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 			"hyper::StatusCode",
-			"std::convert::TryInto"
+			"std::convert::TryInto",
+			"futures::stream::{unfold, Stream}"
 		],
 	"inline": true,
 	"extra_types": [ "'a", "'b", "C" ],
