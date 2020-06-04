@@ -189,6 +189,10 @@ where
         requests::CreateDatabaseBuilder::new(self)
     }
 
+    fn list_database(&self) -> requests::ListDatabasesBuilder<'_> {
+        requests::ListDatabasesBuilder::new(self)
+    }
+
     #[inline]
     fn prepare_request(
         &self,
