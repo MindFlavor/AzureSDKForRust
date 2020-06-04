@@ -85,9 +85,9 @@ where
     //    requests::ReplaceUserBuilder::new(self)
     //}
 
-    //fn delete_user(&self) -> requests::DeleteUserBuilder<'_, CUB> {
-    //    requests::DeleteUserBuilder::new(self)
-    //}
+    fn delete_user(&self) -> requests::DeleteUserBuilder<'_, '_, C, D> {
+        requests::DeleteUserBuilder::new(self)
+    }
 
     //fn with_permission<'c>(
     //    &'c self,
