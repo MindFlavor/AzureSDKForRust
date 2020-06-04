@@ -90,9 +90,9 @@ where
         requests::ReplaceCollectionBuilder::new(self)
     }
 
-    //fn list_documents(&self) -> requests::ListDocumentsBuilder<'_, '_, CUB> {
-    //    requests::ListDocumentsBuilder::new(self)
-    //}
+    fn list_documents(&self) -> requests::ListDocumentsBuilder<'_, '_, C, D> {
+        requests::ListDocumentsBuilder::new(self)
+    }
 
     fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No> {
         requests::CreateDocumentBuilder::new(self)

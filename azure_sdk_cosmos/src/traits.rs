@@ -80,6 +80,7 @@ where
     fn replace_collection(&self) -> requests::ReplaceCollectionBuilder<'_, '_, C, D, No, No>;
 
     fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No>;
+    fn list_documents(&self) -> requests::ListDocumentsBuilder<'_, '_, C, D>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
