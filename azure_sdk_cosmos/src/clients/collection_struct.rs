@@ -2,7 +2,7 @@ use crate::clients::*;
 use crate::requests;
 use crate::{
     CollectionClient, CosmosClient, DatabaseClient, HasCosmosClient, HasDatabaseClient,
-    HasHyperClient, IntoDocumentClient, PartitionKeys,
+    HasHyperClient, IntoDocumentClient, IntoTriggerClient, PartitionKeys,
 };
 use azure_sdk_core::No;
 use std::marker::PhantomData;
@@ -120,10 +120,6 @@ where
     //    UserDefinedFunctionClient::new(&self, user_defined_function_name)
     //}
 
-    //fn with_trigger<'c>(&'c self, trigger_name: &'c dyn TriggerName) -> TriggerClient<'c, CUB> {
-    //    TriggerClient::new(&self, trigger_name)
-    //}
-
     //fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB> {
     //    requests::ListStoredProceduresBuilder::new(self)
     //}
@@ -154,5 +150,15 @@ where
         partition_keys: PartitionKeys,
     ) -> DocumentStruct<C, D, Self> {
         DocumentStruct::new(self, document_name, partition_keys)
+    }
+}
+
+impl<C, D> IntoTriggerClient<C, D, Self, TriggerStruct<C, D, Self>> for CollectionStruct<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn with_trigger(self, trigger_name: String) -> TriggerStruct<C, D, Self> {
+        TriggerStruct::new(self, trigger_name)
     }
 }

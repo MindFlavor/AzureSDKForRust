@@ -178,6 +178,59 @@ where
     fn with_collection(self, collection_name: String) -> COLL;
 }
 
+pub trait TriggerClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn trigger_name(&self) -> &str;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/triggers",
+                self.database_client().database_name(),
+                self.collection_client().collection_name(),
+            ),
+            method,
+            ResourceType::Triggers,
+        )
+    }
+    fn prepare_request_with_trigger_name(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/triggers/{}",
+                self.database_client().database_name(),
+                self.collection_client().collection_name(),
+                self.trigger_name()
+            ),
+            method,
+            ResourceType::Triggers,
+        )
+    }
+}
+
+pub trait HasTriggerClient<C, D, COLL, TRIGGER>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    TRIGGER: TriggerClient<C, D, COLL>,
+{
+    fn trigger_client(&self) -> &TRIGGER;
+}
+
+pub trait IntoTriggerClient<C, D, COLL, TRIGGER>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    TRIGGER: TriggerClient<C, D, COLL>,
+{
+    fn with_trigger(self, trigger_name: String) -> TRIGGER;
+}
+
 pub trait DocumentClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
 where
     C: CosmosClient,
