@@ -77,9 +77,9 @@ where
         requests::CreateUserBuilder::new(self)
     }
 
-    //fn get_user(&self) -> requests::GetUserBuilder<'_, CUB> {
-    //    requests::GetUserBuilder::new(self)
-    //}
+    fn get_user(&self) -> requests::GetUserBuilder<'_, '_, C, D> {
+        requests::GetUserBuilder::new(self)
+    }
 
     //fn replace_user(&self) -> requests::ReplaceUserBuilder<'_, CUB, No> {
     //    requests::ReplaceUserBuilder::new(self)
