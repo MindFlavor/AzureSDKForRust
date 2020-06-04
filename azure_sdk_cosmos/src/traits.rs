@@ -32,6 +32,8 @@ where
     C: CosmosClient,
 {
     fn database_name(&self) -> &str;
+
+    fn get_database(&self) -> requests::GetDatabaseBuilder<'_, '_, C>;
     fn list_collections(&self) -> crate::requests::ListCollectionsBuilder<'_, C>;
     fn create_collection(&self) -> requests::CreateCollectionBuilder<'_, C, No, No, No, No>;
     fn delete_database(&self) -> requests::DeleteDatabaseBuilder<'_, C>;
