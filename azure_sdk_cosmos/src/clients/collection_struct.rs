@@ -130,9 +130,9 @@ where
     //    requests::ListUserDefinedFunctionsBuilder::new(self)
     //}
 
-    //fn list_triggers(&self) -> requests::ListTriggersBuilder<'_, '_, CUB> {
-    //    requests::ListTriggersBuilder::new(self)
-    //}
+    fn list_triggers(&self) -> requests::ListTriggersBuilder<'_, '_, C, D> {
+        requests::ListTriggersBuilder::new(self)
+    }
 
     fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, C, D> {
         requests::GetPartitionKeyRangesBuilder::new(self)
