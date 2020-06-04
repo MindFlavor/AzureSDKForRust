@@ -17,7 +17,7 @@ where
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
 {
-    document_client: &'a DocumentClient<C, D, COLL>,
+    document_client: &'a dyn DocumentClient<C, D, COLL>,
     if_match_condition: Option<IfMatchCondition<'b>>,
     if_modified_since: Option<&'b DateTime<Utc>>,
     user_agent: Option<&'b str>,
@@ -33,7 +33,7 @@ where
 {
     #[inline]
     pub(crate) fn new(
-        document_client: &'a DocumentClient<C, D, COLL>,
+        document_client: &'a dyn DocumentClient<C, D, COLL>,
     ) -> GetDocumentBuilder<'a, 'b, C, D, COLL> {
         GetDocumentBuilder {
             document_client,
@@ -54,7 +54,7 @@ where
     COLL: CollectionClient<C, D>,
 {
     #[inline]
-    fn document_client(&self) -> &'a DocumentClient<C, D, COLL> {
+    fn document_client(&self) -> &'a dyn DocumentClient<C, D, COLL> {
         self.document_client
     }
 }

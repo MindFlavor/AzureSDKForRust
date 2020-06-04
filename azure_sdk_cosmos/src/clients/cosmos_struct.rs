@@ -1,12 +1,7 @@
-//use crate::clients::DatabaseClient;
 use crate::clients::DatabaseStruct;
-use crate::database::DatabaseName;
 use crate::headers::*;
 use crate::requests;
-use crate::{
-    requests::*, AuthorizationToken, CosmosClient, DatabaseClient, HasHyperClient,
-    IntoDatabaseClient, ResourceType,
-};
+use crate::{AuthorizationToken, CosmosClient, HasHyperClient, IntoDatabaseClient, ResourceType};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::No;
 use base64;

@@ -64,13 +64,10 @@ use crate::collection::Collection;
 use crate::collection::CollectionName;
 use crate::headers::*;
 pub use crate::partition_keys::PartitionKeys;
-use crate::stored_procedure::{Parameters, StoredProcedureName};
+use crate::stored_procedure::Parameters;
 pub use crate::user::{User, UserName};
 pub use crate::user_defined_function::UserDefinedFunctionName;
-use attachment::AttachmentName;
-use azure_sdk_core::No;
 use http::request::Builder;
-use serde::Serialize;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
@@ -492,7 +489,7 @@ where
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
 {
-    fn document_client(&'a self) -> &'a DocumentClient<C, D, COLL>;
+    fn document_client(&'a self) -> &'a dyn DocumentClient<C, D, COLL>;
 }
 
 pub trait PermissionClientRequired<'a, CUB>

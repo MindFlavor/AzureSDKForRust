@@ -2,7 +2,6 @@
 	"name": "CreateDocumentBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::document::Document",
 		"crate::prelude::*",
 		"crate::ResourceType",
 		"crate::responses::CreateDocumentResponse",

@@ -1,8 +1,6 @@
 use crate::clients::CollectionStruct;
-use crate::database::DatabaseName;
 use crate::traits::*;
-use crate::CollectionName;
-use crate::{requests, CosmosClient, ResourceType, UserName};
+use crate::{requests, CosmosClient};
 use azure_sdk_core::No;
 
 #[derive(Debug, Clone)]

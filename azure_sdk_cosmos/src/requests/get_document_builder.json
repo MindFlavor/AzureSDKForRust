@@ -20,7 +20,7 @@
 	"constructor_fields": [
 		{
 			"name": "document_client",
-			"field_type": "&'a DocumentClient<C, D, COLL>",
+			"field_type": "&'a dyn DocumentClient<C, D, COLL>",
 			"trait_get": "DocumentClientRequired<'a, C, D, COLL>"
 		}
 	],

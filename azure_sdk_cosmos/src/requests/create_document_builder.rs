@@ -1,4 +1,3 @@
-use crate::document::Document;
 use crate::prelude::*;
 use crate::responses::CreateDocumentResponse;
 use crate::ResourceType;

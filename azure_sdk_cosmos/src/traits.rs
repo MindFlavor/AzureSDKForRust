@@ -1,14 +1,4 @@
-use crate::attachment::AttachmentName;
-use crate::clients::CosmosUriBuilder;
-use crate::collection::CollectionName;
-use crate::database::DatabaseName;
-use crate::document::DocumentName;
-use crate::permission::PermissionName;
 use crate::requests;
-use crate::stored_procedure::StoredProcedureName;
-use crate::trigger::TriggerName;
-use crate::user::UserName;
-use crate::user_defined_function::UserDefinedFunctionName;
 use crate::{PartitionKeys, ResourceType};
 use azure_sdk_core::No;
 use http::request::Builder;
