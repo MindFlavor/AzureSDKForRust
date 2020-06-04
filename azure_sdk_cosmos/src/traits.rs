@@ -81,6 +81,7 @@ where
 
     fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No>;
     fn list_documents(&self) -> requests::ListDocumentsBuilder<'_, '_, C, D>;
+    fn query_documents(&self) -> requests::QueryDocumentsBuilder<'_, '_, C, D, No>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

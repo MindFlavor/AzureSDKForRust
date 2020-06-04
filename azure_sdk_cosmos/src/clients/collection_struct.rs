@@ -105,9 +105,9 @@ where
     //    requests::ReplaceDocumentBuilder::new(self)
     //}
 
-    //fn query_documents(&self) -> requests::QueryDocumentsBuilder<'_, '_, CUB, No> {
-    //    requests::QueryDocumentsBuilder::new(self)
-    //}
+    fn query_documents(&self) -> requests::QueryDocumentsBuilder<'_, '_, C, D, No> {
+        requests::QueryDocumentsBuilder::new(self)
+    }
 
     //fn with_stored_procedure<'c>(
     //    &'c self,

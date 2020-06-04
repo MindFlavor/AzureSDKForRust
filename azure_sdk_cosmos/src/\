@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use crate::responses::QueryDocumentsResponse;
-use crate::{Query, ResourceType};
+use crate::Query;
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
 use azure_sdk_core::{No, ToAssign, Yes};
@@ -11,7 +11,7 @@ use serde::de::DeserializeOwned;
 use std::convert::TryInto;
 use std::marker::PhantomData;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct QueryDocumentsBuilder<'a, 'b, C, D, QuerySet>
 where
     QuerySet: ToAssign,
@@ -31,31 +31,6 @@ where
     partition_keys: Option<&'b PartitionKeys>,
     query_cross_partition: bool,
     parallelize_cross_partition_query: bool,
-}
-
-impl<'a, 'b, C, D, QuerySet> Clone for QueryDocumentsBuilder<'a, 'b, C, D, QuerySet>
-where
-    QuerySet: ToAssign,
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-{
-    fn clone(&self) -> Self {
-        Self {
-            collection_client: self.collection_client,
-            p_query: PhantomData {},
-            query: self.query,
-            if_match_condition: self.if_match_condition,
-            if_modified_since: self.if_modified_since,
-            user_agent: self.user_agent,
-            activity_id: self.activity_id,
-            consistency_level: self.consistency_level.clone(),
-            continuation: self.continuation,
-            max_item_count: self.max_item_count,
-            partition_keys: self.partition_keys,
-            query_cross_partition: self.query_cross_partition,
-            parallelize_cross_partition_query: self.parallelize_cross_partition_query,
-        }
-    }
 }
 
 impl<'a, 'b, C, D> QueryDocumentsBuilder<'a, 'b, C, D, No>
@@ -556,6 +531,8 @@ where
     }
 }
 
+
+
 // methods callable only when every mandatory field has been filled
 impl<'a, 'b, C, D> QueryDocumentsBuilder<'a, 'b, C, D, Yes>
 where
@@ -608,7 +585,8 @@ where
         debug!("\nheaders == {:?}", headers);
         debug!("\nbody == {:#?}", body);
 
-        Ok((&headers, &body as &[u8]).try_into()?)
+        let resp = QueryDocumentsResponse::try_from((&headers, &body as &[u8]))?;
+        Ok(resp)
     }
 
     pub fn stream<T>(
