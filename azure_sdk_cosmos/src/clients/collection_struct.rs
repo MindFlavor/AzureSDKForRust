@@ -98,12 +98,9 @@ where
         requests::CreateDocumentBuilder::new(self)
     }
 
-    //fn replace_document<T>(&self) -> requests::ReplaceDocumentBuilder<'_, '_, T, CUB, No, No, No>
-    //where
-    //    T: Serialize,
-    //{
-    //    requests::ReplaceDocumentBuilder::new(self)
-    //}
+    fn replace_document(&self) -> requests::ReplaceDocumentBuilder<'_, '_, C, D, No, No> {
+        requests::ReplaceDocumentBuilder::new(self)
+    }
 
     fn query_documents(&self) -> requests::QueryDocumentsBuilder<'_, '_, C, D, No> {
         requests::QueryDocumentsBuilder::new(self)
@@ -143,14 +140,6 @@ where
 
     //fn get_partition_key_ranges(&self) -> requests::GetPartitionKeyRangesBuilder<'_, '_, CUB> {
     //    requests::GetPartitionKeyRangesBuilder::new(self)
-    //}
-
-    //fn with_document<'c>(
-    //    &'c self,
-    //    document_name: &'c dyn DocumentName,
-    //    partition_keys: &'c PartitionKeys,
-    //) -> DocumentClient<'c, CUB> {
-    //    DocumentClient::new(&self, document_name, partition_keys)
     //}
 }
 

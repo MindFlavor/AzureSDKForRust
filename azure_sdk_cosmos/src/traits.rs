@@ -80,6 +80,7 @@ where
     fn replace_collection(&self) -> requests::ReplaceCollectionBuilder<'_, '_, C, D, No, No>;
 
     fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No>;
+    fn replace_document(&self) -> requests::ReplaceDocumentBuilder<'_, '_, C, D, No, No>;
     fn list_documents(&self) -> requests::ListDocumentsBuilder<'_, '_, C, D>;
     fn query_documents(&self) -> requests::QueryDocumentsBuilder<'_, '_, C, D, No>;
 
