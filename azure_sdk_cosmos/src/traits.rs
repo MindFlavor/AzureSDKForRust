@@ -74,6 +74,7 @@ where
 
     fn get_collection(&self) -> requests::GetCollectionBuilder<'_, C, D>;
     fn delete_collection(&self) -> requests::DeleteCollectionBuilder<'_, C, D>;
+    fn replace_collection(&self) -> requests::ReplaceCollectionBuilder<'_, '_, C, D, No, No>;
 
     fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No>;
 

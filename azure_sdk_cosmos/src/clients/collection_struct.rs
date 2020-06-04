@@ -86,9 +86,9 @@ where
         requests::DeleteCollectionBuilder::new(self)
     }
 
-    //fn replace_collection(&self) -> requests::ReplaceCollectionBuilder<'_, CUB, No, No> {
-    //    requests::ReplaceCollectionBuilder::new(self)
-    //}
+    fn replace_collection(&self) -> requests::ReplaceCollectionBuilder<'_, '_, C, D, No, No> {
+        requests::ReplaceCollectionBuilder::new(self)
+    }
 
     //fn list_documents(&self) -> requests::ListDocumentsBuilder<'_, '_, CUB> {
     //    requests::ListDocumentsBuilder::new(self)
