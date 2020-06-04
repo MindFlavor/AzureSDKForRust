@@ -1,4 +1,5 @@
 //use crate::prelude::*;
+use crate::requests;
 use crate::traits::*;
 use std::marker::PhantomData;
 //use azure_sdk_core::No;
@@ -72,9 +73,9 @@ where
         &self.user_name
     }
 
-    //fn create_user(&self) -> requests::CreateUserBuilder<'_, CUB> {
-    //    requests::CreateUserBuilder::new(self)
-    //}
+    fn create_user(&self) -> requests::CreateUserBuilder<'_, '_, C, D> {
+        requests::CreateUserBuilder::new(self)
+    }
 
     //fn get_user(&self) -> requests::GetUserBuilder<'_, CUB> {
     //    requests::GetUserBuilder::new(self)

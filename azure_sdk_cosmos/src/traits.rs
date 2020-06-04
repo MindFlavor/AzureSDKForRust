@@ -74,6 +74,27 @@ where
     D: DatabaseClient<C>,
 {
     fn user_name(&self) -> &str;
+
+    fn create_user(&self) -> requests::CreateUserBuilder<'_, '_, C, D>;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!("dbs/{}/users", self.database_client().database_name()),
+            method,
+            ResourceType::Users,
+        )
+    }
+    fn prepare_request_with_user_name(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/users/{}",
+                self.database_client().database_name(),
+                self.user_name()
+            ),
+            method,
+            ResourceType::Users,
+        )
+    }
 }
 
 pub trait HasUserClient<C, D, USER>: HasCosmosClient<C>

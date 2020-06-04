@@ -467,11 +467,12 @@ where
     //    fn trigger_client(&self) -> &'a TriggerClient<'a, CUB>;
 }
 
-pub trait UserClientRequired<'a, CUB>
+pub trait UserClientRequired<'a, C, D>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
 {
-    //   fn user_client(&self) -> &'a UserClient<'a, CUB>;
+    fn user_client(&'a self) -> &'a dyn UserClient<C, D>;
 }
 
 pub trait StoredProcedureNameRequired<'a> {
