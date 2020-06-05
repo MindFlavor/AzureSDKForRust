@@ -460,11 +460,13 @@ where
     //    fn user_defined_function_client(&self) -> &'a UserDefinedFunctionClient<'a, CUB>;
 }
 
-pub trait TriggerClientRequired<'a, CUB>
+pub trait TriggerClientRequired<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    //    fn trigger_client(&self) -> &'a TriggerClient<'a, CUB>;
+    fn trigger_client(&'a self) -> &'a dyn TriggerClient<C, D, COLL>;
 }
 
 pub trait UserClientRequired<'a, C, D>

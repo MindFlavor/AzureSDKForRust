@@ -188,6 +188,12 @@ where
 {
     fn trigger_name(&self) -> &str;
 
+    fn create_trigger(&self)
+        -> requests::CreateOrReplaceTriggerBuilder<'_, C, D, COLL, No, No, No>;
+    fn replace_trigger(
+        &self,
+    ) -> requests::CreateOrReplaceTriggerBuilder<'_, C, D, COLL, No, No, No>;
+
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
             &format!(

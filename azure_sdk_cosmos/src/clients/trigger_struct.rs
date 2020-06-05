@@ -1,5 +1,6 @@
-//use crate::requests;
+use crate::requests;
 use crate::traits::*;
+use azure_sdk_core::No;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
@@ -91,13 +92,17 @@ where
         &self.trigger_name
     }
 
-    //fn create_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No> {
-    //    requests::CreateOrReplaceTriggerBuilder::new(self, true)
-    //}
+    fn create_trigger(
+        &self,
+    ) -> requests::CreateOrReplaceTriggerBuilder<'_, C, D, COLL, No, No, No> {
+        requests::CreateOrReplaceTriggerBuilder::new(self, true)
+    }
 
-    //fn replace_trigger(&self) -> requests::CreateOrReplaceTriggerBuilder<'_, CUB, No, No, No> {
-    //    requests::CreateOrReplaceTriggerBuilder::new(self, false)
-    //}
+    fn replace_trigger(
+        &self,
+    ) -> requests::CreateOrReplaceTriggerBuilder<'_, C, D, COLL, No, No, No> {
+        requests::CreateOrReplaceTriggerBuilder::new(self, false)
+    }
 
     //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB> {
     //    requests::DeleteTriggerBuilder::new(self)
