@@ -40,8 +40,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let authorization_token = AuthorizationToken::new_master(&master_key)?;
 
     let client = ClientBuilder::new(account, authorization_token)?;
-    let client = client.with_database(&database_name);
-    let client = client.with_collection(&collection_name);
+    let client = client.with_database(database_name);
+    let client = client.with_collection(collection_name);
 
     for i in 0u64..5 {
         let doc = Document::new(MySampleStruct {
@@ -54,9 +54,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // let's add an entity.
         client
             .create_document()
-            .with_document(&doc)
             .with_partition_keys(PartitionKeys::new().push(&doc.document.id)?)
-            .execute()
+            .execute_with_document(&doc)
             .await?;
     }
 
@@ -96,22 +95,26 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // us if we call the stream function. Here we
     // ask for 3 items at the time but of course you don't have to do that, the
     // stream function will work regardless of the limits imposed.
-    println!("\nStreaming documents");
-    let stream = client.list_documents().with_max_item_count(3);
-    let mut stream = Box::pin(stream.stream::<MySampleStruct>());
-    // TODO: As soon as the streaming functionality is completed
-    // in Rust substitute this while let Some... into
-    // for each (or whatever the Rust team picks).
-    while let Some(res) = stream.next().await {
-        let res = res?;
-        println!("Received {} documents in one batch!", res.documents.len());
+    {
+        println!("\nStreaming documents");
+        let stream = client.list_documents().with_max_item_count(3);
+        let mut stream = Box::pin(stream.stream::<MySampleStruct>());
+        // TODO: As soon as the streaming functionality is completed
+        // in Rust substitute this while let Some... into
+        // for each (or whatever the Rust team picks).
+        while let Some(res) = stream.next().await {
+            let res = res?;
+            println!("Received {} documents in one batch!", res.documents.len());
+        }
     }
 
     println!("\n\nLooking for a specific item");
     let id = format!("unique_id{}", 3);
+    let partition_keys: PartitionKeys = (&id).into();
 
     let response = client
-        .with_document(&id, PartitionKeys::new().push(&id)?)
+        .clone()
+        .with_document(id.to_owned(), partition_keys.to_owned())
         .get_document()
         .execute::<MySampleStruct>()
         .await?;
@@ -133,12 +136,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("\n\nReplacing document");
     let replace_document_response = client
         .replace_document()
-        .with_document(&doc.document)
-        .with_partition_keys(PartitionKeys::new().push(&id)?)
+        .with_partition_keys(&partition_keys)
         .with_document_id(&id)
         .with_consistency_level(ConsistencyLevel::from(&response))
         .with_if_match_condition(IfMatchCondition::Match(&etag)) // use optimistic concurrency check
-        .execute()
+        .execute_with_document(&doc.document)
         .await?;
 
     println!(
@@ -150,9 +152,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // has_been_found == false
     println!("\n\nLooking for non-existing item");
     let id = format!("unique_id{}", 100);
+    let partition_keys: PartitionKeys = (&id).into();
 
     let response = client
-        .with_document(&id, PartitionKeys::new().push(&id)?)
+        .clone()
+        .with_document(id, partition_keys)
         .get_document()
         .execute::<MySampleStruct>()
         .await?;
@@ -165,8 +169,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     for i in 0u64..5 {
         let id = format!("unique_id{}", i);
+        let partition_keys: PartitionKeys = (&id).into();
         client
-            .with_document(&id, PartitionKeys::new().push(&id)?)
+            .clone()
+            .with_document(id, partition_keys)
             .delete_document()
             .execute()
             .await?;

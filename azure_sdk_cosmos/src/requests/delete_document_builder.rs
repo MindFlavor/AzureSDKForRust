@@ -277,7 +277,9 @@ where
     pub async fn execute(&self) -> Result<DeleteDocumentResponse, AzureError> {
         trace!("DeleteDocumentBuilder::execute called");
 
-        let mut req = self.document_client.prepare_request(hyper::Method::DELETE);
+        let mut req = self
+            .document_client
+            .prepare_request_with_document_name(hyper::Method::DELETE);
 
         // add trait headers
         req = IfMatchConditionOption::add_header(self, req);
