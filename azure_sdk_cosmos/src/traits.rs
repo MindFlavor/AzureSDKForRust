@@ -257,6 +257,9 @@ where
     fn replace_user_defined_function(
         &self,
     ) -> requests::CreateOrReplaceUserDefinedFunctionBuilder<'_, '_, C, D, COLL, No>;
+    fn delete_user_defined_function(
+        &self,
+    ) -> requests::DeleteUserDefinedFunctionBuilder<'_, '_, C, D, COLL>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

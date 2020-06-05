@@ -104,7 +104,9 @@ where
         requests::CreateOrReplaceUserDefinedFunctionBuilder::new(self, false)
     }
 
-    //fn delete_user_defined_function(&self) -> requests::DeleteUserDefinedFunctionBuilder<'_, CUB> {
-    //    requests::DeleteUserDefinedFunctionBuilder::new(self)
-    //}
+    fn delete_user_defined_function(
+        &self,
+    ) -> requests::DeleteUserDefinedFunctionBuilder<'_, '_, C, D, COLL> {
+        requests::DeleteUserDefinedFunctionBuilder::new(self)
+    }
 }
