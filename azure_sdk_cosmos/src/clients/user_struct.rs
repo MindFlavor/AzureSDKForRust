@@ -90,9 +90,9 @@ where
         requests::DeleteUserBuilder::new(self)
     }
 
-    //fn list_permissions(&self) -> requests::ListPermissionsBuilder<'_, CUB> {
-    //    requests::ListPermissionsBuilder::new(self)
-    //}
+    fn list_permissions(&self) -> requests::ListPermissionsBuilder<'_, '_, C, D> {
+        requests::ListPermissionsBuilder::new(self)
+    }
 }
 
 impl<C, D> IntoPermissionClient<C, D, Self, PermissionStruct<C, D, Self>> for UserStruct<C, D>

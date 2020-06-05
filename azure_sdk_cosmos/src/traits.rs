@@ -81,6 +81,8 @@ where
     fn get_user(&self) -> requests::GetUserBuilder<'_, '_, C, D>;
     fn replace_user(&self) -> requests::ReplaceUserBuilder<'_, '_, C, D, No>;
 
+    fn list_permissions(&self) -> requests::ListPermissionsBuilder<'_, '_, C, D>;
+
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
             &format!("dbs/{}/users", self.database_client().database_name()),
