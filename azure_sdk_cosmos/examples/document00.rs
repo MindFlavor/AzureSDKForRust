@@ -168,6 +168,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     );
 
     // Now we get the same document by id.
+    println!("getting document by id {}", &doc.document.id);
     let get_document_response = collection_client
         .clone()
         .with_document(doc.document.id.to_string(), (&doc.document.id).into())

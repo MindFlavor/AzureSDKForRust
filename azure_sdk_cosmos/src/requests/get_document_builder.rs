@@ -238,7 +238,9 @@ where
     where
         T: DeserializeOwned,
     {
-        let mut req = self.document_client.prepare_request(hyper::Method::GET);
+        let mut req = self
+            .document_client
+            .prepare_request_with_document_name(hyper::Method::GET);
 
         // add trait headers
         req = IfMatchConditionOption::add_header(self, req);
