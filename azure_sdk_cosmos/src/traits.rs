@@ -329,6 +329,9 @@ where
     fn execute_stored_procedure(
         &self,
     ) -> requests::ExecuteStoredProcedureBuilder<'_, '_, C, D, COLL>;
+    fn replace_stored_procedure(
+        &self,
+    ) -> requests::ReplaceStoredProcedureBuilder<'_, '_, C, D, COLL, No>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

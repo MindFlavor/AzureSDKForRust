@@ -98,9 +98,11 @@ where
         requests::CreateStoredProcedureBuilder::new(self)
     }
 
-    //fn replace_stored_procedure(&self) -> requests::ReplaceStoredProcedureBuilder<'_, CUB, No> {
-    //    requests::ReplaceStoredProcedureBuilder::new(self)
-    //}
+    fn replace_stored_procedure(
+        &self,
+    ) -> requests::ReplaceStoredProcedureBuilder<'_, '_, C, D, COLL, No> {
+        requests::ReplaceStoredProcedureBuilder::new(self)
+    }
 
     fn execute_stored_procedure(
         &self,
