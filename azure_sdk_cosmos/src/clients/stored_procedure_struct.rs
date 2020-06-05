@@ -106,7 +106,9 @@ where
     //    requests::ExecuteStoredProcedureBuilder::new(self)
     //}
 
-    //fn delete_stored_procedure(&self) -> requests::DeleteStoredProcedureBuilder<'_, CUB> {
-    //    requests::DeleteStoredProcedureBuilder::new(self)
-    //}
+    fn delete_stored_procedure(
+        &self,
+    ) -> requests::DeleteStoredProcedureBuilder<'_, '_, C, D, COLL> {
+        requests::DeleteStoredProcedureBuilder::new(self)
+    }
 }
