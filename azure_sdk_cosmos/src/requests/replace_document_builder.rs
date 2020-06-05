@@ -464,7 +464,10 @@ where
     C: CosmosClient,
     D: DatabaseClient<C>,
 {
-    pub async fn execute<T>(&self, document: &T) -> Result<ReplaceDocumentResponse, AzureError>
+    pub async fn execute_with_document<T>(
+        &self,
+        document: &T,
+    ) -> Result<ReplaceDocumentResponse, AzureError>
     where
         T: Serialize,
     {

@@ -495,26 +495,13 @@ where
     fn document_client(&'a self) -> &'a dyn DocumentClient<C, D, COLL>;
 }
 
-pub trait PermissionClientRequired<'a, CUB>
+pub trait PermissionClientRequired<'a, C, D, USER>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
 {
-    //    fn permission_client(&self) -> &'a PermissionClient<'a, CUB>;
-}
-
-pub trait PermissionModeRequired<'a, R>
-where
-    R: PermissionResource,
-{
-    fn permission_mode(&self) -> &'a PermissionMode<R>;
-}
-
-pub trait PermissionModeSupport<'a, R>
-where
-    R: PermissionResource,
-{
-    type O;
-    fn with_permission_mode(self, permission: &'a PermissionMode<R>) -> Self::O;
+    fn permission_client(&self) -> &'a dyn PermissionClient<C, D, USER>;
 }
 
 pub trait OfferRequired {

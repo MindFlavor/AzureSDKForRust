@@ -236,7 +236,7 @@ where
     pub async fn execute(&self) -> Result<ListPermissionsResponse<'a>, AzureError> {
         trace!("ListPermissionsBuilder::execute called");
 
-        let req = self.user_client.cosmos_client().prepare_request(
+        let request = self.user_client.cosmos_client().prepare_request(
             &format!(
                 "dbs/{}/users/{}/permissions",
                 self.user_client.database_client().database_name(),
@@ -246,11 +246,17 @@ where
             ResourceType::Permissions,
         );
 
-        let req = req.body(hyper::Body::empty())?;
-        debug!("\nreq == {:#?}", req);
+        let request = UserAgentOption::add_header(self, request);
+        let request = ActivityIdOption::add_header(self, request);
+        let request = ConsistencyLevelOption::add_header(self, request);
+        let request = ContinuationOption::add_header(self, request);
+        let request = MaxItemCountOption::add_header(self, request);
+
+        let request = request.body(hyper::Body::empty())?;
+        debug!("\nrequest == {:#?}", request);
 
         let (headers, body) = check_status_extract_headers_and_body(
-            self.user_client.hyper_client().request(req),
+            self.user_client.hyper_client().request(request),
             StatusCode::OK,
         )
         .await?;

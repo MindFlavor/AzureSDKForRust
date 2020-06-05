@@ -1,7 +1,7 @@
+use crate::requests;
 use crate::traits::*;
-use std::marker::PhantomData;
-//use crate::{requests, PermissionName, PermissionResource, PermissionTrait, UserName, UserTrait};
 //use azure_sdk_core::No;
+use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
 pub struct PermissionStruct<C, D, USER>
@@ -92,12 +92,9 @@ where
         &self.permission_name
     }
 
-    //fn create_permission<R>(&self) -> requests::CreatePermissionBuilder<'_, CUB, R, No>
-    //where
-    //    R: PermissionResource,
-    //{
-    //    requests::CreatePermissionBuilder::new(self)
-    //}
+    fn create_permission(&self) -> requests::CreatePermissionBuilder<'_, '_, C, D, USER> {
+        requests::CreatePermissionBuilder::new(self)
+    }
 
     //fn replace_permission<R>(&self) -> requests::ReplacePermissionBuilder<'_, CUB, R, No>
     //where
