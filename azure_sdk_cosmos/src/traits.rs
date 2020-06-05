@@ -194,6 +194,7 @@ where
     fn replace_collection(&self) -> requests::ReplaceCollectionBuilder<'_, '_, C, D, No, No>;
 
     fn list_triggers(&self) -> requests::ListTriggersBuilder<'_, '_, C, D>;
+    fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, '_, C, D>;
 
     fn create_document(&self) -> requests::CreateDocumentBuilder<'_, '_, C, D, No>;
     fn replace_document(&self) -> requests::ReplaceDocumentBuilder<'_, '_, C, D, No, No>;

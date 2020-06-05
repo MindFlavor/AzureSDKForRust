@@ -107,9 +107,9 @@ where
         requests::QueryDocumentsBuilder::new(self)
     }
 
-    //fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB> {
-    //    requests::ListStoredProceduresBuilder::new(self)
-    //}
+    fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, '_, C, D> {
+        requests::ListStoredProceduresBuilder::new(self)
+    }
 
     //fn list_user_defined_functions(
     //    &self,
