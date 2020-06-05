@@ -73,7 +73,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // has many options (such as indexing and so on).
     let collection = {
         let collections = client
-            .with_database(&database.id)
+            .clone()
+            .with_database(database.id.to_owned())
             .list_collections()
             .execute()
             .await?;
@@ -110,7 +111,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
             // you can also use the predefined performance levels. For example:
             // `Offer::S2`.
             client
-                .with_database(&database.id)
+                .clone()
+                .with_database(database.id.to_owned())
                 .create_collection()
                 .with_collection_name(&COLLECTION)
                 .with_offer(Offer::Throughput(400))
@@ -138,16 +140,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Notice how easy it is! :)
     // First we construct a "collection" specific client so we
     // do not need to specify it over and over.
-    let database_client = client.with_database(&database.id);
-    let collection_client = database_client.with_collection(&collection.id);
+    let database_client = client.clone().with_database(database.id.to_owned());
+    let collection_client = database_client.with_collection(collection.id);
 
     // The method create_document will return, upon success,
     // the document attributes.
     let create_document_response = collection_client
         .create_document()
-        .with_document(&doc)
         .with_partition_keys(&(&doc.document.id).into())
-        .execute()
+        .execute_with_document(&doc)
         .await?;
     println!(
         "create_document_response == {:#?}",
@@ -168,7 +169,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // Now we get the same document by id.
     let get_document_response = collection_client
-        .with_document(&doc.document.id, &(&doc.document.id).into())
+        .clone()
+        .with_document(doc.document.id.to_string(), (&doc.document.id).into())
         .get_document()
         .execute::<MySampleStruct>()
         .await?;
@@ -186,11 +188,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // CosmosDB it means something else updated the document before us!
         let replace_document_response = collection_client
             .replace_document()
-            .with_document(&doc)
             .with_document_id(&doc.document.id)
             .with_partition_keys(&(&doc.document.id).into())
             .with_if_match_condition(IfMatchCondition::Match(&document.etag))
-            .execute()
+            .execute_with_document(&doc)
             .await?;
         println!(
             "replace_document_response == {:#?}",
@@ -200,8 +201,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // We will perform some cleanup. First we delete the collection...
     client
-        .with_database(&DATABASE)
-        .with_collection(&COLLECTION)
+        .clone()
+        .with_database(DATABASE.to_owned())
+        .with_collection(COLLECTION.to_owned())
         .delete_collection()
         .execute()
         .await?;
@@ -209,7 +211,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // And then we delete the database.
     client
-        .with_database(&database.id)
+        .with_database(database.id)
         .delete_database()
         .execute()
         .await?;

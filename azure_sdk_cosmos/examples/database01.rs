@@ -1,6 +1,4 @@
 use azure_sdk_cosmos::prelude::*;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::error::Error;
 
 #[tokio::main]

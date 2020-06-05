@@ -28,12 +28,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     for db in dbs.databases {
         println!("database == {:?}", db);
-        let database = client.with_database(&db);
+        let database = client.clone().with_database(db.name().to_owned());
 
         let collections = database.list_collections().execute().await?;
         for collection in collections.collections {
             println!("collection == {:?}", collection);
-            let collection_client = database.with_collection(&collection);
+            let collection_client = database.clone().with_collection(collection.id.to_owned());
 
             if collection_client.collection_name().name() == "democ" {
                 println!("democ!");
@@ -53,10 +53,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 let document = Document::new(v);
                 let resp = collection_client
                     .create_document()
-                    .with_document(&document)
                     .with_partition_keys(PartitionKeys::new().push(&43u32)?)
                     .with_is_upsert(true)
-                    .execute()
+                    .execute_with_document(&document)
                     .await?;
 
                 println!("resp == {:?}", resp);

@@ -254,7 +254,9 @@ where
     pub async fn execute(&self) -> Result<CreateCollectionResponse, AzureError> {
         trace!("ReplaceCollectionBuilder::execute called");
 
-        let req = self.collection_client.prepare_request(hyper::Method::PUT);
+        let req = self
+            .collection_client
+            .prepare_request_with_collection_name(hyper::Method::PUT);
 
         let req = UserAgentOption::add_header(self, req);
         let req = ActivityIdOption::add_header(self, req);

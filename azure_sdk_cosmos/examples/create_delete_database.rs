@@ -45,7 +45,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // create collection!
     {
-        let db_client = client.with_database(&database_name);
+        let db_client = client.clone().with_database(database_name.clone());
 
         let indexes = IncludedPathIndex {
             kind: KeyKind::Hash,
@@ -79,7 +79,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             create_collection_response
         );
 
-        let db_collection = db_client.with_collection(&"panzadoro");
+        let db_collection = db_client.clone().with_collection("panzadoro".to_owned());
 
         let get_collection_response = db_collection.get_collection().execute().await?;
         println!("get_collection_response == {:#?}", get_collection_response);
@@ -96,7 +96,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let resp = client
-        .with_database(&database_name)
+        .with_database(database_name)
         .delete_database()
         .execute()
         .await?;
