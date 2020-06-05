@@ -104,7 +104,7 @@ where
         requests::CreateOrReplaceTriggerBuilder::new(self, false)
     }
 
-    //fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, CUB> {
-    //    requests::DeleteTriggerBuilder::new(self)
-    //}
+    fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, '_, C, D, COLL> {
+        requests::DeleteTriggerBuilder::new(self)
+    }
 }

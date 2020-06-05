@@ -193,6 +193,7 @@ where
     fn replace_trigger(
         &self,
     ) -> requests::CreateOrReplaceTriggerBuilder<'_, C, D, COLL, No, No, No>;
+    fn delete_trigger(&self) -> requests::DeleteTriggerBuilder<'_, '_, C, D, COLL>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
