@@ -2,8 +2,8 @@ use crate::clients::*;
 use crate::requests;
 use crate::{
     CollectionClient, CosmosClient, DatabaseClient, HasCosmosClient, HasDatabaseClient,
-    HasHyperClient, IntoDocumentClient, IntoTriggerClient, IntoUserDefinedFunctionClient,
-    PartitionKeys, UserDefinedFunctionStruct,
+    HasHyperClient, IntoDocumentClient, IntoStoredProcedureClient, IntoTriggerClient,
+    IntoUserDefinedFunctionClient, PartitionKeys, UserDefinedFunctionStruct,
 };
 use azure_sdk_core::No;
 use std::marker::PhantomData;
@@ -107,20 +107,6 @@ where
         requests::QueryDocumentsBuilder::new(self)
     }
 
-    //fn with_stored_procedure<'c>(
-    //    &'c self,
-    //    stored_procedure_name: &'c dyn StoredProcedureName,
-    //) -> StoredProcedureClient<'c, CUB> {
-    //    StoredProcedureClient::new(&self, stored_procedure_name)
-    //}
-
-    //fn with_user_defined_function<'c>(
-    //    &'c self,
-    //    user_defined_function_name: &'c dyn UserDefinedFunctionName,
-    //) -> UserDefinedFunctionClient<'c, CUB> {
-    //    UserDefinedFunctionClient::new(&self, user_defined_function_name)
-    //}
-
     //fn list_stored_procedures(&self) -> requests::ListStoredProceduresBuilder<'_, CUB> {
     //    requests::ListStoredProceduresBuilder::new(self)
     //}
@@ -175,5 +161,19 @@ where
         user_defined_function_name: String,
     ) -> UserDefinedFunctionStruct<C, D, Self> {
         UserDefinedFunctionStruct::new(self, user_defined_function_name)
+    }
+}
+
+impl<C, D> IntoStoredProcedureClient<C, D, Self, StoredProcedureStruct<C, D, Self>>
+    for CollectionStruct<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn with_stored_procedure(
+        self,
+        stored_procedure_name: String,
+    ) -> StoredProcedureStruct<C, D, Self> {
+        StoredProcedureStruct::new(self, stored_procedure_name)
     }
 }

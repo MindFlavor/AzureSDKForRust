@@ -309,6 +309,62 @@ where
     fn with_user_defined_function(self, user_defined_function_name: String) -> UDF;
 }
 
+pub trait StoredProcedureClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn stored_procedure_name(&self) -> &str;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/sprocs",
+                self.database_client().database_name(),
+                self.collection_client().collection_name(),
+            ),
+            method,
+            ResourceType::StoredProcedures,
+        )
+    }
+    fn prepare_request_with_stored_procedure_name(
+        &self,
+        method: hyper::Method,
+    ) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/sprocs/{}",
+                self.database_client().database_name(),
+                self.collection_client().collection_name(),
+                self.stored_procedure_name()
+            ),
+            method,
+            ResourceType::StoredProcedures,
+        )
+    }
+}
+
+pub trait HasStoredProcedureClient<C, D, COLL, SP>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    SP: StoredProcedureClient<C, D, COLL>,
+{
+    fn stored_procedure_client(&self) -> &SP;
+}
+
+pub trait IntoStoredProcedureClient<C, D, COLL, SP>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    SP: StoredProcedureClient<C, D, COLL>,
+{
+    fn with_stored_procedure(self, stored_procedure_name: String) -> SP;
+}
+
 pub trait TriggerClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
 where
     C: CosmosClient,
