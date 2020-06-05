@@ -111,11 +111,11 @@ where
         requests::ListStoredProceduresBuilder::new(self)
     }
 
-    //fn list_user_defined_functions(
-    //    &self,
-    //) -> requests::ListUserDefinedFunctionsBuilder<'_, '_, CUB> {
-    //    requests::ListUserDefinedFunctionsBuilder::new(self)
-    //}
+    fn list_user_defined_functions(
+        &self,
+    ) -> requests::ListUserDefinedFunctionsBuilder<'_, '_, C, D> {
+        requests::ListUserDefinedFunctionsBuilder::new(self)
+    }
 
     fn list_triggers(&self) -> requests::ListTriggersBuilder<'_, '_, C, D> {
         requests::ListTriggersBuilder::new(self)
