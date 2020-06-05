@@ -27,5 +27,6 @@ pub use crate::{
     TriggerBodyRequired, TriggerBodySupport, TriggerClient, TriggerClientRequired,
     TriggerOperationRequired, TriggerOperationSupport, TriggerTypeRequired, TriggerTypeSupport,
     UserClient, UserClientRequired, UserDefinedFunctionBodyRequired,
-    UserDefinedFunctionBodySupport, UserName, UserNameRequired, UserNameSupport,
+    UserDefinedFunctionBodySupport, UserDefinedFunctionClient, UserDefinedFunctionClientRequired,
+    UserName, UserNameRequired, UserNameSupport,
 };

@@ -251,6 +251,13 @@ where
 {
     fn user_defined_function_name(&self) -> &str;
 
+    fn create_user_defined_function(
+        &self,
+    ) -> requests::CreateOrReplaceUserDefinedFunctionBuilder<'_, '_, C, D, COLL, No>;
+    fn replace_user_defined_function(
+        &self,
+    ) -> requests::CreateOrReplaceUserDefinedFunctionBuilder<'_, '_, C, D, COLL, No>;
+
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(
             &format!(
