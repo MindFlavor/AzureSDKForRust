@@ -130,6 +130,9 @@ where
     fn permission_name(&self) -> &str;
 
     fn create_permission(&self) -> requests::CreatePermissionBuilder<'_, '_, C, D, USER>;
+    fn get_permission(&self) -> requests::GetPermissionBuilder<'_, '_, C, D, USER>;
+    fn replace_permission(&self) -> requests::ReplacePermissionBuilder<'_, '_, C, D, USER>;
+    fn delete_permission(&self) -> requests::DeletePermissionsBuilder<'_, '_, C, D, USER>;
 
     fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
         self.cosmos_client().prepare_request(

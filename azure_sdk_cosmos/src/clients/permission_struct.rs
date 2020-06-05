@@ -96,18 +96,15 @@ where
         requests::CreatePermissionBuilder::new(self)
     }
 
-    //fn replace_permission<R>(&self) -> requests::ReplacePermissionBuilder<'_, CUB, R, No>
-    //where
-    //    R: PermissionResource,
-    //{
-    //    requests::ReplacePermissionBuilder::new(self)
-    //}
+    fn replace_permission(&self) -> requests::ReplacePermissionBuilder<'_, '_, C, D, USER> {
+        requests::ReplacePermissionBuilder::new(self)
+    }
 
-    //fn get_permission(&self) -> requests::GetPermissionBuilder<'_, CUB> {
-    //    requests::GetPermissionBuilder::new(self)
-    //}
+    fn get_permission(&self) -> requests::GetPermissionBuilder<'_, '_, C, D, USER> {
+        requests::GetPermissionBuilder::new(self)
+    }
 
-    //fn delete_permission(&self) -> requests::DeletePermissionsBuilder<'_, CUB> {
-    //    requests::DeletePermissionsBuilder::new(self)
-    //}
+    fn delete_permission(&self) -> requests::DeletePermissionsBuilder<'_, '_, C, D, USER> {
+        requests::DeletePermissionsBuilder::new(self)
+    }
 }
