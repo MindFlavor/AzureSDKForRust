@@ -243,6 +243,62 @@ where
     fn with_collection(self, collection_name: String) -> COLL;
 }
 
+pub trait UserDefinedFunctionClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn user_defined_function_name(&self) -> &str;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/udfs",
+                self.database_client().database_name(),
+                self.collection_client().collection_name(),
+            ),
+            method,
+            ResourceType::UserDefinedFunctions,
+        )
+    }
+    fn prepare_request_with_user_defined_function_name(
+        &self,
+        method: hyper::Method,
+    ) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/colls/{}/udfs/{}",
+                self.database_client().database_name(),
+                self.collection_client().collection_name(),
+                self.user_defined_function_name()
+            ),
+            method,
+            ResourceType::UserDefinedFunctions,
+        )
+    }
+}
+
+pub trait HasUserDefinedFunctionClient<C, D, COLL, UDF>: HasCollectionClient<C, D, COLL>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    UDF: UserDefinedFunctionClient<C, D, COLL>,
+{
+    fn user_defined_function_client(&self) -> &UDF;
+}
+
+pub trait IntoUserDefinedFunctionClient<C, D, COLL, UDF>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    UDF: UserDefinedFunctionClient<C, D, COLL>,
+{
+    fn with_user_defined_function(self, user_defined_function_name: String) -> UDF;
+}
+
 pub trait TriggerClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
 where
     C: CosmosClient,
