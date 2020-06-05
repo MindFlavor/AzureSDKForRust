@@ -1,6 +1,6 @@
-//use crate::requests;
-//use azure_sdk_core::No;
+use crate::requests;
 use crate::traits::*;
+use azure_sdk_core::No;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
@@ -92,9 +92,11 @@ where
         &self.stored_procedure_name
     }
 
-    //fn create_stored_procedure(&self) -> requests::CreateStoredProcedureBuilder<'_, CUB, No> {
-    //    requests::CreateStoredProcedureBuilder::new(self)
-    //}
+    fn create_stored_procedure(
+        &self,
+    ) -> requests::CreateStoredProcedureBuilder<'_, '_, C, D, COLL, No> {
+        requests::CreateStoredProcedureBuilder::new(self)
+    }
 
     //fn replace_stored_procedure(&self) -> requests::ReplaceStoredProcedureBuilder<'_, CUB, No> {
     //    requests::ReplaceStoredProcedureBuilder::new(self)

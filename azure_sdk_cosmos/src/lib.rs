@@ -446,11 +446,13 @@ where
     fn attachment_client(&self) -> &'a dyn AttachmentClient<C, D, COLL, DOC>;
 }
 
-pub trait StoredProcedureClientRequired<'a, CUB>
+pub trait StoredProcedureClientRequired<'a, C, D, COLL>
 where
-    CUB: CosmosUriBuilder,
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
 {
-    //    fn stored_procedure_client(&self) -> &'a StoredProcedureClient<'a, CUB>;
+    fn stored_procedure_client(&self) -> &'a dyn StoredProcedureClient<C, D, COLL>;
 }
 
 pub trait UserDefinedFunctionClientRequired<'a, C, D, COLL>

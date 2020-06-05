@@ -6,7 +6,7 @@ mod create_or_replace_user_defined_function_builder;
 mod create_permission_builder;
 mod create_reference_attachment_builder;
 mod create_slug_attachment_builder;
-//mod create_stored_procedure_builder;
+mod create_stored_procedure_builder;
 mod create_user_builder;
 mod delete_attachment_builder;
 mod delete_collection_builder;
@@ -50,7 +50,7 @@ pub use self::create_or_replace_user_defined_function_builder::CreateOrReplaceUs
 pub use self::create_permission_builder::CreatePermissionBuilder;
 pub use self::create_reference_attachment_builder::CreateReferenceAttachmentBuilder;
 pub use self::create_slug_attachment_builder::CreateSlugAttachmentBuilder;
-//pub use self::create_stored_procedure_builder::CreateStoredProcedureBuilder;
+pub use self::create_stored_procedure_builder::CreateStoredProcedureBuilder;
 pub use self::create_user_builder::CreateUserBuilder;
 pub use self::delete_attachment_builder::DeleteAttachmentBuilder;
 pub use self::delete_collection_builder::DeleteCollectionBuilder;
