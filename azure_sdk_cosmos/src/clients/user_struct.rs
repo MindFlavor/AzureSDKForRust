@@ -1,6 +1,7 @@
 //use crate::prelude::*;
 use crate::requests;
 use crate::traits::*;
+use crate::PermissionStruct;
 use azure_sdk_core::No;
 use std::marker::PhantomData;
 
@@ -89,14 +90,17 @@ where
         requests::DeleteUserBuilder::new(self)
     }
 
-    //fn with_permission<'c>(
-    //    &'c self,
-    //    permission_name: &'c dyn PermissionName,
-    //) -> PermissionClient<'c, CUB> {
-    //    PermissionClient::new(self, permission_name)
-    //}
-
     //fn list_permissions(&self) -> requests::ListPermissionsBuilder<'_, CUB> {
     //    requests::ListPermissionsBuilder::new(self)
     //}
+}
+
+impl<C, D> IntoPermissionClient<C, D, Self, PermissionStruct<C, D, Self>> for UserStruct<C, D>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn with_permission(self, permission_name: String) -> PermissionStruct<C, D, Self> {
+        PermissionStruct::new(self, permission_name)
+    }
 }

@@ -101,7 +101,7 @@ where
     }
 }
 
-pub trait HasUserClient<C, D, USER>: HasCosmosClient<C>
+pub trait HasUserClient<C, D, USER>: HasDatabaseClient<C, D>
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
@@ -117,6 +117,62 @@ where
     USER: UserClient<C, D>,
 {
     fn with_user(self, user_name: String) -> USER;
+}
+
+pub trait PermissionClient<C, D, USER>: HasUserClient<C, D, USER>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
+{
+    fn permission_name(&self) -> &str;
+
+    fn prepare_request(&self, method: hyper::Method) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/users/{}/permissions",
+                self.database_client().database_name(),
+                self.user_client().user_name()
+            ),
+            method,
+            ResourceType::Permissions,
+        )
+    }
+    fn prepare_request_with_permission_name(
+        &self,
+        method: hyper::Method,
+    ) -> http::request::Builder {
+        self.cosmos_client().prepare_request(
+            &format!(
+                "dbs/{}/users/{}/permissions/{}",
+                self.database_client().database_name(),
+                self.user_client().user_name(),
+                self.permission_name()
+            ),
+            method,
+            ResourceType::Permissions,
+        )
+    }
+}
+
+pub trait HasPermissionClient<C, D, USER, PERMISSION>: HasUserClient<C, D, USER>
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
+    PERMISSION: PermissionClient<C, D, USER>,
+{
+    fn permission_client(&self) -> &PERMISSION;
+}
+
+pub trait IntoPermissionClient<C, D, USER, PERMISSION>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
+    PERMISSION: PermissionClient<C, D, USER>,
+{
+    fn with_permission(self, permission_name: String) -> PERMISSION;
 }
 
 pub trait CollectionClient<C, D>: HasDatabaseClient<C, D>
