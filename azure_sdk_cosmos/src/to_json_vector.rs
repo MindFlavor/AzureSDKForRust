@@ -116,6 +116,14 @@ impl std::convert::From<&String> for ToJsonVector {
     }
 }
 
+impl std::convert::From<u64> for ToJsonVector {
+    fn from(t: u64) -> Self {
+        let mut pk = Self::new();
+        let _ = pk.push(t).unwrap();
+        pk
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
