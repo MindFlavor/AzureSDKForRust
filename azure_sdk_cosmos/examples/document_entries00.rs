@@ -43,6 +43,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client = client.with_database(database_name);
     let client = client.with_collection(collection_name);
 
+    let mut response = None;
     for i in 0u64..5 {
         let doc = Document::new(MySampleStruct {
             id: Cow::Owned(format!("unique_id{}", i)),
@@ -52,11 +53,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
         });
 
         // let's add an entity.
-        client
-            .create_document()
-            .with_partition_keys(PartitionKeys::new().push(&doc.document.id)?)
-            .execute_with_document(&doc)
-            .await?;
+        response = Some(
+            client
+                .create_document()
+                .with_partition_keys(PartitionKeys::new().push(&doc.document.id)?)
+                .execute_with_document(&doc)
+                .await?,
+        );
     }
 
     println!("Created 5 documents.");
@@ -64,6 +67,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Let's get 3 entries at a time.
     let response = client
         .list_documents()
+        .with_consistency_level(response.unwrap().into())
         .with_max_item_count(3)
         .execute::<MySampleStruct>()
         .await?;
@@ -75,11 +79,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // continuation_token must be present
     assert!(response.continuation_token.is_some());
 
-    let ct = response.continuation_token.unwrap();
+    let session_token = (&response).into();
+    let ct = response.continuation_token.clone().unwrap();
     println!("ct == {}", ct);
 
     let response = client
         .list_documents()
+        .with_consistency_level(session_token)
         .with_continuation(&ct)
         .execute::<MySampleStruct>()
         .await?;
@@ -95,9 +101,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // us if we call the stream function. Here we
     // ask for 3 items at the time but of course you don't have to do that, the
     // stream function will work regardless of the limits imposed.
+    let session_token: ConsistencyLevel = (&response).into();
     {
         println!("\nStreaming documents");
-        let stream = client.list_documents().with_max_item_count(3);
+        let stream = client
+            .list_documents()
+            .with_consistency_level(session_token.clone())
+            .with_max_item_count(3);
         let mut stream = Box::pin(stream.stream::<MySampleStruct>());
         // TODO: As soon as the streaming functionality is completed
         // in Rust substitute this while let Some... into
@@ -116,6 +126,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .clone()
         .with_document(id.to_owned(), partition_keys.to_owned())
         .get_document()
+        .with_consistency_level(session_token)
         .execute::<MySampleStruct>()
         .await?;
 
@@ -158,6 +169,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .clone()
         .with_document(id, partition_keys)
         .get_document()
+        .with_consistency_level((&response).into())
         .execute::<MySampleStruct>()
         .await?;
 
@@ -174,6 +186,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             .clone()
             .with_document(id, partition_keys)
             .delete_document()
+            .with_consistency_level((&response).into())
             .execute()
             .await?;
     }
