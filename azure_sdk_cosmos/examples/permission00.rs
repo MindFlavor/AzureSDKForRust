@@ -34,11 +34,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let get_database_response = database_client.get_database().execute().await?;
     println!("get_database_response == {:#?}", get_database_response);
 
-    let get_collection_response = collection_client
-        .get_collection()
-        .with_consistency_level((&get_database_response).into())
-        .execute()
-        .await?;
+    let get_collection_response = collection_client.get_collection().execute().await?;
     println!("get_collection_response == {:#?}", get_collection_response);
 
     let get_collection2_response = collection2_client.get_collection().execute().await?;
@@ -100,16 +96,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?;
     println!("get_permission_response == {:#?}", get_permission_response);
 
-    let (permission, session_token, ..) = get_permission_response.unwrap();
+    let get_permission_response = get_permission_response.unwrap();
 
     // renew permission extending its validity for 60 seconds more.
     let replace_permission_response = permission_client
         .replace_permission()
         .with_expiry_seconds(60)
         .with_consistency_level(ConsistencyLevel::from(
-            &get_permission_response.unwrap().session_token,
+            &get_permission_response.session_token,
         ))
-        .execute_with_permission(&permission.permission_mode)
+        .execute_with_permission(&get_permission_response.permission.permission_mode)
         .await?;
     println!(
         "replace_permission_response == {:#?}",
