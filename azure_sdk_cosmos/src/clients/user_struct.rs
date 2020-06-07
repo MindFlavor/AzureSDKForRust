@@ -96,16 +96,13 @@ where
     }
 }
 
-impl<'a, C, D> IntoPermissionClient<C, D, Self, PermissionStruct<'static, C, D, Self>>
+impl<'a, C, D> IntoPermissionClient<C, D, Self, PermissionStruct<'a, C, D, Self>>
     for UserStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn into_permission_client(
-        self,
-        permission_name: String,
-    ) -> PermissionStruct<'static, C, D, Self> {
+    fn into_permission_client(self, permission_name: String) -> PermissionStruct<'a, C, D, Self> {
         PermissionStruct::new(Cow::Owned(self), permission_name)
     }
 }

@@ -136,7 +136,7 @@ where
 }
 
 impl<'a, 'b, C, D, COLL>
-    IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<'static, C, D, COLL, Self>>
+    IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<'a, C, D, COLL, Self>>
     for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
@@ -146,7 +146,7 @@ where
     fn into_attachment_client(
         self,
         attachment_name: String,
-    ) -> AttachmentStruct<'static, C, D, COLL, Self> {
+    ) -> AttachmentStruct<'a, C, D, COLL, Self> {
         AttachmentStruct::new(Cow::Owned(self), attachment_name)
     }
 }

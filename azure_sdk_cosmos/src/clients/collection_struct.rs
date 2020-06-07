@@ -128,8 +128,8 @@ where
     }
 }
 
-impl<'b, C, D> IntoDocumentClient<'b, C, D, Self, DocumentStruct<'static, 'b, C, D, Self>>
-    for CollectionStruct<'static, C, D>
+impl<'a, 'b, C, D> IntoDocumentClient<'b, C, D, Self, DocumentStruct<'a, 'b, C, D, Self>>
+    for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -138,7 +138,7 @@ where
         self,
         document_name: DocName,
         partition_keys: PartitionKeys,
-    ) -> DocumentStruct<'static, 'b, C, D, Self>
+    ) -> DocumentStruct<'a, 'b, C, D, Self>
     where
         DocName: Into<Cow<'b, str>>,
     {
@@ -175,13 +175,13 @@ where
     }
 }
 
-impl<'a, C, D> IntoTriggerClient<C, D, Self, TriggerStruct<'static, C, D, Self>>
+impl<'a, C, D> IntoTriggerClient<C, D, Self, TriggerStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn into_trigger_client(self, trigger_name: String) -> TriggerStruct<'static, C, D, Self> {
+    fn into_trigger_client(self, trigger_name: String) -> TriggerStruct<'a, C, D, Self> {
         TriggerStruct::new(Cow::Owned(self), trigger_name)
     }
 }
@@ -201,8 +201,7 @@ where
     }
 }
 
-impl<'a, C, D>
-    IntoUserDefinedFunctionClient<C, D, Self, UserDefinedFunctionStruct<'static, C, D, Self>>
+impl<'a, C, D> IntoUserDefinedFunctionClient<C, D, Self, UserDefinedFunctionStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
@@ -211,7 +210,7 @@ where
     fn into_user_defined_function_client(
         self,
         user_defined_function_name: String,
-    ) -> UserDefinedFunctionStruct<'static, C, D, Self> {
+    ) -> UserDefinedFunctionStruct<'a, C, D, Self> {
         UserDefinedFunctionStruct::new(Cow::Owned(self), user_defined_function_name)
     }
 }
@@ -230,7 +229,7 @@ where
     }
 }
 
-impl<'a, C, D> IntoStoredProcedureClient<C, D, Self, StoredProcedureStruct<'static, C, D, Self>>
+impl<'a, C, D> IntoStoredProcedureClient<C, D, Self, StoredProcedureStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
@@ -239,7 +238,7 @@ where
     fn into_stored_procedure_client(
         self,
         stored_procedure_name: String,
-    ) -> StoredProcedureStruct<'static, C, D, Self> {
+    ) -> StoredProcedureStruct<'a, C, D, Self> {
         StoredProcedureStruct::new(Cow::Owned(self), stored_procedure_name)
     }
 }

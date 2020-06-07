@@ -219,11 +219,11 @@ where
     }
 }
 
-impl<CUB> IntoDatabaseClient<Self, DatabaseStruct<'static, Self>> for CosmosStruct<CUB>
+impl<'a, CUB> IntoDatabaseClient<Self, DatabaseStruct<'a, Self>> for CosmosStruct<CUB>
 where
     CUB: CosmosUriBuilder + Debug + Clone,
 {
-    fn into_database_client(self, database_name: String) -> DatabaseStruct<'static, Self> {
+    fn into_database_client(self, database_name: String) -> DatabaseStruct<'a, Self> {
         DatabaseStruct::new(Cow::Owned(self), database_name)
     }
 }

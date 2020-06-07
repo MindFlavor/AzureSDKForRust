@@ -88,12 +88,11 @@ where
     }
 }
 
-impl<'a, C> IntoCollectionClient<C, Self, CollectionStruct<'static, C, Self>>
-    for DatabaseStruct<'a, C>
+impl<'a, C> IntoCollectionClient<C, Self, CollectionStruct<'a, C, Self>> for DatabaseStruct<'a, C>
 where
     C: CosmosClient + Clone,
 {
-    fn into_collection_client(self, collection_name: String) -> CollectionStruct<'static, C, Self> {
+    fn into_collection_client(self, collection_name: String) -> CollectionStruct<'a, C, Self> {
         CollectionStruct::new(Cow::Owned(self), collection_name)
     }
 }
@@ -107,11 +106,11 @@ where
     }
 }
 
-impl<'a, C> IntoUserClient<C, Self, UserStruct<'static, C, Self>> for DatabaseStruct<'a, C>
+impl<'a, C> IntoUserClient<C, Self, UserStruct<'a, C, Self>> for DatabaseStruct<'a, C>
 where
     C: CosmosClient + Clone,
 {
-    fn into_user_client(self, user_name: String) -> UserStruct<'static, C, Self> {
+    fn into_user_client(self, user_name: String) -> UserStruct<'a, C, Self> {
         UserStruct::new(Cow::Owned(self), user_name)
     }
 }
