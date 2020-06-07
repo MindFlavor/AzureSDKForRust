@@ -22,18 +22,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let authorization_token = AuthorizationToken::new_master(&master_key)?;
 
-    let client = ClientBuilder::new(account.clone(), authorization_token)?;
+    let client = ClientBuilder::new(&account, authorization_token)?;
 
     let dbs = client.list_databases().execute().await?;
 
     for db in dbs.databases {
         println!("database == {:?}", db);
-        let database = client.clone().with_database(db.name().to_owned());
+        let database = client.with_database_client(db.name());
 
         let collections = database.list_collections().execute().await?;
         for collection in collections.collections {
             println!("collection == {:?}", collection);
-            let collection_client = database.clone().with_collection(collection.id.to_owned());
+            let collection_client = database.with_collection_client(collection.id);
 
             if collection_client.collection_name().name() == "democ" {
                 println!("democ!");
