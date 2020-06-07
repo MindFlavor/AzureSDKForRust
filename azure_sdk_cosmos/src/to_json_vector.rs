@@ -124,6 +124,18 @@ impl std::convert::From<u64> for ToJsonVector {
     }
 }
 
+impl<'a> std::convert::From<ToJsonVector> for Cow<'a, ToJsonVector> {
+    fn from(t: ToJsonVector) -> Self {
+        Cow::Owned(t)
+    }
+}
+
+impl<'a> std::convert::From<&'a ToJsonVector> for Cow<'a, ToJsonVector> {
+    fn from(t: &'a ToJsonVector) -> Self {
+        Cow::Borrowed(t)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
