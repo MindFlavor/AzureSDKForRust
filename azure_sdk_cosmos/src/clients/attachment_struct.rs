@@ -1,31 +1,32 @@
 use crate::requests;
 use crate::traits::*;
 use azure_sdk_core::No;
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct AttachmentStruct<C, D, COLL, DOC>
+pub struct AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
-    document_client: DOC,
+    document_client: Cow<'a, DOC>,
     attachment_name: String,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
     p_coll: PhantomData<COLL>,
 }
 
-impl<C, D, COLL, DOC> AttachmentStruct<C, D, COLL, DOC>
+impl<'a, C, D, COLL, DOC> AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
-    pub(crate) fn new(document_client: DOC, attachment_name: String) -> Self {
+    pub(crate) fn new(document_client: Cow<'a, DOC>, attachment_name: String) -> Self {
         Self {
             document_client,
             attachment_name,
@@ -36,12 +37,12 @@ where
     }
 }
 
-impl<C, D, COLL, DOC> HasHyperClient for AttachmentStruct<C, D, COLL, DOC>
+impl<'a, C, D, COLL, DOC> HasHyperClient for AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
     #[inline]
     fn hyper_client(
@@ -51,12 +52,12 @@ where
     }
 }
 
-impl<C, D, COLL, DOC> HasCosmosClient<C> for AttachmentStruct<C, D, COLL, DOC>
+impl<'a, C, D, COLL, DOC> HasCosmosClient<C> for AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
     #[inline]
     fn cosmos_client(&self) -> &C {
@@ -64,12 +65,12 @@ where
     }
 }
 
-impl<C, D, COLL, DOC> HasDatabaseClient<C, D> for AttachmentStruct<C, D, COLL, DOC>
+impl<'a, C, D, COLL, DOC> HasDatabaseClient<C, D> for AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
     #[inline]
     fn database_client(&self) -> &D {
@@ -77,12 +78,12 @@ where
     }
 }
 
-impl<C, D, COLL, DOC> HasCollectionClient<C, D, COLL> for AttachmentStruct<C, D, COLL, DOC>
+impl<'a, C, D, COLL, DOC> HasCollectionClient<C, D, COLL> for AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
     #[inline]
     fn collection_client(&self) -> &COLL {
@@ -90,12 +91,13 @@ where
     }
 }
 
-impl<C, D, COLL, DOC> HasDocumentClient<C, D, COLL, DOC> for AttachmentStruct<C, D, COLL, DOC>
+impl<'a, C, D, COLL, DOC> HasDocumentClient<C, D, COLL, DOC>
+    for AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
     #[inline]
     fn document_client(&self) -> &DOC {
@@ -103,12 +105,13 @@ where
     }
 }
 
-impl<C, D, COLL, DOC> AttachmentClient<C, D, COLL, DOC> for AttachmentStruct<C, D, COLL, DOC>
+impl<'a, C, D, COLL, DOC> AttachmentClient<C, D, COLL, DOC>
+    for AttachmentStruct<'a, C, D, COLL, DOC>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
-    DOC: DocumentClient<C, D, COLL>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+    DOC: DocumentClient<C, D, COLL> + Clone,
 {
     fn attachment_name(&self) -> &str {
         &self.attachment_name

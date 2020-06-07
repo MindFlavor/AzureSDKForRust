@@ -600,6 +600,17 @@ where
     fn attachment_client(&self) -> &ATT;
 }
 
+pub trait WithAttachmentClient<'a, C, D, COLL, DOC, ATT>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+    ATT: AttachmentClient<C, D, COLL, DOC>,
+{
+    fn with_attachment_client(&'a self, attachment_name: String) -> ATT;
+}
+
 pub trait IntoAttachmentClient<C, D, COLL, DOC, ATT>: Debug
 where
     C: CosmosClient,
@@ -608,7 +619,7 @@ where
     DOC: DocumentClient<C, D, COLL>,
     ATT: AttachmentClient<C, D, COLL, DOC>,
 {
-    fn with_attachment(self, attachment_name: String) -> ATT;
+    fn into_attachment_client(self, attachment_name: String) -> ATT;
 }
 
 ///////////////////////////////////////////////

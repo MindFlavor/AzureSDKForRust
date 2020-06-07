@@ -2,7 +2,7 @@ use crate::requests;
 use crate::{
     AttachmentStruct, CollectionClient, CosmosClient, DatabaseClient, DocumentClient,
     HasCollectionClient, HasCosmosClient, HasDatabaseClient, HasHyperClient, IntoAttachmentClient,
-    PartitionKeys,
+    PartitionKeys, WithAttachmentClient,
 };
 use std::borrow::Cow;
 use std::marker::PhantomData;
@@ -119,14 +119,34 @@ where
     }
 }
 
-impl<'a, C, D, COLL> IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<C, D, COLL, Self>>
+impl<'a, C, D, COLL>
+    WithAttachmentClient<'a, C, D, COLL, Self, AttachmentStruct<'a, C, D, COLL, Self>>
     for DocumentStruct<'a, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
     COLL: CollectionClient<C, D> + Clone,
 {
-    fn with_attachment(self, attachment_name: String) -> AttachmentStruct<C, D, COLL, Self> {
-        AttachmentStruct::new(self, attachment_name)
+    fn with_attachment_client(
+        &'a self,
+        attachment_name: String,
+    ) -> AttachmentStruct<'a, C, D, COLL, Self> {
+        AttachmentStruct::new(Cow::Borrowed(self), attachment_name)
+    }
+}
+
+impl<'a, C, D, COLL>
+    IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<'static, C, D, COLL, Self>>
+    for DocumentStruct<'a, C, D, COLL>
+where
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
+{
+    fn into_attachment_client(
+        self,
+        attachment_name: String,
+    ) -> AttachmentStruct<'static, C, D, COLL, Self> {
+        AttachmentStruct::new(Cow::Owned(self), attachment_name)
     }
 }

@@ -30,6 +30,6 @@ pub use crate::{
     TriggerOperationRequired, TriggerOperationSupport, TriggerTypeRequired, TriggerTypeSupport,
     UserClient, UserClientRequired, UserDefinedFunctionBodyRequired,
     UserDefinedFunctionBodySupport, UserDefinedFunctionClient, UserDefinedFunctionClientRequired,
-    UserName, UserNameRequired, UserNameSupport, WithCollectionClient, WithDatabaseClient,
-    WithDocumentClient, WithStoredProcedureClient,
+    UserName, UserNameRequired, UserNameSupport, WithAttachmentClient, WithCollectionClient,
+    WithDatabaseClient, WithDocumentClient, WithStoredProcedureClient,
 };
