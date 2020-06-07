@@ -4,7 +4,7 @@ use crate::{
     CollectionClient, CosmosClient, DatabaseClient, HasCosmosClient, HasDatabaseClient,
     HasHyperClient, IntoDocumentClient, IntoStoredProcedureClient, IntoTriggerClient,
     IntoUserDefinedFunctionClient, PartitionKeys, UserDefinedFunctionStruct, WithDocumentClient,
-    WithStoredProcedureClient, WithTriggerClient,
+    WithStoredProcedureClient, WithTriggerClient, WithUserDefinedFunctionClient,
 };
 use azure_sdk_core::No;
 use std::borrow::Cow;
@@ -180,17 +180,33 @@ where
     }
 }
 
-impl<'a, C, D> IntoUserDefinedFunctionClient<C, D, Self, UserDefinedFunctionStruct<C, D, Self>>
+impl<'a, C, D>
+    WithUserDefinedFunctionClient<'a, C, D, Self, UserDefinedFunctionStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn with_user_defined_function(
+    fn with_user_defined_function_client(
+        &'a self,
+        user_defined_function_name: String,
+    ) -> UserDefinedFunctionStruct<'a, C, D, Self> {
+        UserDefinedFunctionStruct::new(Cow::Borrowed(self), user_defined_function_name)
+    }
+}
+
+impl<'a, C, D>
+    IntoUserDefinedFunctionClient<C, D, Self, UserDefinedFunctionStruct<'static, C, D, Self>>
+    for CollectionStruct<'a, C, D>
+where
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+{
+    fn into_user_defined_function_client(
         self,
         user_defined_function_name: String,
-    ) -> UserDefinedFunctionStruct<C, D, Self> {
-        UserDefinedFunctionStruct::new(self, user_defined_function_name)
+    ) -> UserDefinedFunctionStruct<'static, C, D, Self> {
+        UserDefinedFunctionStruct::new(Cow::Owned(self), user_defined_function_name)
     }
 }
 

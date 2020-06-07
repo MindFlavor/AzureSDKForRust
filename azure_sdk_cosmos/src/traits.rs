@@ -330,6 +330,16 @@ where
     fn user_defined_function_client(&self) -> &UDF;
 }
 
+pub trait WithUserDefinedFunctionClient<'a, C, D, COLL, UDF>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    UDF: UserDefinedFunctionClient<C, D, COLL>,
+{
+    fn with_user_defined_function_client(&'a self, user_defined_function_name: String) -> UDF;
+}
+
 pub trait IntoUserDefinedFunctionClient<C, D, COLL, UDF>: Debug
 where
     C: CosmosClient,
@@ -337,7 +347,7 @@ where
     COLL: CollectionClient<C, D>,
     UDF: UserDefinedFunctionClient<C, D, COLL>,
 {
-    fn with_user_defined_function(self, user_defined_function_name: String) -> UDF;
+    fn into_user_defined_function_client(self, user_defined_function_name: String) -> UDF;
 }
 
 pub trait StoredProcedureClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
