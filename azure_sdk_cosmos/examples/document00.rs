@@ -139,7 +139,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // First we construct a "collection" specific client so we
     // do not need to specify it over and over.
     let database_client = client.with_database_client(database.id.to_owned());
-    let collection_client = database_client.with_collection_client(collection.id);
+    let collection_client = database_client.with_collection_client(&collection.id);
 
     // The method create_document will return, upon success,
     // the document attributes.
@@ -200,7 +200,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // We will perform some cleanup. First we delete the collection...
     client
         .with_database_client(DATABASE.to_owned())
-        .with_collection_client(COLLECTION.to_owned())
+        .with_collection_client(COLLECTION)
         .delete_collection()
         .execute()
         .await?;

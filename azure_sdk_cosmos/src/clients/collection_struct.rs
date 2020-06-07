@@ -17,7 +17,7 @@ where
     D: DatabaseClient<C> + Clone,
 {
     database_client: Cow<'a, D>,
-    collection_name: String,
+    collection_name: Cow<'a, str>,
     p_c: PhantomData<C>,
 }
 
@@ -27,7 +27,7 @@ where
     D: DatabaseClient<C> + Clone,
 {
     #[inline]
-    pub(crate) fn new(database_client: Cow<'a, D>, collection_name: String) -> Self {
+    pub(crate) fn new(database_client: Cow<'a, D>, collection_name: Cow<'a, str>) -> Self {
         Self {
             database_client,
             collection_name,

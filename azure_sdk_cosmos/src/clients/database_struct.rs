@@ -83,17 +83,30 @@ impl<'a, C> WithCollectionClient<'a, C, Self, CollectionStruct<'a, C, Self>>
 where
     C: CosmosClient + Clone,
 {
-    fn with_collection_client(&'a self, collection_name: String) -> CollectionStruct<'a, C, Self> {
-        CollectionStruct::new(Cow::Borrowed(self), collection_name)
+    fn with_collection_client<IntoCowStr>(
+        &'a self,
+        collection_name: IntoCowStr,
+    ) -> CollectionStruct<'a, C, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        CollectionStruct::new(Cow::Borrowed(self), collection_name.into())
     }
 }
 
-impl<'a, C> IntoCollectionClient<C, Self, CollectionStruct<'a, C, Self>> for DatabaseStruct<'a, C>
+impl<'a, C> IntoCollectionClient<'a, C, Self, CollectionStruct<'a, C, Self>>
+    for DatabaseStruct<'a, C>
 where
     C: CosmosClient + Clone,
 {
-    fn into_collection_client(self, collection_name: String) -> CollectionStruct<'a, C, Self> {
-        CollectionStruct::new(Cow::Owned(self), collection_name)
+    fn into_collection_client<IntoCowStr>(
+        self,
+        collection_name: IntoCowStr,
+    ) -> CollectionStruct<'a, C, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        CollectionStruct::new(Cow::Owned(self), collection_name.into())
     }
 }
 

@@ -272,16 +272,20 @@ where
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
 {
-    fn with_collection_client(&'a self, collection_name: String) -> COLL;
+    fn with_collection_client<IntoCowStr>(&'a self, collection_name: IntoCowStr) -> COLL
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoCollectionClient<C, D, COLL>: Debug
+pub trait IntoCollectionClient<'a, C, D, COLL>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
 {
-    fn into_collection_client(self, collection_name: String) -> COLL;
+    fn into_collection_client<IntoCowStr>(self, collection_name: IntoCowStr) -> COLL
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
 pub trait UserDefinedFunctionClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
