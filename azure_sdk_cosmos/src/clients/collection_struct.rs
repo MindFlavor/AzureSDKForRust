@@ -3,9 +3,11 @@ use crate::requests;
 use crate::{
     CollectionClient, CosmosClient, DatabaseClient, HasCosmosClient, HasDatabaseClient,
     HasHyperClient, IntoDocumentClient, IntoStoredProcedureClient, IntoTriggerClient,
-    IntoUserDefinedFunctionClient, PartitionKeys, UserDefinedFunctionStruct,
+    IntoUserDefinedFunctionClient, PartitionKeys, UserDefinedFunctionStruct, WithDocumentClient,
+    WithStoredProcedureClient,
 };
 use azure_sdk_core::No;
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
@@ -126,17 +128,33 @@ where
     }
 }
 
-impl<C, D> IntoDocumentClient<C, D, Self, DocumentStruct<C, D, Self>> for CollectionStruct<C, D>
+impl<C, D> IntoDocumentClient<C, D, Self, DocumentStruct<'static, C, D, Self>>
+    for CollectionStruct<C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
-    fn with_document(
+    fn into_document_client(
         self,
         document_name: String,
         partition_keys: PartitionKeys,
-    ) -> DocumentStruct<C, D, Self> {
-        DocumentStruct::new(self, document_name, partition_keys)
+    ) -> DocumentStruct<'static, C, D, Self> {
+        DocumentStruct::new(Cow::Owned(self), document_name, partition_keys)
+    }
+}
+
+impl<'a, C, D> WithDocumentClient<'a, C, D, Self, DocumentStruct<'a, C, D, Self>>
+    for CollectionStruct<C, D>
+where
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+{
+    fn with_document_client(
+        &'a self,
+        document_name: String,
+        partition_keys: PartitionKeys,
+    ) -> DocumentStruct<'a, C, D, Self> {
+        DocumentStruct::new(Cow::Borrowed(self), document_name, partition_keys)
     }
 }
 
@@ -164,16 +182,30 @@ where
     }
 }
 
-impl<C, D> IntoStoredProcedureClient<C, D, Self, StoredProcedureStruct<C, D, Self>>
+impl<'a, C, D> WithStoredProcedureClient<'a, C, D, Self, StoredProcedureStruct<'a, C, D, Self>>
     for CollectionStruct<C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
-    fn with_stored_procedure(
+    fn with_stored_procedure_client(
+        &'a self,
+        stored_procedure_name: String,
+    ) -> StoredProcedureStruct<'a, C, D, Self> {
+        StoredProcedureStruct::new(Cow::Borrowed(self), stored_procedure_name)
+    }
+}
+
+impl<'a, C, D> IntoStoredProcedureClient<C, D, Self, StoredProcedureStruct<'static, C, D, Self>>
+    for CollectionStruct<C, D>
+where
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+{
+    fn into_stored_procedure_client(
         self,
         stored_procedure_name: String,
-    ) -> StoredProcedureStruct<C, D, Self> {
-        StoredProcedureStruct::new(self, stored_procedure_name)
+    ) -> StoredProcedureStruct<'static, C, D, Self> {
+        StoredProcedureStruct::new(Cow::Owned(self), stored_procedure_name)
     }
 }

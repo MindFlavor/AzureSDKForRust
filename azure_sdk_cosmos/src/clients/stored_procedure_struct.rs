@@ -1,28 +1,29 @@
 use crate::requests;
 use crate::traits::*;
 use azure_sdk_core::No;
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct StoredProcedureStruct<C, D, COLL>
+pub struct StoredProcedureStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
-    collection_client: COLL,
+    collection_client: Cow<'a, COLL>,
     stored_procedure_name: String,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
 
-impl<C, D, COLL> StoredProcedureStruct<C, D, COLL>
+impl<'a, C, D, COLL> StoredProcedureStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
-    pub(crate) fn new(collection_client: COLL, stored_procedure_name: String) -> Self {
+    pub(crate) fn new(collection_client: Cow<'a, COLL>, stored_procedure_name: String) -> Self {
         Self {
             collection_client,
             stored_procedure_name,
@@ -32,11 +33,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasHyperClient for StoredProcedureStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasHyperClient for StoredProcedureStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn hyper_client(
@@ -46,11 +47,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasCosmosClient<C> for StoredProcedureStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasCosmosClient<C> for StoredProcedureStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn cosmos_client(&self) -> &C {
@@ -58,11 +59,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasDatabaseClient<C, D> for StoredProcedureStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasDatabaseClient<C, D> for StoredProcedureStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn database_client(&self) -> &D {
@@ -70,11 +71,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasCollectionClient<C, D, COLL> for StoredProcedureStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasCollectionClient<C, D, COLL> for StoredProcedureStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn collection_client(&self) -> &COLL {
@@ -82,11 +83,11 @@ where
     }
 }
 
-impl<C, D, COLL> StoredProcedureClient<C, D, COLL> for StoredProcedureStruct<C, D, COLL>
+impl<'a, C, D, COLL> StoredProcedureClient<C, D, COLL> for StoredProcedureStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     fn stored_procedure_name(&self) -> &str {
         &self.stored_procedure_name

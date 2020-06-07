@@ -371,6 +371,16 @@ where
     fn stored_procedure_client(&self) -> &SP;
 }
 
+pub trait WithStoredProcedureClient<'a, C, D, COLL, SP>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    SP: StoredProcedureClient<C, D, COLL>,
+{
+    fn with_stored_procedure_client(&'a self, stored_procedure_name: String) -> SP;
+}
+
 pub trait IntoStoredProcedureClient<C, D, COLL, SP>: Debug
 where
     C: CosmosClient,
@@ -378,7 +388,7 @@ where
     COLL: CollectionClient<C, D>,
     SP: StoredProcedureClient<C, D, COLL>,
 {
-    fn with_stored_procedure(self, stored_procedure_name: String) -> SP;
+    fn into_stored_procedure_client(self, stored_procedure_name: String) -> SP;
 }
 
 pub trait TriggerClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
@@ -489,6 +499,16 @@ where
     fn document_client(&self) -> &DOC;
 }
 
+pub trait WithDocumentClient<'a, C, D, COLL, DOC>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    DOC: DocumentClient<C, D, COLL>,
+{
+    fn with_document_client(&'a self, document_name: String, partition_keys: PartitionKeys) -> DOC;
+}
+
 pub trait IntoDocumentClient<C, D, COLL, DOC>: Debug
 where
     C: CosmosClient,
@@ -496,7 +516,7 @@ where
     COLL: CollectionClient<C, D>,
     DOC: DocumentClient<C, D, COLL>,
 {
-    fn with_document(self, document_name: String, partition_keys: PartitionKeys) -> DOC;
+    fn into_document_client(self, document_name: String, partition_keys: PartitionKeys) -> DOC;
 }
 
 pub trait AttachmentClient<C, D, COLL, DOC>: HasDocumentClient<C, D, COLL, DOC>

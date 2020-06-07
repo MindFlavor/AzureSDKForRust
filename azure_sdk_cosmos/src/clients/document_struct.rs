@@ -4,30 +4,31 @@ use crate::{
     HasCollectionClient, HasCosmosClient, HasDatabaseClient, HasHyperClient, IntoAttachmentClient,
     PartitionKeys,
 };
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct DocumentStruct<C, D, COLL>
+pub struct DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
-    collection_client: COLL,
+    collection_client: Cow<'a, COLL>,
     document_name: String,
     partition_keys: PartitionKeys,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
 
-impl<C, D, COLL> DocumentStruct<C, D, COLL>
+impl<'a, C, D, COLL> DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     pub(crate) fn new(
-        collection_client: COLL,
+        collection_client: Cow<'a, COLL>,
         document_name: String,
         partition_keys: PartitionKeys,
     ) -> Self {
@@ -41,11 +42,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasHyperClient for DocumentStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasHyperClient for DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn hyper_client(
@@ -55,11 +56,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasCosmosClient<C> for DocumentStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasCosmosClient<C> for DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn cosmos_client(&self) -> &C {
@@ -67,11 +68,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasDatabaseClient<C, D> for DocumentStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasDatabaseClient<C, D> for DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn database_client(&self) -> &D {
@@ -79,11 +80,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasCollectionClient<C, D, COLL> for DocumentStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasCollectionClient<C, D, COLL> for DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn collection_client(&self) -> &COLL {
@@ -91,11 +92,11 @@ where
     }
 }
 
-impl<C, D, COLL> DocumentClient<C, D, COLL> for DocumentStruct<C, D, COLL>
+impl<'a, C, D, COLL> DocumentClient<C, D, COLL> for DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     fn document_name(&self) -> &str {
         &self.document_name
@@ -118,12 +119,12 @@ where
     }
 }
 
-impl<C, D, COLL> IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<C, D, COLL, Self>>
-    for DocumentStruct<C, D, COLL>
+impl<'a, C, D, COLL> IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<C, D, COLL, Self>>
+    for DocumentStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     fn with_attachment(self, attachment_name: String) -> AttachmentStruct<C, D, COLL, Self> {
         AttachmentStruct::new(self, attachment_name)
