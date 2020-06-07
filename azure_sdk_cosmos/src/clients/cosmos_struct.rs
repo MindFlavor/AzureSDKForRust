@@ -29,17 +29,17 @@ pub trait CosmosUriBuilder {
 }
 
 #[derive(Debug, Clone)]
-pub struct CosmosStruct<CUB>
+pub struct CosmosStruct<'a, CUB>
 where
     CUB: CosmosUriBuilder,
 {
     hyper_client: hyper::Client<HttpsConnector<hyper::client::HttpConnector>>,
-    account: String,
+    account: Cow<'a, str>,
     auth_token: AuthorizationToken,
     cosmos_uri_builder: CUB,
 }
 
-impl<CUB> CosmosStruct<CUB>
+impl<'a, CUB> CosmosStruct<'a, CUB>
 where
     CUB: CosmosUriBuilder + Clone,
 {
@@ -107,12 +107,35 @@ pub struct ClientBuilder {}
 
 impl ClientBuilder {
     #[allow(clippy::new_ret_no_self)]
-    pub fn new(
-        account: String,
+    pub fn new<'a, IntoCowStr>(
+        account: IntoCowStr,
         auth_token: AuthorizationToken,
-    ) -> Result<CosmosStruct<DefaultCosmosUri>, AzureError> {
+    ) -> Result<CosmosStruct<'a, DefaultCosmosUri>, AzureError>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        let account = account.into();
         let client = hyper::Client::builder().build(HttpsConnector::new());
-        let cosmos_uri_builder = DefaultCosmosUri::new(&account);
+        let cosmos_uri_builder = DefaultCosmosUri::new(account.as_ref());
+
+        Ok(CosmosStruct {
+            hyper_client: client,
+            account: account,
+            auth_token,
+            cosmos_uri_builder,
+        })
+    }
+
+    pub fn new_china<'a, IntoCowStr>(
+        account: IntoCowStr,
+        auth_token: AuthorizationToken,
+    ) -> Result<CosmosStruct<'a, ChinaCosmosUri>, AzureError>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        let account = account.into();
+        let client = hyper::Client::builder().build(HttpsConnector::new());
+        let cosmos_uri_builder = ChinaCosmosUri::new(account.as_ref());
 
         Ok(CosmosStruct {
             hyper_client: client,
@@ -122,31 +145,19 @@ impl ClientBuilder {
         })
     }
 
-    pub fn new_china(
-        account: String,
-        auth_token: AuthorizationToken,
-    ) -> Result<CosmosStruct<ChinaCosmosUri>, AzureError> {
-        let client = hyper::Client::builder().build(HttpsConnector::new());
-        let cosmos_uri_builder = ChinaCosmosUri::new(&account);
-
-        Ok(CosmosStruct {
-            hyper_client: client,
-            account,
-            auth_token,
-            cosmos_uri_builder,
-        })
-    }
-
-    pub fn new_custom(
-        account: String,
+    pub fn new_custom<'a, IntoCowStr>(
+        account: IntoCowStr,
         auth_token: AuthorizationToken,
         uri: String,
-    ) -> Result<CosmosStruct<CustomCosmosUri>, AzureError> {
+    ) -> Result<CosmosStruct<'a, CustomCosmosUri>, AzureError>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
         let client = hyper::Client::builder().build(HttpsConnector::new());
 
         Ok(CosmosStruct {
             hyper_client: client,
-            account,
+            account: account.into(),
             auth_token,
             cosmos_uri_builder: CustomCosmosUri { uri },
         })
@@ -165,7 +176,7 @@ impl ClientBuilder {
         ).unwrap();
         Ok(CosmosStruct {
             hyper_client: client,
-            account: format!("{}:{}", address, port),
+            account: Cow::Owned(format!("{}:{}", address, port)),
             auth_token,
             cosmos_uri_builder: CustomCosmosUri {
                 uri: format!("https://{}:{}", address, port),
@@ -174,7 +185,7 @@ impl ClientBuilder {
     }
 }
 
-impl<CUB> HasHyperClient for CosmosStruct<CUB>
+impl<'a, CUB> HasHyperClient for CosmosStruct<'a, CUB>
 where
     CUB: CosmosUriBuilder + Debug,
 {
@@ -184,7 +195,7 @@ where
     }
 }
 
-impl<CUB> CosmosClient for CosmosStruct<CUB>
+impl<'a, CUB> CosmosClient for CosmosStruct<'a, CUB>
 where
     CUB: CosmosUriBuilder + Debug,
 {
@@ -219,7 +230,7 @@ where
     }
 }
 
-impl<'a, CUB> IntoDatabaseClient<'a, Self, DatabaseStruct<'a, Self>> for CosmosStruct<CUB>
+impl<'a, CUB> IntoDatabaseClient<'a, Self, DatabaseStruct<'a, Self>> for CosmosStruct<'a, CUB>
 where
     CUB: CosmosUriBuilder + Debug + Clone,
 {
@@ -231,7 +242,7 @@ where
     }
 }
 
-impl<'a, CUB> WithDatabaseClient<'a, Self, DatabaseStruct<'a, Self>> for CosmosStruct<CUB>
+impl<'a, CUB> WithDatabaseClient<'a, Self, DatabaseStruct<'a, Self>> for CosmosStruct<'a, CUB>
 where
     CUB: CosmosUriBuilder + Debug + Clone,
 {
@@ -266,7 +277,7 @@ where
 //    //}
 //}
 
-impl<CUB> CosmosStruct<CUB>
+impl<'a, CUB> CosmosStruct<'a, CUB>
 where
     CUB: CosmosUriBuilder + Debug,
 {

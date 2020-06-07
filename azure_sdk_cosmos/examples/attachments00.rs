@@ -74,7 +74,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // reference attachment
     println!("creating");
-    let attachment_client = document_client.with_attachment_client("myref05".to_owned());
+    let attachment_client = document_client.with_attachment_client("myref05");
     let resp = attachment_client
         .create_reference()
         .with_consistency_level((&ret).into())
@@ -91,7 +91,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let session_token: ConsistencyLevel = resp.into();
 
     println!("replacing");
-    let attachment_client = document_client.with_attachment_client("myref05".to_owned());
+    let attachment_client = document_client.with_attachment_client("myref05");
     let resp = attachment_client
         .replace_reference()
         .with_consistency_level(session_token)
@@ -113,7 +113,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // slug attachment
     println!("creating slug attachment");
-    let attachment_client = document_client.with_attachment_client("slug00".to_owned());
+    let attachment_client = document_client.with_attachment_client("slug00");
     let resp = attachment_client
         .create_slug()
         .with_consistency_level((&resp_delete).into())
