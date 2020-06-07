@@ -7,22 +7,22 @@ use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct UserStruct<C, D>
+pub struct UserStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
-    database_client: D,
+    database_client: Cow<'a, D>,
     user_name: String,
     p_c: PhantomData<C>,
 }
 
-impl<C, D> UserStruct<C, D>
+impl<'a, C, D> UserStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
-    pub(crate) fn new(database_client: D, user_name: String) -> Self {
+    pub(crate) fn new(database_client: Cow<'a, D>, user_name: String) -> Self {
         Self {
             database_client,
             user_name,
@@ -31,10 +31,10 @@ where
     }
 }
 
-impl<C, D> HasHyperClient for UserStruct<C, D>
+impl<'a, C, D> HasHyperClient for UserStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
     fn hyper_client(
@@ -44,10 +44,10 @@ where
     }
 }
 
-impl<C, D> HasCosmosClient<C> for UserStruct<C, D>
+impl<'a, C, D> HasCosmosClient<C> for UserStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
     fn cosmos_client(&self) -> &C {
@@ -55,10 +55,10 @@ where
     }
 }
 
-impl<C, D> HasDatabaseClient<C, D> for UserStruct<C, D>
+impl<'a, C, D> HasDatabaseClient<C, D> for UserStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
     fn database_client(&self) -> &D {
@@ -66,10 +66,10 @@ where
     }
 }
 
-impl<C, D> UserClient<C, D> for UserStruct<C, D>
+impl<'a, C, D> UserClient<C, D> for UserStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     fn user_name(&self) -> &str {
         &self.user_name
@@ -96,8 +96,8 @@ where
     }
 }
 
-impl<C, D> IntoPermissionClient<C, D, Self, PermissionStruct<'static, C, D, Self>>
-    for UserStruct<C, D>
+impl<'a, C, D> IntoPermissionClient<C, D, Self, PermissionStruct<'static, C, D, Self>>
+    for UserStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -111,7 +111,7 @@ where
 }
 
 impl<'a, C, D> WithPermissionClient<'a, C, D, Self, PermissionStruct<'a, C, D, Self>>
-    for UserStruct<C, D>
+    for UserStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,

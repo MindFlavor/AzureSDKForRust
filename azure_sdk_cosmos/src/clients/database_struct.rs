@@ -98,11 +98,20 @@ where
     }
 }
 
-impl<'a, C> IntoUserClient<C, Self, UserStruct<C, Self>> for DatabaseStruct<'a, C>
+impl<'a, C> WithUserClient<'a, C, Self, UserStruct<'a, C, Self>> for DatabaseStruct<'a, C>
 where
     C: CosmosClient + Clone,
 {
-    fn with_user(self, user_name: String) -> UserStruct<C, Self> {
-        UserStruct::new(self, user_name)
+    fn with_user_client(&'a self, user_name: String) -> UserStruct<'a, C, Self> {
+        UserStruct::new(Cow::Borrowed(self), user_name)
+    }
+}
+
+impl<'a, C> IntoUserClient<C, Self, UserStruct<'static, C, Self>> for DatabaseStruct<'a, C>
+where
+    C: CosmosClient + Clone,
+{
+    fn into_user_client(self, user_name: String) -> UserStruct<'static, C, Self> {
+        UserStruct::new(Cow::Owned(self), user_name)
     }
 }

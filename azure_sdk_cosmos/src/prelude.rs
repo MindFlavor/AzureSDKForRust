@@ -32,5 +32,5 @@ pub use crate::{
     UserDefinedFunctionBodySupport, UserDefinedFunctionClient, UserDefinedFunctionClientRequired,
     UserName, UserNameRequired, UserNameSupport, WithAttachmentClient, WithCollectionClient,
     WithDatabaseClient, WithDocumentClient, WithPermissionClient, WithStoredProcedureClient,
-    WithTriggerClient, WithUserDefinedFunctionClient,
+    WithTriggerClient, WithUserClient, WithUserDefinedFunctionClient,
 };

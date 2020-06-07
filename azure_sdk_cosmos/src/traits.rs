@@ -120,13 +120,22 @@ where
     fn user_client(&self) -> &USER;
 }
 
+pub trait WithUserClient<'a, C, D, USER>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
+{
+    fn with_user_client(&'a self, user_name: String) -> USER;
+}
+
 pub trait IntoUserClient<C, D, USER>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     USER: UserClient<C, D>,
 {
-    fn with_user(self, user_name: String) -> USER;
+    fn into_user_client(self, user_name: String) -> USER;
 }
 
 pub trait PermissionClient<C, D, USER>: HasUserClient<C, D, USER>
