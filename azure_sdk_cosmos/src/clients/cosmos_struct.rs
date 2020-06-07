@@ -1,7 +1,10 @@
 use crate::clients::DatabaseStruct;
 use crate::headers::*;
 use crate::requests;
-use crate::{AuthorizationToken, CosmosClient, HasHyperClient, IntoDatabaseClient, ResourceType};
+use crate::{
+    AuthorizationToken, CosmosClient, HasHyperClient, IntoDatabaseClient, ResourceType,
+    WithDatabaseClient,
+};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::No;
 use base64;
@@ -216,12 +219,21 @@ where
     }
 }
 
-impl<CUB> IntoDatabaseClient<Self, DatabaseStruct<Self>> for CosmosStruct<CUB>
+impl<CUB> IntoDatabaseClient<Self, DatabaseStruct<'static, Self>> for CosmosStruct<CUB>
 where
-    CUB: CosmosUriBuilder + Debug,
+    CUB: CosmosUriBuilder + Debug + Clone,
 {
-    fn with_database(self, database_name: String) -> DatabaseStruct<Self> {
-        DatabaseStruct::new(self, database_name)
+    fn into_database_client(self, database_name: String) -> DatabaseStruct<'static, Self> {
+        DatabaseStruct::new(Cow::Owned(self), database_name)
+    }
+}
+
+impl<'a, CUB> WithDatabaseClient<'a, Self, DatabaseStruct<'a, Self>> for CosmosStruct<CUB>
+where
+    CUB: CosmosUriBuilder + Debug + Clone,
+{
+    fn with_database_client(&'a self, database_name: String) -> DatabaseStruct<'a, Self> {
+        DatabaseStruct::new(Cow::Borrowed(self), database_name)
     }
 }
 

@@ -61,12 +61,20 @@ where
     fn database_client(&self) -> &D;
 }
 
+pub trait WithDatabaseClient<'a, C, D>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+{
+    fn with_database_client(&'a self, database_name: String) -> D;
+}
+
 pub trait IntoDatabaseClient<C, D>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
 {
-    fn with_database(self, database_name: String) -> D;
+    fn into_database_client(self, database_name: String) -> D;
 }
 
 pub trait UserClient<C, D>: HasDatabaseClient<C, D>
@@ -238,13 +246,22 @@ where
     fn collection_client(&self) -> &COLL;
 }
 
+pub trait WithCollectionClient<'a, C, D, COLL>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+{
+    fn with_collection_client(&'a self, collection_name: String) -> COLL;
+}
+
 pub trait IntoCollectionClient<C, D, COLL>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
 {
-    fn with_collection(self, collection_name: String) -> COLL;
+    fn into_collection_client(self, collection_name: String) -> COLL;
 }
 
 pub trait UserDefinedFunctionClient<C, D, COLL>: HasCollectionClient<C, D, COLL>

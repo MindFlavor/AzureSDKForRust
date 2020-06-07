@@ -11,23 +11,23 @@ use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct CollectionStruct<C, D>
+pub struct CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
-    database_client: D,
+    database_client: Cow<'a, D>,
     collection_name: String,
     p_c: PhantomData<C>,
 }
 
-impl<C, D> CollectionStruct<C, D>
+impl<'a, C, D> CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
-    pub(crate) fn new(database_client: D, collection_name: String) -> Self {
+    pub(crate) fn new(database_client: Cow<'a, D>, collection_name: String) -> Self {
         Self {
             database_client,
             collection_name,
@@ -36,10 +36,10 @@ where
     }
 }
 
-impl<C, D> HasHyperClient for CollectionStruct<C, D>
+impl<'a, C, D> HasHyperClient for CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
     fn hyper_client(
@@ -49,10 +49,10 @@ where
     }
 }
 
-impl<C, D> HasCosmosClient<C> for CollectionStruct<C, D>
+impl<'a, C, D> HasCosmosClient<C> for CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
     fn cosmos_client(&self) -> &C {
@@ -60,10 +60,10 @@ where
     }
 }
 
-impl<C, D> HasDatabaseClient<C, D> for CollectionStruct<C, D>
+impl<'a, C, D> HasDatabaseClient<C, D> for CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
     fn database_client(&self) -> &D {
@@ -71,10 +71,10 @@ where
     }
 }
 
-impl<C, D> CollectionClient<C, D> for CollectionStruct<C, D>
+impl<'a, C, D> CollectionClient<C, D> for CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     #[inline]
     fn collection_name(&self) -> &str {
@@ -129,7 +129,7 @@ where
 }
 
 impl<C, D> IntoDocumentClient<C, D, Self, DocumentStruct<'static, C, D, Self>>
-    for CollectionStruct<C, D>
+    for CollectionStruct<'static, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -144,7 +144,7 @@ where
 }
 
 impl<'a, C, D> WithDocumentClient<'a, C, D, Self, DocumentStruct<'a, C, D, Self>>
-    for CollectionStruct<C, D>
+    for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -158,21 +158,22 @@ where
     }
 }
 
-impl<C, D> IntoTriggerClient<C, D, Self, TriggerStruct<C, D, Self>> for CollectionStruct<C, D>
+impl<'a, C, D> IntoTriggerClient<C, D, Self, TriggerStruct<C, D, Self>>
+    for CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     fn with_trigger(self, trigger_name: String) -> TriggerStruct<C, D, Self> {
         TriggerStruct::new(self, trigger_name)
     }
 }
 
-impl<C, D> IntoUserDefinedFunctionClient<C, D, Self, UserDefinedFunctionStruct<C, D, Self>>
-    for CollectionStruct<C, D>
+impl<'a, C, D> IntoUserDefinedFunctionClient<C, D, Self, UserDefinedFunctionStruct<C, D, Self>>
+    for CollectionStruct<'a, C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
     fn with_user_defined_function(
         self,
@@ -183,7 +184,7 @@ where
 }
 
 impl<'a, C, D> WithStoredProcedureClient<'a, C, D, Self, StoredProcedureStruct<'a, C, D, Self>>
-    for CollectionStruct<C, D>
+    for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -197,7 +198,7 @@ where
 }
 
 impl<'a, C, D> IntoStoredProcedureClient<C, D, Self, StoredProcedureStruct<'static, C, D, Self>>
-    for CollectionStruct<C, D>
+    for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
