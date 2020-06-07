@@ -13,7 +13,7 @@ where
     D: DatabaseClient<C> + Clone,
 {
     database_client: Cow<'a, D>,
-    user_name: String,
+    user_name: Cow<'a, str>,
     p_c: PhantomData<C>,
 }
 
@@ -22,7 +22,7 @@ where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    pub(crate) fn new(database_client: Cow<'a, D>, user_name: String) -> Self {
+    pub(crate) fn new(database_client: Cow<'a, D>, user_name: Cow<'a, str>) -> Self {
         Self {
             database_client,
             user_name,
@@ -96,14 +96,20 @@ where
     }
 }
 
-impl<'a, C, D> IntoPermissionClient<C, D, Self, PermissionStruct<'a, C, D, Self>>
+impl<'a, C, D> IntoPermissionClient<'a, C, D, Self, PermissionStruct<'a, C, D, Self>>
     for UserStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn into_permission_client(self, permission_name: String) -> PermissionStruct<'a, C, D, Self> {
-        PermissionStruct::new(Cow::Owned(self), permission_name)
+    fn into_permission_client<IntoCowStr>(
+        self,
+        permission_name: IntoCowStr,
+    ) -> PermissionStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        PermissionStruct::new(Cow::Owned(self), permission_name.into())
     }
 }
 
@@ -113,10 +119,13 @@ where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn with_permission_client(
+    fn with_permission_client<IntoCowStr>(
         &'a self,
-        permission_name: String,
-    ) -> PermissionStruct<'a, C, D, Self> {
-        PermissionStruct::new(Cow::Borrowed(self), permission_name)
+        permission_name: IntoCowStr,
+    ) -> PermissionStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        PermissionStruct::new(Cow::Borrowed(self), permission_name.into())
     }
 }

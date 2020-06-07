@@ -131,16 +131,20 @@ where
     D: DatabaseClient<C>,
     USER: UserClient<C, D>,
 {
-    fn with_user_client(&'a self, user_name: String) -> USER;
+    fn with_user_client<IntoCowStr>(&'a self, user_name: IntoCowStr) -> USER
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoUserClient<C, D, USER>: Debug
+pub trait IntoUserClient<'a, C, D, USER>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     USER: UserClient<C, D>,
 {
-    fn into_user_client(self, user_name: String) -> USER;
+    fn into_user_client<IntoCowStr>(self, user_name: IntoCowStr) -> USER
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
 pub trait PermissionClient<C, D, USER>: HasUserClient<C, D, USER>
@@ -201,17 +205,21 @@ where
     USER: UserClient<C, D>,
     PERMISSION: PermissionClient<C, D, USER>,
 {
-    fn with_permission_client(&'a self, permission_name: String) -> PERMISSION;
+    fn with_permission_client<IntoCowStr>(&'a self, permission_name: IntoCowStr) -> PERMISSION
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoPermissionClient<C, D, USER, PERMISSION>: Debug
+pub trait IntoPermissionClient<'a, C, D, USER, PERMISSION>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     USER: UserClient<C, D>,
     PERMISSION: PermissionClient<C, D, USER>,
 {
-    fn into_permission_client(self, permission_name: String) -> PERMISSION;
+    fn into_permission_client<IntoCowStr>(self, permission_name: IntoCowStr) -> PERMISSION
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
 pub trait CollectionClient<C, D>: HasDatabaseClient<C, D>
@@ -355,17 +363,27 @@ where
     COLL: CollectionClient<C, D>,
     UDF: UserDefinedFunctionClient<C, D, COLL>,
 {
-    fn with_user_defined_function_client(&'a self, user_defined_function_name: String) -> UDF;
+    fn with_user_defined_function_client<IntoCowStr>(
+        &'a self,
+        user_defined_function_name: IntoCowStr,
+    ) -> UDF
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoUserDefinedFunctionClient<C, D, COLL, UDF>: Debug
+pub trait IntoUserDefinedFunctionClient<'a, C, D, COLL, UDF>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
     UDF: UserDefinedFunctionClient<C, D, COLL>,
 {
-    fn into_user_defined_function_client(self, user_defined_function_name: String) -> UDF;
+    fn into_user_defined_function_client<IntoCowStr>(
+        self,
+        user_defined_function_name: IntoCowStr,
+    ) -> UDF
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
 pub trait StoredProcedureClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
@@ -433,17 +451,21 @@ where
     COLL: CollectionClient<C, D>,
     SP: StoredProcedureClient<C, D, COLL>,
 {
-    fn with_stored_procedure_client(&'a self, stored_procedure_name: String) -> SP;
+    fn with_stored_procedure_client<IntoCowStr>(&'a self, stored_procedure_name: IntoCowStr) -> SP
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoStoredProcedureClient<C, D, COLL, SP>: Debug
+pub trait IntoStoredProcedureClient<'a, C, D, COLL, SP>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
     SP: StoredProcedureClient<C, D, COLL>,
 {
-    fn into_stored_procedure_client(self, stored_procedure_name: String) -> SP;
+    fn into_stored_procedure_client<IntoCowStr>(self, stored_procedure_name: IntoCowStr) -> SP
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
 pub trait TriggerClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
@@ -503,17 +525,21 @@ where
     COLL: CollectionClient<C, D>,
     TRIGGER: TriggerClient<C, D, COLL>,
 {
-    fn with_trigger_client(&'a self, trigger_name: String) -> TRIGGER;
+    fn with_trigger_client<IntoCowStr>(&'a self, trigger_name: IntoCowStr) -> TRIGGER
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoTriggerClient<C, D, COLL, TRIGGER>: Debug
+pub trait IntoTriggerClient<'a, C, D, COLL, TRIGGER>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
     TRIGGER: TriggerClient<C, D, COLL>,
 {
-    fn into_trigger_client(self, trigger_name: String) -> TRIGGER;
+    fn into_trigger_client<IntoCowStr>(self, trigger_name: IntoCowStr) -> TRIGGER
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
 pub trait DocumentClient<C, D, COLL>: HasCollectionClient<C, D, COLL>
@@ -668,10 +694,12 @@ where
     DOC: DocumentClient<C, D, COLL>,
     ATT: AttachmentClient<C, D, COLL, DOC>,
 {
-    fn with_attachment_client(&'a self, attachment_name: String) -> ATT;
+    fn with_attachment_client<IntoCowStr>(&'a self, attachment_name: IntoCowStr) -> ATT
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoAttachmentClient<C, D, COLL, DOC, ATT>: Debug
+pub trait IntoAttachmentClient<'a, C, D, COLL, DOC, ATT>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
@@ -679,5 +707,7 @@ where
     DOC: DocumentClient<C, D, COLL>,
     ATT: AttachmentClient<C, D, COLL, DOC>,
 {
-    fn into_attachment_client(self, attachment_name: String) -> ATT;
+    fn into_attachment_client<IntoCowStr>(self, attachment_name: IntoCowStr) -> ATT
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }

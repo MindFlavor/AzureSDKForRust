@@ -12,7 +12,7 @@ where
     COLL: CollectionClient<C, D> + Clone,
 {
     collection_client: Cow<'a, COLL>,
-    trigger_name: String,
+    trigger_name: Cow<'a, str>,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
@@ -23,7 +23,7 @@ where
     D: DatabaseClient<C> + Clone,
     COLL: CollectionClient<C, D> + Clone,
 {
-    pub(crate) fn new(collection_client: Cow<'a, COLL>, trigger_name: String) -> Self {
+    pub(crate) fn new(collection_client: Cow<'a, COLL>, trigger_name: Cow<'a, str>) -> Self {
         Self {
             collection_client,
             trigger_name,

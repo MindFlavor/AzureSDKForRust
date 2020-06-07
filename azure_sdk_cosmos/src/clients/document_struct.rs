@@ -127,26 +127,32 @@ where
     D: DatabaseClient<C> + Clone,
     COLL: CollectionClient<C, D> + Clone,
 {
-    fn with_attachment_client(
+    fn with_attachment_client<IntoCowStr>(
         &'a self,
-        attachment_name: String,
-    ) -> AttachmentStruct<'a, C, D, COLL, Self> {
-        AttachmentStruct::new(Cow::Borrowed(self), attachment_name)
+        attachment_name: IntoCowStr,
+    ) -> AttachmentStruct<'a, C, D, COLL, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        AttachmentStruct::new(Cow::Borrowed(self), attachment_name.into())
     }
 }
 
 impl<'a, 'b, C, D, COLL>
-    IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<'a, C, D, COLL, Self>>
+    IntoAttachmentClient<'a, C, D, COLL, Self, AttachmentStruct<'a, C, D, COLL, Self>>
     for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
     COLL: CollectionClient<C, D> + Clone,
 {
-    fn into_attachment_client(
+    fn into_attachment_client<IntoCowStr>(
         self,
-        attachment_name: String,
-    ) -> AttachmentStruct<'a, C, D, COLL, Self> {
-        AttachmentStruct::new(Cow::Owned(self), attachment_name)
+        attachment_name: IntoCowStr,
+    ) -> AttachmentStruct<'a, C, D, COLL, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        AttachmentStruct::new(Cow::Owned(self), attachment_name.into())
     }
 }

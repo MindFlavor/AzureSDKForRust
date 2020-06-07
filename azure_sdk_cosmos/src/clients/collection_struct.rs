@@ -170,19 +170,31 @@ where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn with_trigger_client(&'a self, trigger_name: String) -> TriggerStruct<'a, C, D, Self> {
-        TriggerStruct::new(Cow::Borrowed(self), trigger_name)
+    fn with_trigger_client<IntoCowStr>(
+        &'a self,
+        trigger_name: IntoCowStr,
+    ) -> TriggerStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        TriggerStruct::new(Cow::Borrowed(self), trigger_name.into())
     }
 }
 
-impl<'a, C, D> IntoTriggerClient<C, D, Self, TriggerStruct<'a, C, D, Self>>
+impl<'a, C, D> IntoTriggerClient<'a, C, D, Self, TriggerStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn into_trigger_client(self, trigger_name: String) -> TriggerStruct<'a, C, D, Self> {
-        TriggerStruct::new(Cow::Owned(self), trigger_name)
+    fn into_trigger_client<IntoCowStr>(
+        self,
+        trigger_name: IntoCowStr,
+    ) -> TriggerStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        TriggerStruct::new(Cow::Owned(self), trigger_name.into())
     }
 }
 
@@ -193,25 +205,32 @@ where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn with_user_defined_function_client(
+    fn with_user_defined_function_client<IntoCowStr>(
         &'a self,
-        user_defined_function_name: String,
-    ) -> UserDefinedFunctionStruct<'a, C, D, Self> {
-        UserDefinedFunctionStruct::new(Cow::Borrowed(self), user_defined_function_name)
+        user_defined_function_name: IntoCowStr,
+    ) -> UserDefinedFunctionStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        UserDefinedFunctionStruct::new(Cow::Borrowed(self), user_defined_function_name.into())
     }
 }
 
-impl<'a, C, D> IntoUserDefinedFunctionClient<C, D, Self, UserDefinedFunctionStruct<'a, C, D, Self>>
+impl<'a, C, D>
+    IntoUserDefinedFunctionClient<'a, C, D, Self, UserDefinedFunctionStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn into_user_defined_function_client(
+    fn into_user_defined_function_client<IntoCowStr>(
         self,
-        user_defined_function_name: String,
-    ) -> UserDefinedFunctionStruct<'a, C, D, Self> {
-        UserDefinedFunctionStruct::new(Cow::Owned(self), user_defined_function_name)
+        user_defined_function_name: IntoCowStr,
+    ) -> UserDefinedFunctionStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        UserDefinedFunctionStruct::new(Cow::Owned(self), user_defined_function_name.into())
     }
 }
 
@@ -221,24 +240,30 @@ where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn with_stored_procedure_client(
+    fn with_stored_procedure_client<IntoCowStr>(
         &'a self,
-        stored_procedure_name: String,
-    ) -> StoredProcedureStruct<'a, C, D, Self> {
-        StoredProcedureStruct::new(Cow::Borrowed(self), stored_procedure_name)
+        stored_procedure_name: IntoCowStr,
+    ) -> StoredProcedureStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        StoredProcedureStruct::new(Cow::Borrowed(self), stored_procedure_name.into())
     }
 }
 
-impl<'a, C, D> IntoStoredProcedureClient<C, D, Self, StoredProcedureStruct<'a, C, D, Self>>
+impl<'a, C, D> IntoStoredProcedureClient<'a, C, D, Self, StoredProcedureStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn into_stored_procedure_client(
+    fn into_stored_procedure_client<IntoCowStr>(
         self,
-        stored_procedure_name: String,
-    ) -> StoredProcedureStruct<'a, C, D, Self> {
-        StoredProcedureStruct::new(Cow::Owned(self), stored_procedure_name)
+        stored_procedure_name: IntoCowStr,
+    ) -> StoredProcedureStruct<'a, C, D, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        StoredProcedureStruct::new(Cow::Owned(self), stored_procedure_name.into())
     }
 }

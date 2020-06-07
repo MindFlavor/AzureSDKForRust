@@ -12,7 +12,7 @@ where
     COLL: CollectionClient<C, D> + Clone,
 {
     collection_client: Cow<'a, COLL>,
-    user_defined_function_name: String,
+    user_defined_function_name: Cow<'a, str>,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
@@ -25,7 +25,7 @@ where
 {
     pub(crate) fn new(
         collection_client: Cow<'a, COLL>,
-        user_defined_function_name: String,
+        user_defined_function_name: Cow<'a, str>,
     ) -> Self {
         Self {
             collection_client,

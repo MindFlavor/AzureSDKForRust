@@ -13,7 +13,7 @@ where
     DOC: DocumentClient<C, D, COLL> + Clone,
 {
     document_client: Cow<'a, DOC>,
-    attachment_name: String,
+    attachment_name: Cow<'a, str>,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
     p_coll: PhantomData<COLL>,
@@ -26,7 +26,7 @@ where
     COLL: CollectionClient<C, D> + Clone,
     DOC: DocumentClient<C, D, COLL> + Clone,
 {
-    pub(crate) fn new(document_client: Cow<'a, DOC>, attachment_name: String) -> Self {
+    pub(crate) fn new(document_client: Cow<'a, DOC>, attachment_name: Cow<'a, str>) -> Self {
         Self {
             document_client,
             attachment_name,

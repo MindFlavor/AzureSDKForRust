@@ -12,7 +12,7 @@ where
     USER: UserClient<C, D> + Clone,
 {
     user_client: Cow<'a, USER>,
-    permission_name: String,
+    permission_name: Cow<'a, str>,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
@@ -23,7 +23,7 @@ where
     D: DatabaseClient<C> + Clone,
     USER: UserClient<C, D> + Clone,
 {
-    pub(crate) fn new(user_client: Cow<'a, USER>, permission_name: String) -> Self {
+    pub(crate) fn new(user_client: Cow<'a, USER>, permission_name: Cow<'a, str>) -> Self {
         Self {
             user_client,
             permission_name,
