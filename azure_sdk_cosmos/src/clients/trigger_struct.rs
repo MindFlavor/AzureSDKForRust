@@ -1,28 +1,29 @@
 use crate::requests;
 use crate::traits::*;
 use azure_sdk_core::No;
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct TriggerStruct<C, D, COLL>
+pub struct TriggerStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
-    collection_client: COLL,
+    collection_client: Cow<'a, COLL>,
     trigger_name: String,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
 
-impl<C, D, COLL> TriggerStruct<C, D, COLL>
+impl<'a, C, D, COLL> TriggerStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
-    pub(crate) fn new(collection_client: COLL, trigger_name: String) -> Self {
+    pub(crate) fn new(collection_client: Cow<'a, COLL>, trigger_name: String) -> Self {
         Self {
             collection_client,
             trigger_name,
@@ -32,11 +33,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasHyperClient for TriggerStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasHyperClient for TriggerStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn hyper_client(
@@ -46,11 +47,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasCosmosClient<C> for TriggerStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasCosmosClient<C> for TriggerStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn cosmos_client(&self) -> &C {
@@ -58,11 +59,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasDatabaseClient<C, D> for TriggerStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasDatabaseClient<C, D> for TriggerStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn database_client(&self) -> &D {
@@ -70,11 +71,11 @@ where
     }
 }
 
-impl<C, D, COLL> HasCollectionClient<C, D, COLL> for TriggerStruct<C, D, COLL>
+impl<'a, C, D, COLL> HasCollectionClient<C, D, COLL> for TriggerStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     #[inline]
     fn collection_client(&self) -> &COLL {
@@ -82,11 +83,11 @@ where
     }
 }
 
-impl<C, D, COLL> TriggerClient<C, D, COLL> for TriggerStruct<C, D, COLL>
+impl<'a, C, D, COLL> TriggerClient<C, D, COLL> for TriggerStruct<'a, C, D, COLL>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    COLL: CollectionClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    COLL: CollectionClient<C, D> + Clone,
 {
     fn trigger_name(&self) -> &str {
         &self.trigger_name

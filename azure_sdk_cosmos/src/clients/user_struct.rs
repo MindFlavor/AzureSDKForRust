@@ -3,6 +3,7 @@ use crate::requests;
 use crate::traits::*;
 use crate::PermissionStruct;
 use azure_sdk_core::No;
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
@@ -95,12 +96,30 @@ where
     }
 }
 
-impl<C, D> IntoPermissionClient<C, D, Self, PermissionStruct<C, D, Self>> for UserStruct<C, D>
+impl<C, D> IntoPermissionClient<C, D, Self, PermissionStruct<'static, C, D, Self>>
+    for UserStruct<C, D>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
 {
-    fn with_permission(self, permission_name: String) -> PermissionStruct<C, D, Self> {
-        PermissionStruct::new(self, permission_name)
+    fn into_permission_client(
+        self,
+        permission_name: String,
+    ) -> PermissionStruct<'static, C, D, Self> {
+        PermissionStruct::new(Cow::Owned(self), permission_name)
+    }
+}
+
+impl<'a, C, D> WithPermissionClient<'a, C, D, Self, PermissionStruct<'a, C, D, Self>>
+    for UserStruct<C, D>
+where
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+{
+    fn with_permission_client(
+        &'a self,
+        permission_name: String,
+    ) -> PermissionStruct<'a, C, D, Self> {
+        PermissionStruct::new(Cow::Borrowed(self), permission_name)
     }
 }

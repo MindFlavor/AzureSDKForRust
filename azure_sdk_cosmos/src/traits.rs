@@ -180,6 +180,16 @@ where
     fn permission_client(&self) -> &PERMISSION;
 }
 
+pub trait WithPermissionClient<'a, C, D, USER, PERMISSION>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    USER: UserClient<C, D>,
+    PERMISSION: PermissionClient<C, D, USER>,
+{
+    fn with_permission_client(&'a self, permission_name: String) -> PERMISSION;
+}
+
 pub trait IntoPermissionClient<C, D, USER, PERMISSION>: Debug
 where
     C: CosmosClient,
@@ -187,7 +197,7 @@ where
     USER: UserClient<C, D>,
     PERMISSION: PermissionClient<C, D, USER>,
 {
-    fn with_permission(self, permission_name: String) -> PERMISSION;
+    fn into_permission_client(self, permission_name: String) -> PERMISSION;
 }
 
 pub trait CollectionClient<C, D>: HasDatabaseClient<C, D>
@@ -458,6 +468,16 @@ where
     fn trigger_client(&self) -> &TRIGGER;
 }
 
+pub trait WithTriggerClient<'a, C, D, COLL, TRIGGER>: Debug
+where
+    C: CosmosClient,
+    D: DatabaseClient<C>,
+    COLL: CollectionClient<C, D>,
+    TRIGGER: TriggerClient<C, D, COLL>,
+{
+    fn with_trigger_client(&'a self, trigger_name: String) -> TRIGGER;
+}
+
 pub trait IntoTriggerClient<C, D, COLL, TRIGGER>: Debug
 where
     C: CosmosClient,
@@ -465,7 +485,7 @@ where
     COLL: CollectionClient<C, D>,
     TRIGGER: TriggerClient<C, D, COLL>,
 {
-    fn with_trigger(self, trigger_name: String) -> TRIGGER;
+    fn into_trigger_client(self, trigger_name: String) -> TRIGGER;
 }
 
 pub trait DocumentClient<C, D, COLL>: HasCollectionClient<C, D, COLL>

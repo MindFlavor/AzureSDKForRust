@@ -4,7 +4,7 @@ use crate::{
     CollectionClient, CosmosClient, DatabaseClient, HasCosmosClient, HasDatabaseClient,
     HasHyperClient, IntoDocumentClient, IntoStoredProcedureClient, IntoTriggerClient,
     IntoUserDefinedFunctionClient, PartitionKeys, UserDefinedFunctionStruct, WithDocumentClient,
-    WithStoredProcedureClient,
+    WithStoredProcedureClient, WithTriggerClient,
 };
 use azure_sdk_core::No;
 use std::borrow::Cow;
@@ -158,14 +158,25 @@ where
     }
 }
 
-impl<'a, C, D> IntoTriggerClient<C, D, Self, TriggerStruct<C, D, Self>>
+impl<'a, C, D> WithTriggerClient<'a, C, D, Self, TriggerStruct<'a, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn with_trigger(self, trigger_name: String) -> TriggerStruct<C, D, Self> {
-        TriggerStruct::new(self, trigger_name)
+    fn with_trigger_client(&'a self, trigger_name: String) -> TriggerStruct<'a, C, D, Self> {
+        TriggerStruct::new(Cow::Borrowed(self), trigger_name)
+    }
+}
+
+impl<'a, C, D> IntoTriggerClient<C, D, Self, TriggerStruct<'static, C, D, Self>>
+    for CollectionStruct<'a, C, D>
+where
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+{
+    fn into_trigger_client(self, trigger_name: String) -> TriggerStruct<'static, C, D, Self> {
+        TriggerStruct::new(Cow::Owned(self), trigger_name)
     }
 }
 

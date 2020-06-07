@@ -1,28 +1,29 @@
 use crate::requests;
 use crate::traits::*;
 //use azure_sdk_core::No;
+use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct PermissionStruct<C, D, USER>
+pub struct PermissionStruct<'a, C, D, USER>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    USER: UserClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    USER: UserClient<C, D> + Clone,
 {
-    user_client: USER,
+    user_client: Cow<'a, USER>,
     permission_name: String,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
 
-impl<C, D, USER> PermissionStruct<C, D, USER>
+impl<'a, C, D, USER> PermissionStruct<'a, C, D, USER>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    USER: UserClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    USER: UserClient<C, D> + Clone,
 {
-    pub(crate) fn new(user_client: USER, permission_name: String) -> Self {
+    pub(crate) fn new(user_client: Cow<'a, USER>, permission_name: String) -> Self {
         Self {
             user_client,
             permission_name,
@@ -32,11 +33,11 @@ where
     }
 }
 
-impl<C, D, USER> HasHyperClient for PermissionStruct<C, D, USER>
+impl<'a, C, D, USER> HasHyperClient for PermissionStruct<'a, C, D, USER>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    USER: UserClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    USER: UserClient<C, D> + Clone,
 {
     #[inline]
     fn hyper_client(
@@ -46,11 +47,11 @@ where
     }
 }
 
-impl<C, D, USER> HasCosmosClient<C> for PermissionStruct<C, D, USER>
+impl<'a, C, D, USER> HasCosmosClient<C> for PermissionStruct<'a, C, D, USER>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    USER: UserClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    USER: UserClient<C, D> + Clone,
 {
     #[inline]
     fn cosmos_client(&self) -> &C {
@@ -58,11 +59,11 @@ where
     }
 }
 
-impl<C, D, USER> HasDatabaseClient<C, D> for PermissionStruct<C, D, USER>
+impl<'a, C, D, USER> HasDatabaseClient<C, D> for PermissionStruct<'a, C, D, USER>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    USER: UserClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    USER: UserClient<C, D> + Clone,
 {
     #[inline]
     fn database_client(&self) -> &D {
@@ -70,11 +71,11 @@ where
     }
 }
 
-impl<C, D, USER> HasUserClient<C, D, USER> for PermissionStruct<C, D, USER>
+impl<'a, C, D, USER> HasUserClient<C, D, USER> for PermissionStruct<'a, C, D, USER>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    USER: UserClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    USER: UserClient<C, D> + Clone,
 {
     #[inline]
     fn user_client(&self) -> &USER {
@@ -82,11 +83,11 @@ where
     }
 }
 
-impl<C, D, USER> PermissionClient<C, D, USER> for PermissionStruct<C, D, USER>
+impl<'a, C, D, USER> PermissionClient<C, D, USER> for PermissionStruct<'a, C, D, USER>
 where
-    C: CosmosClient,
-    D: DatabaseClient<C>,
-    USER: UserClient<C, D>,
+    C: CosmosClient + Clone,
+    D: DatabaseClient<C> + Clone,
+    USER: UserClient<C, D> + Clone,
 {
     fn permission_name(&self) -> &str {
         &self.permission_name
