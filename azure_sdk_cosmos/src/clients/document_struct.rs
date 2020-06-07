@@ -8,20 +8,20 @@ use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct DocumentStruct<'a, C, D, COLL>
+pub struct DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
     COLL: CollectionClient<C, D> + Clone,
 {
     collection_client: Cow<'a, COLL>,
-    document_name: String,
+    document_name: Cow<'b, str>,
     partition_keys: PartitionKeys,
     p_c: PhantomData<C>,
     p_d: PhantomData<D>,
 }
 
-impl<'a, C, D, COLL> DocumentStruct<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL> DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -29,7 +29,7 @@ where
 {
     pub(crate) fn new(
         collection_client: Cow<'a, COLL>,
-        document_name: String,
+        document_name: Cow<'b, str>,
         partition_keys: PartitionKeys,
     ) -> Self {
         Self {
@@ -42,7 +42,7 @@ where
     }
 }
 
-impl<'a, C, D, COLL> HasHyperClient for DocumentStruct<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL> HasHyperClient for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<'a, C, D, COLL> HasCosmosClient<C> for DocumentStruct<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL> HasCosmosClient<C> for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -68,7 +68,7 @@ where
     }
 }
 
-impl<'a, C, D, COLL> HasDatabaseClient<C, D> for DocumentStruct<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL> HasDatabaseClient<C, D> for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -80,7 +80,7 @@ where
     }
 }
 
-impl<'a, C, D, COLL> HasCollectionClient<C, D, COLL> for DocumentStruct<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL> HasCollectionClient<C, D, COLL> for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -92,7 +92,7 @@ where
     }
 }
 
-impl<'a, C, D, COLL> DocumentClient<C, D, COLL> for DocumentStruct<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL> DocumentClient<C, D, COLL> for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -119,9 +119,9 @@ where
     }
 }
 
-impl<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL>
     WithAttachmentClient<'a, C, D, COLL, Self, AttachmentStruct<'a, C, D, COLL, Self>>
-    for DocumentStruct<'a, C, D, COLL>
+    for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -135,9 +135,9 @@ where
     }
 }
 
-impl<'a, C, D, COLL>
+impl<'a, 'b, C, D, COLL>
     IntoAttachmentClient<C, D, COLL, Self, AttachmentStruct<'static, C, D, COLL, Self>>
-    for DocumentStruct<'a, C, D, COLL>
+    for DocumentStruct<'a, 'b, C, D, COLL>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,

@@ -168,7 +168,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Now we get the same document by id.
     println!("getting document by id {}", &doc.document.id);
     let get_document_response = collection_client
-        .with_document_client(doc.document.id.to_string(), (&doc.document.id).into())
+        .with_document_client(doc.document.id.as_ref(), (&doc.document.id).into())
         .get_document()
         .execute::<MySampleStruct>()
         .await?;

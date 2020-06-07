@@ -3,6 +3,7 @@ use crate::{PartitionKeys, ResourceType};
 use azure_sdk_core::No;
 use http::request::Builder;
 use hyper_rustls::HttpsConnector;
+use std::borrow::Cow;
 use std::fmt::Debug;
 
 pub trait HasHyperClient: Debug {
@@ -555,24 +556,36 @@ where
     fn document_client(&self) -> &DOC;
 }
 
-pub trait WithDocumentClient<'a, C, D, COLL, DOC>: Debug
+pub trait WithDocumentClient<'a, 'b, C, D, COLL, DOC>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
     DOC: DocumentClient<C, D, COLL>,
 {
-    fn with_document_client(&'a self, document_name: String, partition_keys: PartitionKeys) -> DOC;
+    fn with_document_client<DocName>(
+        &'a self,
+        document_name: DocName,
+        partition_keys: PartitionKeys,
+    ) -> DOC
+    where
+        DocName: Into<Cow<'b, str>>;
 }
 
-pub trait IntoDocumentClient<C, D, COLL, DOC>: Debug
+pub trait IntoDocumentClient<'b, C, D, COLL, DOC>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
     COLL: CollectionClient<C, D>,
     DOC: DocumentClient<C, D, COLL>,
 {
-    fn into_document_client(self, document_name: String, partition_keys: PartitionKeys) -> DOC;
+    fn into_document_client<DocName>(
+        self,
+        document_name: DocName,
+        partition_keys: PartitionKeys,
+    ) -> DOC
+    where
+        DocName: Into<Cow<'b, str>>;
 }
 
 pub trait AttachmentClient<C, D, COLL, DOC>: HasDocumentClient<C, D, COLL, DOC>

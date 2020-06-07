@@ -128,33 +128,39 @@ where
     }
 }
 
-impl<C, D> IntoDocumentClient<C, D, Self, DocumentStruct<'static, C, D, Self>>
+impl<'b, C, D> IntoDocumentClient<'b, C, D, Self, DocumentStruct<'static, 'b, C, D, Self>>
     for CollectionStruct<'static, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn into_document_client(
+    fn into_document_client<DocName>(
         self,
-        document_name: String,
+        document_name: DocName,
         partition_keys: PartitionKeys,
-    ) -> DocumentStruct<'static, C, D, Self> {
-        DocumentStruct::new(Cow::Owned(self), document_name, partition_keys)
+    ) -> DocumentStruct<'static, 'b, C, D, Self>
+    where
+        DocName: Into<Cow<'b, str>>,
+    {
+        DocumentStruct::new(Cow::Owned(self), document_name.into(), partition_keys)
     }
 }
 
-impl<'a, C, D> WithDocumentClient<'a, C, D, Self, DocumentStruct<'a, C, D, Self>>
+impl<'a, 'b, C, D> WithDocumentClient<'a, 'b, C, D, Self, DocumentStruct<'a, 'b, C, D, Self>>
     for CollectionStruct<'a, C, D>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
-    fn with_document_client(
+    fn with_document_client<DocName>(
         &'a self,
-        document_name: String,
+        document_name: DocName,
         partition_keys: PartitionKeys,
-    ) -> DocumentStruct<'a, C, D, Self> {
-        DocumentStruct::new(Cow::Borrowed(self), document_name, partition_keys)
+    ) -> DocumentStruct<'a, 'b, C, D, Self>
+    where
+        DocName: Into<Cow<'b, str>>,
+    {
+        DocumentStruct::new(Cow::Borrowed(self), document_name.into(), partition_keys)
     }
 }
 
