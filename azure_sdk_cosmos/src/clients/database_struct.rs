@@ -10,7 +10,7 @@ where
     C: CosmosClient + Clone,
 {
     cosmos_client: Cow<'a, C>,
-    database_name: String,
+    database_name: Cow<'a, str>,
 }
 
 impl<'a, C> DatabaseStruct<'a, C>
@@ -18,7 +18,7 @@ where
     C: CosmosClient + Clone,
 {
     #[inline]
-    pub(crate) fn new(cosmos_client: Cow<'a, C>, database_name: String) -> Self {
+    pub(crate) fn new(cosmos_client: Cow<'a, C>, database_name: Cow<'a, str>) -> Self {
         DatabaseStruct {
             cosmos_client,
             database_name,

@@ -219,12 +219,15 @@ where
     }
 }
 
-impl<'a, CUB> IntoDatabaseClient<Self, DatabaseStruct<'a, Self>> for CosmosStruct<CUB>
+impl<'a, CUB> IntoDatabaseClient<'a, Self, DatabaseStruct<'a, Self>> for CosmosStruct<CUB>
 where
     CUB: CosmosUriBuilder + Debug + Clone,
 {
-    fn into_database_client(self, database_name: String) -> DatabaseStruct<'a, Self> {
-        DatabaseStruct::new(Cow::Owned(self), database_name)
+    fn into_database_client<IntoCowStr>(self, database_name: IntoCowStr) -> DatabaseStruct<'a, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        DatabaseStruct::new(Cow::Owned(self), database_name.into())
     }
 }
 
@@ -232,8 +235,14 @@ impl<'a, CUB> WithDatabaseClient<'a, Self, DatabaseStruct<'a, Self>> for CosmosS
 where
     CUB: CosmosUriBuilder + Debug + Clone,
 {
-    fn with_database_client(&'a self, database_name: String) -> DatabaseStruct<'a, Self> {
-        DatabaseStruct::new(Cow::Borrowed(self), database_name)
+    fn with_database_client<IntoCowStr>(
+        &'a self,
+        database_name: IntoCowStr,
+    ) -> DatabaseStruct<'a, Self>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        DatabaseStruct::new(Cow::Borrowed(self), database_name.into())
     }
 }
 

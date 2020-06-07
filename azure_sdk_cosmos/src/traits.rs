@@ -67,15 +67,19 @@ where
     C: CosmosClient,
     D: DatabaseClient<C>,
 {
-    fn with_database_client(&'a self, database_name: String) -> D;
+    fn with_database_client<IntoCowStr>(&'a self, database_name: IntoCowStr) -> D
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
-pub trait IntoDatabaseClient<C, D>: Debug
+pub trait IntoDatabaseClient<'a, C, D>: Debug
 where
     C: CosmosClient,
     D: DatabaseClient<C>,
 {
-    fn into_database_client(self, database_name: String) -> D;
+    fn into_database_client<IntoCowStr>(self, database_name: IntoCowStr) -> D
+    where
+        IntoCowStr: Into<Cow<'a, str>>;
 }
 
 pub trait UserClient<C, D>: HasDatabaseClient<C, D>
