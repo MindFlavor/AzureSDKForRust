@@ -30,8 +30,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let authorization_token = AuthorizationToken::new_master(&master_key)?;
 
     let client = ClientBuilder::new(account, authorization_token)?;
-    let client = client.with_database(database_name);
-    let client = client.with_collection(collection_name);
+    let client = client.into_database_client(&database_name);
+    let client = client.into_collection_client(&collection_name);
 
     let mut doc = Document::new(MySampleStruct {
         id: Cow::Owned(format!("unique_id{}", 500)),
@@ -56,9 +56,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         create_document_response
     );
 
-    let document_client = client
-        .clone()
-        .with_document(doc.document.id.to_string(), partition_keys.clone());
+    let document_client =
+        client.with_document_client(&doc.document.id as &str, partition_keys.clone());
 
     let get_document_response = document_client
         .get_document()
@@ -67,9 +66,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?;
     println!("get_document_response == {:#?}", get_document_response);
 
-    let document_client = client
-        .clone()
-        .with_document("ciccia".to_owned(), partition_keys.clone());
+    let document_client = client.with_document_client("ciccia", partition_keys.clone());
 
     let get_document_response = document_client
         .get_document()

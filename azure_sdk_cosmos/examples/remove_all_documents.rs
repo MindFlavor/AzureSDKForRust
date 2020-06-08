@@ -31,9 +31,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let stream = client.list_documents();
     let mut stream = Box::pin(stream.stream::<serde_json::Value>());
-    // TODO: As soon as the streaming functionality is completed
-    // in Rust substitute this while let Some... into
-    // for each (or whatever the Rust team picks).
     while let Some(res) = stream.next().await {
         for doc in res?.documents {
             documents.push(doc);
@@ -51,8 +48,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
             Value::String(id) => id,
             _ => panic!("cannot find id field as string"),
         };
-        let partition_key = match &doc_as_obj[&partition_key_name] {
-            Value::String(id) => id,
+        let partition_key: PartitionKeys = match &doc_as_obj[&partition_key_name] {
+            Value::String(id) => id.into(),
+            Value::Number(num) => num
+                .as_i64()
+                .expect("only numbers up to i64 are supported")
+                .into(),
             _ => panic!("cannot find supplied partition key as string"),
         };
 
@@ -62,7 +63,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         );
 
         client
-            .with_document_client(id, partition_key.into())
+            .with_document_client(id, partition_key)
             .delete_document()
             .execute()
             .await?;

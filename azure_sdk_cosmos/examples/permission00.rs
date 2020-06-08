@@ -26,10 +26,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let authorization_token = AuthorizationToken::new_master(&master_key)?;
 
     let client = ClientBuilder::new(account.clone(), authorization_token)?;
-    let database_client = client.with_database(database_name);
-    let collection_client = database_client.clone().with_collection(collection_name);
-    let collection2_client = database_client.clone().with_collection(collection_name2);
-    let user_client = database_client.clone().with_user(user_name);
+    let database_client = client.with_database_client(database_name);
+    let collection_client = database_client.with_collection_client(collection_name);
+    let collection2_client = database_client.with_collection_client(collection_name2);
+    let user_client = database_client.with_user_client(user_name);
 
     let get_database_response = database_client.get_database().execute().await?;
     println!("get_database_response == {:#?}", get_database_response);
@@ -47,7 +47,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("create_user_response == {:#?}", create_user_response);
 
     // create the first permission!
-    let permission_client = user_client.clone().with_permission("matrix".to_owned());
+    let permission_client = user_client.with_permission_client("matrix");
     let permission_mode = PermissionMode::Read(get_collection_response.collection);
 
     let create_permission_response = permission_client
@@ -62,7 +62,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     );
 
     // create the second permission!
-    let permission_client = user_client.clone().with_permission("neo".to_owned());
+    let permission_client = user_client.with_permission_client("neo");
     let permission_mode = PermissionMode::All(get_collection2_response.collection);
 
     let create_permission2_response = permission_client

@@ -124,6 +124,14 @@ impl std::convert::From<u64> for ToJsonVector {
     }
 }
 
+impl std::convert::From<i64> for ToJsonVector {
+    fn from(t: i64) -> Self {
+        let mut pk = Self::new();
+        let _ = pk.push(t).unwrap();
+        pk
+    }
+}
+
 impl<'a> std::convert::From<ToJsonVector> for Cow<'a, ToJsonVector> {
     fn from(t: ToJsonVector) -> Self {
         Cow::Owned(t)

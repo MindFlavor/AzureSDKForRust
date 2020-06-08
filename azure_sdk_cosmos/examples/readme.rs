@@ -47,11 +47,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let authorization_token = AuthorizationToken::new_master(&master_key)?;
 
     // Next we will create a Cosmos client.
-    let client = ClientBuilder::new(account, authorization_token.clone())?;
+    let client = ClientBuilder::new(account, authorization_token)?;
     // We know the database so we can obtain a database client.
-    let database_client = client.with_database(database_name);
+    let database_client = client.with_database_client(database_name);
     // We know the collection so we can obtain a collection client.
-    let collection_client = database_client.with_collection(collection_name);
+    let collection_client = database_client.with_collection_client(collection_name);
 
     // TASK 1 - Insert 10 documents
     println!("Inserting 10 documents...");
@@ -65,7 +65,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             a_timestamp: chrono::Utc::now().timestamp(),
         });
 
-        // insert it!
+        // insert it and store the returned session token for later use!
         session_token = Some(
             collection_client
                 .create_document()
@@ -75,7 +75,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .with_is_upsert(true) // this option will overwrite a preexisting document (if any)
                 .execute_with_document(&document_to_insert)
                 .await?
-                .session_token,
+                .session_token, // get only the session token, if everything else was ok!
         );
     }
     // wow that was easy and fast, wasnt'it? :)
@@ -138,11 +138,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
         // to spice the delete a little we use optimistic concurreny
         collection_client
-            .clone()
-            .with_document(
-                document.result.id.to_string(),
-                document.result.a_number.into(),
-            )
+            .with_document_client(&document.result.id as &str, document.result.a_number.into())
             .delete_document()
             .with_consistency_level(session_token.clone())
             .with_if_match_condition((&document.document_attributes).into())
