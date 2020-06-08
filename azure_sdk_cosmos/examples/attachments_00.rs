@@ -74,7 +74,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // reference attachment
     println!("creating");
-    let attachment_client = document_client.with_attachment_client("myref05");
+    let attachment_client = document_client.with_attachment_client("myref06");
     let resp = attachment_client
         .create_reference()
         .with_consistency_level((&ret).into())
@@ -90,8 +90,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // sure to find the just created attachment
     let session_token: ConsistencyLevel = resp.into();
 
+    let resp = attachment_client
+        .get()
+        .with_consistency_level(session_token)
+        .execute()
+        .await?;
+
+    println!("get attachment == {:#?}", resp);
+    let session_token: ConsistencyLevel = resp.into();
+
     println!("replacing");
-    let attachment_client = document_client.with_attachment_client("myref05");
+    let attachment_client = document_client.with_attachment_client("myref06");
     let resp = attachment_client
         .replace_reference()
         .with_consistency_level(session_token)

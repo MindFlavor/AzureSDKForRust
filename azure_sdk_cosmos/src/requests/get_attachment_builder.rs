@@ -207,7 +207,9 @@ where
     DOC: DocumentClient<C, D, COLL>,
 {
     pub async fn execute(&self) -> Result<crate::responses::GetAttachmentResponse, AzureError> {
-        let mut req = self.attachment_client.prepare_request(hyper::Method::GET);
+        let mut req = self
+            .attachment_client
+            .prepare_request_with_attachment_name(hyper::Method::GET);
 
         // add trait headers
         req = IfMatchConditionOption::add_header(self, req);
