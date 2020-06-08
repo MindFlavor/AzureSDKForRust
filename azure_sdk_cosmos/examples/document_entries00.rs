@@ -39,9 +39,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let authorization_token = AuthorizationToken::new_master(&master_key)?;
 
-    let client = ClientBuilder::new(account, authorization_token)?;
-    let client = client.with_database(database_name);
-    let client = client.with_collection(collection_name);
+    let client = ClientBuilder::new(&account, authorization_token)?;
+    let client = client.with_database_client(&database_name);
+    let client = client.with_collection_client(&collection_name);
 
     let mut response = None;
     for i in 0u64..5 {
@@ -123,8 +123,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let partition_keys: PartitionKeys = (&id).into();
 
     let response = client
-        .clone()
-        .with_document(id.to_owned(), partition_keys.to_owned())
+        .with_document_client(&id, partition_keys.clone())
         .get_document()
         .with_consistency_level(session_token)
         .execute::<MySampleStruct>()
@@ -142,15 +141,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     };
     doc.document.document.a_string = "Something else here".into();
 
-    let etag = doc.etag.to_owned();
-
     println!("\n\nReplacing document");
     let replace_document_response = client
         .replace_document()
         .with_partition_keys(&partition_keys)
         .with_document_id(&id)
         .with_consistency_level(ConsistencyLevel::from(&response))
-        .with_if_match_condition(IfMatchCondition::Match(&etag)) // use optimistic concurrency check
+        .with_if_match_condition(IfMatchCondition::Match(&doc.etag)) // use optimistic concurrency check
         .execute_with_document(&doc.document)
         .await?;
 
@@ -166,8 +163,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let partition_keys: PartitionKeys = (&id).into();
 
     let response = client
-        .clone()
-        .with_document(id, partition_keys)
+        .with_document_client(&id, partition_keys)
         .get_document()
         .with_consistency_level((&response).into())
         .execute::<MySampleStruct>()
@@ -183,8 +179,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let id = format!("unique_id{}", i);
         let partition_keys: PartitionKeys = (&id).into();
         client
-            .clone()
-            .with_document(id, partition_keys)
+            .with_document_client(&id, partition_keys)
             .delete_document()
             .with_consistency_level((&response).into())
             .execute()
