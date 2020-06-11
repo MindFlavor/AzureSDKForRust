@@ -15,7 +15,7 @@ categories         = ["api-bindings"]
 edition            = "2018"
 
 [dependencies]
-azure_sdk_core       = { path = "../azure_sdk_core", version = "0.43.3" }
+azure_sdk_core       = { path = "../azure_sdk_core", version = "0.44.0" }
 oauth2               = { version = "3.0.0-alpha.9", features = ["reqwest-010", "futures-03"], default-features = false}
 url                  = "2.1"
 failure              = "0.1"
