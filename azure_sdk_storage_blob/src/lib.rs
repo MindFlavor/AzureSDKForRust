@@ -12,7 +12,7 @@ pub mod container;
 pub mod prelude;
 use azure_sdk_core::No;
 use azure_sdk_storage_core::Client;
-//use std::borrow::Borrow;
+use std::borrow::Borrow;
 
 pub trait Blob<C>
 where
@@ -20,17 +20,17 @@ where
 {
     fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, C, No>;
     fn get_blob<'a>(&'a self) -> blob::requests::GetBlobBuilder<'a, C, No, No>;
-    //fn put_block_blob<'a>(&'a self) -> blob::requests::PutBlockBlobBuilder<'a, No, No, No>;
+    fn put_block_blob<'a>(&'a self) -> blob::requests::PutBlockBlobBuilder<'a, C, No, No, No>;
     //fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, No, No, No>;
     //fn put_append_blob<'a>(&'a self) -> blob::requests::PutAppendBlobBuilder<'a, No, No>;
     //fn put_append_block<'a>(&'a self) -> blob::requests::PutAppendBlockBuilder<'a, No, No, No>;
     //fn update_page<'a>(&'a self) -> blob::requests::UpdatePageBuilder<'a, No, No, No, No>;
     //fn clear_page<'a>(&'a self) -> blob::requests::ClearPageBuilder<'a, No, No, No>;
     //fn put_block<'a>(&'a self) -> blob::requests::PutBlockBuilder<'a, No, No, No, No>;
-    //fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, No, No, No>;
-    //fn put_block_list<'a, T: Borrow<[u8]> + 'a>(
-    //    &'a self,
-    //) -> blob::requests::PutBlockListBuilder<'a, T, No, No, No>;
+    fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, C, No, No, No>;
+    fn put_block_list<'a, T: Borrow<[u8]> + 'a>(
+        &'a self,
+    ) -> blob::requests::PutBlockListBuilder<'a, C, T, No, No, No>;
     //fn acquire_blob_lease<'a>(&'a self) -> blob::requests::AcquireBlobLeaseBuilder<'a, No, No, No>;
     //fn renew_blob_lease<'a>(&'a self) -> blob::requests::RenewBlobLeaseBuilder<'a, No, No, No>;
     //fn change_blob_lease<'a>(
@@ -77,9 +77,9 @@ where
         blob::requests::GetBlobBuilder::new(self)
     }
 
-    //fn put_block_blob<'a>(&'a self) -> blob::requests::PutBlockBlobBuilder<'a, No, No, No> {
-    //    blob::requests::PutBlockBlobBuilder::new(self)
-    //}
+    fn put_block_blob<'a>(&'a self) -> blob::requests::PutBlockBlobBuilder<'a, C, No, No, No> {
+        blob::requests::PutBlockBlobBuilder::new(self)
+    }
 
     //fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, No, No, No> {
     //    blob::requests::PutPageBlobBuilder::new(self)
@@ -105,15 +105,15 @@ where
     //    blob::requests::PutBlockBuilder::new(self)
     //}
 
-    //fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, No, No, No> {
-    //    blob::requests::GetBlockListBuilder::new(self)
-    //}
+    fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, C, No, No, No> {
+        blob::requests::GetBlockListBuilder::new(self)
+    }
 
-    //fn put_block_list<'a, T: Borrow<[u8]> + 'a>(
-    //    &'a self,
-    //) -> blob::requests::PutBlockListBuilder<'a, T, No, No, No> {
-    //    blob::requests::PutBlockListBuilder::new(self)
-    //}
+    fn put_block_list<'a, T: Borrow<[u8]> + 'a>(
+        &'a self,
+    ) -> blob::requests::PutBlockListBuilder<'a, C, T, No, No, No> {
+        blob::requests::PutBlockListBuilder::new(self)
+    }
 
     //fn acquire_blob_lease<'a>(&'a self) -> blob::requests::AcquireBlobLeaseBuilder<'a, No, No, No> {
     //    blob::requests::AcquireBlobLeaseBuilder::new(self)
