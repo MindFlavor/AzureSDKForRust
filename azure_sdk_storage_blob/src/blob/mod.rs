@@ -14,8 +14,6 @@ mod block_with_size_list;
 pub use self::block_with_size_list::BlockWithSizeList;
 mod block_list;
 pub use self::block_list::BlockList;
-mod shared_access;
-pub use self::shared_access::SignedUrlBuilder;
 pub mod requests;
 pub mod responses;
 use azure_sdk_core::headers::{

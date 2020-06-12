@@ -11,12 +11,13 @@ use azure_sdk_storage_core::{
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, SignatureSet>
+pub struct SignedUrlBuilder<'a, C, ContainerNameSet, BlobNameSet, SignatureSet>
 where
+    C: Client,
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
 {
-    client: &'a KeyClient,
+    client: &'a C,
     p_container_name: PhantomData<ContainerNameSet>,
     p_blob_name: PhantomData<BlobNameSet>,
     p_signature: PhantomData<SignatureSet>,
@@ -25,9 +26,12 @@ where
     signature: Option<&'a SharedAccessSignature>,
 }
 
-impl<'a> SignedUrlBuilder<'a, No, No, No> {
-    pub fn new(client: &'a KeyClient) -> SignedUrlBuilder<'a, No, No, No> {
-        SignedUrlBuilder {
+impl<'a, C> SignedUrlBuilder<'a, C, No, No, No>
+where
+    C: Client,
+{
+    pub fn new(client: &'a C) -> Self {
+        Self {
             client,
             p_container_name: PhantomData {},
             container_name: None,
@@ -39,22 +43,24 @@ impl<'a> SignedUrlBuilder<'a, No, No, No> {
     }
 }
 
-impl<'a, ContainerNameSet, BlobNameSet, SignatureSet> KeyClientRequired<'a>
-    for SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, SignatureSet>
+impl<'a, C, ContainerNameSet, BlobNameSet, SignatureSet> ClientRequired<'a, C>
+    for SignedUrlBuilder<'a, C, ContainerNameSet, BlobNameSet, SignatureSet>
 where
+    C: Client,
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
     SignatureSet: ToAssign,
 {
     #[inline]
-    fn key_client(&self) -> &'a KeyClient {
-        self.client
+    fn client(&self) -> &'a C {
+        &self.client
     }
 }
 
-impl<'a, BlobNameSet, SignatureSet> ContainerNameRequired<'a>
-    for SignedUrlBuilder<'a, Yes, BlobNameSet, SignatureSet>
+impl<'a, C, BlobNameSet, SignatureSet> ContainerNameRequired<'a>
+    for SignedUrlBuilder<'a, C, Yes, BlobNameSet, SignatureSet>
 where
+    C: Client,
     BlobNameSet: ToAssign,
     SignatureSet: ToAssign,
 {
@@ -64,9 +70,10 @@ where
     }
 }
 
-impl<'a, ContainerNameSet, SignatureSet> BlobNameRequired<'a>
-    for SignedUrlBuilder<'a, ContainerNameSet, Yes, SignatureSet>
+impl<'a, C, ContainerNameSet, SignatureSet> BlobNameRequired<'a>
+    for SignedUrlBuilder<'a, C, ContainerNameSet, Yes, SignatureSet>
 where
+    C: Client,
     ContainerNameSet: ToAssign,
     SignatureSet: ToAssign,
 {
@@ -76,9 +83,10 @@ where
     }
 }
 
-impl<'a, ContainerNameSet, BlobNameSet> SharedAccessSignatureRequired<'a>
-    for SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, Yes>
+impl<'a, C, ContainerNameSet, BlobNameSet> SharedAccessSignatureRequired<'a>
+    for SignedUrlBuilder<'a, C, ContainerNameSet, BlobNameSet, Yes>
 where
+    C: Client,
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
 {
@@ -88,14 +96,15 @@ where
     }
 }
 
-impl<'a, ContainerNameSet, BlobNameSet, SignatureSet> ContainerNameSupport<'a>
-    for SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, SignatureSet>
+impl<'a, C, ContainerNameSet, BlobNameSet, SignatureSet> ContainerNameSupport<'a>
+    for SignedUrlBuilder<'a, C, ContainerNameSet, BlobNameSet, SignatureSet>
 where
+    C: Client,
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
     SignatureSet: ToAssign,
 {
-    type O = SignedUrlBuilder<'a, Yes, BlobNameSet, SignatureSet>;
+    type O = SignedUrlBuilder<'a, C, Yes, BlobNameSet, SignatureSet>;
 
     #[inline]
     fn with_container_name(self, container_name: &'a str) -> Self::O {
@@ -111,14 +120,15 @@ where
     }
 }
 
-impl<'a, ContainerNameSet, BlobNameSet, SignatureSet> BlobNameSupport<'a>
-    for SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, SignatureSet>
+impl<'a, C, ContainerNameSet, BlobNameSet, SignatureSet> BlobNameSupport<'a>
+    for SignedUrlBuilder<'a, C, ContainerNameSet, BlobNameSet, SignatureSet>
 where
+    C: Client,
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
     SignatureSet: ToAssign,
 {
-    type O = SignedUrlBuilder<'a, ContainerNameSet, Yes, SignatureSet>;
+    type O = SignedUrlBuilder<'a, C, ContainerNameSet, Yes, SignatureSet>;
 
     #[inline]
     fn with_blob_name(self, blob_name: &'a str) -> Self::O {
@@ -134,14 +144,15 @@ where
     }
 }
 
-impl<'a, ContainerNameSet, BlobNameSet, SignatureSet> SharedAccessSignatureSupport<'a>
-    for SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, SignatureSet>
+impl<'a, C, ContainerNameSet, BlobNameSet, SignatureSet> SharedAccessSignatureSupport<'a>
+    for SignedUrlBuilder<'a, C, ContainerNameSet, BlobNameSet, SignatureSet>
 where
+    C: Client,
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
     SignatureSet: ToAssign,
 {
-    type O = SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, Yes>;
+    type O = SignedUrlBuilder<'a, C, ContainerNameSet, BlobNameSet, Yes>;
 
     #[inline]
     fn with_shared_access_signature(self, signature: &'a SharedAccessSignature) -> Self::O {
@@ -157,11 +168,14 @@ where
     }
 }
 
-impl<'a> SignedUrlBuilder<'a, Yes, Yes, Yes> {
+impl<'a, C> SignedUrlBuilder<'a, C, Yes, Yes, Yes>
+where
+    C: Client,
+{
     #[inline]
     pub fn finalize(self) -> String {
         generate_blob_uri(
-            self.key_client(),
+            self.client(),
             self.container_name(),
             self.blob_name(),
             Some(&self.signature.unwrap().token()),
