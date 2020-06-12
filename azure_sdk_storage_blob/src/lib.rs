@@ -21,21 +21,23 @@ where
     fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, C, No>;
     fn get_blob<'a>(&'a self) -> blob::requests::GetBlobBuilder<'a, C, No, No>;
     fn put_block_blob<'a>(&'a self) -> blob::requests::PutBlockBlobBuilder<'a, C, No, No, No>;
-    //fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, No, No, No>;
-    //fn put_append_blob<'a>(&'a self) -> blob::requests::PutAppendBlobBuilder<'a, No, No>;
-    //fn put_append_block<'a>(&'a self) -> blob::requests::PutAppendBlockBuilder<'a, No, No, No>;
-    //fn update_page<'a>(&'a self) -> blob::requests::UpdatePageBuilder<'a, No, No, No, No>;
-    //fn clear_page<'a>(&'a self) -> blob::requests::ClearPageBuilder<'a, No, No, No>;
-    //fn put_block<'a>(&'a self) -> blob::requests::PutBlockBuilder<'a, No, No, No, No>;
+    fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, C, No, No, No>;
+    fn put_append_blob<'a>(&'a self) -> blob::requests::PutAppendBlobBuilder<'a, C, No, No>;
+    fn put_append_block<'a>(&'a self) -> blob::requests::PutAppendBlockBuilder<'a, C, No, No, No>;
+    fn update_page<'a>(&'a self) -> blob::requests::UpdatePageBuilder<'a, C, No, No, No, No>;
+    fn clear_page<'a>(&'a self) -> blob::requests::ClearPageBuilder<'a, C, No, No, No>;
+    fn put_block<'a>(&'a self) -> blob::requests::PutBlockBuilder<'a, C, No, No, No, No>;
     fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, C, No, No, No>;
     fn put_block_list<'a, T: Borrow<[u8]> + 'a>(
         &'a self,
     ) -> blob::requests::PutBlockListBuilder<'a, C, T, No, No, No>;
-    //fn acquire_blob_lease<'a>(&'a self) -> blob::requests::AcquireBlobLeaseBuilder<'a, No, No, No>;
-    //fn renew_blob_lease<'a>(&'a self) -> blob::requests::RenewBlobLeaseBuilder<'a, No, No, No>;
-    //fn change_blob_lease<'a>(
-    //    &'a self,
-    //) -> blob::requests::ChangeBlobLeaseBuilder<'a, No, No, No, No>;
+    fn acquire_blob_lease<'a>(
+        &'a self,
+    ) -> blob::requests::AcquireBlobLeaseBuilder<'a, C, No, No, No>;
+    fn renew_blob_lease<'a>(&'a self) -> blob::requests::RenewBlobLeaseBuilder<'a, C, No, No, No>;
+    fn change_blob_lease<'a>(
+        &'a self,
+    ) -> blob::requests::ChangeBlobLeaseBuilder<'a, C, No, No, No, No>;
     //fn release_blob_lease<'a>(&'a self) -> blob::requests::ReleaseBlobLeaseBuilder<'a, No, No, No>;
     //fn break_blob_lease<'a>(&'a self) -> blob::requests::BreakBlobLeaseBuilder<'a, No, No, No>;
     //fn delete_blob_snapshot<'a>(
@@ -81,29 +83,29 @@ where
         blob::requests::PutBlockBlobBuilder::new(self)
     }
 
-    //fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, No, No, No> {
-    //    blob::requests::PutPageBlobBuilder::new(self)
-    //}
+    fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, C, No, No, No> {
+        blob::requests::PutPageBlobBuilder::new(self)
+    }
 
-    //fn put_append_blob<'a>(&'a self) -> blob::requests::PutAppendBlobBuilder<'a, No, No> {
-    //    blob::requests::PutAppendBlobBuilder::new(self)
-    //}
+    fn put_append_blob<'a>(&'a self) -> blob::requests::PutAppendBlobBuilder<'a, C, No, No> {
+        blob::requests::PutAppendBlobBuilder::new(self)
+    }
 
-    //fn put_append_block<'a>(&'a self) -> blob::requests::PutAppendBlockBuilder<'a, No, No, No> {
-    //    blob::requests::PutAppendBlockBuilder::new(self)
-    //}
+    fn put_append_block<'a>(&'a self) -> blob::requests::PutAppendBlockBuilder<'a, C, No, No, No> {
+        blob::requests::PutAppendBlockBuilder::new(self)
+    }
 
-    //fn update_page<'a>(&'a self) -> blob::requests::UpdatePageBuilder<'a, No, No, No, No> {
-    //    blob::requests::UpdatePageBuilder::new(self)
-    //}
+    fn update_page<'a>(&'a self) -> blob::requests::UpdatePageBuilder<'a, C, No, No, No, No> {
+        blob::requests::UpdatePageBuilder::new(self)
+    }
 
-    //fn clear_page<'a>(&'a self) -> blob::requests::ClearPageBuilder<'a, No, No, No> {
-    //    blob::requests::ClearPageBuilder::new(self)
-    //}
+    fn clear_page<'a>(&'a self) -> blob::requests::ClearPageBuilder<'a, C, No, No, No> {
+        blob::requests::ClearPageBuilder::new(self)
+    }
 
-    //fn put_block<'a>(&'a self) -> blob::requests::PutBlockBuilder<'a, No, No, No, No> {
-    //    blob::requests::PutBlockBuilder::new(self)
-    //}
+    fn put_block<'a>(&'a self) -> blob::requests::PutBlockBuilder<'a, C, No, No, No, No> {
+        blob::requests::PutBlockBuilder::new(self)
+    }
 
     fn get_block_list<'a>(&'a self) -> blob::requests::GetBlockListBuilder<'a, C, No, No, No> {
         blob::requests::GetBlockListBuilder::new(self)
@@ -115,19 +117,21 @@ where
         blob::requests::PutBlockListBuilder::new(self)
     }
 
-    //fn acquire_blob_lease<'a>(&'a self) -> blob::requests::AcquireBlobLeaseBuilder<'a, No, No, No> {
-    //    blob::requests::AcquireBlobLeaseBuilder::new(self)
-    //}
+    fn acquire_blob_lease<'a>(
+        &'a self,
+    ) -> blob::requests::AcquireBlobLeaseBuilder<'a, C, No, No, No> {
+        blob::requests::AcquireBlobLeaseBuilder::new(self)
+    }
 
-    //fn renew_blob_lease<'a>(&'a self) -> blob::requests::RenewBlobLeaseBuilder<'a, No, No, No> {
-    //    blob::requests::RenewBlobLeaseBuilder::new(self)
-    //}
+    fn renew_blob_lease<'a>(&'a self) -> blob::requests::RenewBlobLeaseBuilder<'a, C, No, No, No> {
+        blob::requests::RenewBlobLeaseBuilder::new(self)
+    }
 
-    //fn change_blob_lease<'a>(
-    //    &'a self,
-    //) -> blob::requests::ChangeBlobLeaseBuilder<'a, No, No, No, No> {
-    //    blob::requests::ChangeBlobLeaseBuilder::new(self)
-    //}
+    fn change_blob_lease<'a>(
+        &'a self,
+    ) -> blob::requests::ChangeBlobLeaseBuilder<'a, C, No, No, No, No> {
+        blob::requests::ChangeBlobLeaseBuilder::new(self)
+    }
 
     //fn release_blob_lease<'a>(&'a self) -> blob::requests::ReleaseBlobLeaseBuilder<'a, No, No, No> {
     //    blob::requests::ReleaseBlobLeaseBuilder::new(self)
