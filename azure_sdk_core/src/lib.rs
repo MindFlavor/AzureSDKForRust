@@ -764,6 +764,15 @@ pub fn add_content_md5_header(content_md5: &[u8], builder: Builder) -> Builder {
     builder.header(CONTENT_MD5, &s as &str)
 }
 
+pub trait ChunkSizeSupport {
+    type O;
+    fn with_chunk_size(self, chunk_size: u64) -> Self::O;
+}
+
+pub trait ChunkSizeOption {
+    fn chunk_size(&self) -> u64;
+}
+
 pub trait RangeSupport<'a> {
     type O;
     fn with_range(self, _: &'a range::Range) -> Self::O;
