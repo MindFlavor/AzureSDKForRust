@@ -20,11 +20,11 @@ pub enum ServiceType {
     Table,
 }
 
-const AZURE_VERSION: &str = "2018-03-28";
-const SAS_VERSION: &str = "2019-02-02";
+pub(crate) const AZURE_VERSION: &str = "2019-07-07";
+pub(crate) const SAS_VERSION: &str = "2019-02-02";
 
-pub const HEADER_VERSION: &str = "x-ms-version"; //=> [String] }
-pub const HEADER_DATE: &str = "x-ms-date"; //=> [String] }
+pub(crate) const HEADER_VERSION: &str = "x-ms-version"; //=> [String] }
+pub(crate) const HEADER_DATE: &str = "x-ms-date"; //=> [String] }
 
 fn generate_authorization<CE: ClientEndpoint>(
     client_endpoint: &CE,

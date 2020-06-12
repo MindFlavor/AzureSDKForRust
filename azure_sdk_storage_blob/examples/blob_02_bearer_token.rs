@@ -9,19 +9,21 @@ use std::error::Error;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // First we retrieve the account name and master key from environment variables.
-    let account =
-        std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
-    let master_key =
-        std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    let container = std::env::args()
+    let account = std::env::args()
         .nth(1)
-        .expect("please specify container name as command line parameter");
-    let blob = std::env::args()
+        .expect("please specify the account name as first command line parameter");
+    let container = std::env::args()
         .nth(2)
-        .expect("please specify blob name as command line parameter");
+        .expect("please specify the container name as second command line parameter");
+    let blob = std::env::args()
+        .nth(3)
+        .expect("please specify the blob name as third command line parameter");
+    let bearer_token = std::env::args()
+        .nth(4)
+        .expect("please specify the bearer token as fourth command line parameter");
 
-    let client = client::with_access_key(&account, &master_key);
+    let client = client::with_bearer_token(account, bearer_token);
 
     trace!("Requesting blob");
 

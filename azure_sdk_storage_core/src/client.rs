@@ -1,8 +1,9 @@
 use crate::key_client::get_sas_token_parms;
-use crate::{ConnectionString, KeyClient};
+use crate::{BearerTokenClient, ConnectionString, KeyClient};
 use azure_sdk_core::errors::AzureError;
 use hyper::{self, Method};
 use hyper_rustls::HttpsConnector;
+use std::borrow::Cow;
 use url::Url;
 
 pub trait Client {
@@ -28,45 +29,50 @@ pub trait Client {
     ) -> Result<hyper::client::ResponseFuture, AzureError>
     where
         F: FnOnce(::http::request::Builder) -> ::http::request::Builder;
+}
 
-    //
-    // def impl
-    //
-    fn new(account: &str, key: &str) -> Result<KeyClient, AzureError> {
-        KeyClient::azure(account, key)
-    }
+//
+// def impl
+//
+#[deprecated(
+    since = "0.44.0",
+    note = "Please use the with_access_key function instead"
+)]
+pub fn new(account: &str, key: &str) -> KeyClient {
+    with_access_key(account, key)
+}
 
-    fn azure_sas(account: &str, sas_token: &str) -> Result<KeyClient, AzureError> {
-        let client = hyper::Client::builder().build(HttpsConnector::new());
-        let params = get_sas_token_parms(sas_token);
+pub fn with_azure_sas(account: &str, sas_token: &str) -> KeyClient {
+    let client = hyper::Client::builder().build(HttpsConnector::new());
+    let params = get_sas_token_parms(sas_token);
 
-        Ok(KeyClient::new(
-            account.to_owned(),
-            String::new(),
-            Some(params),
-            client,
-            format!("https://{}.blob.core.windows.net", account),
-            format!("https://{}.table.core.windows.net", account),
-        ))
-    }
+    KeyClient::new(
+        account.to_owned(),
+        String::new(),
+        Some(params),
+        client,
+        format!("https://{}.blob.core.windows.net", account),
+        format!("https://{}.table.core.windows.net", account),
+    )
+}
 
-    fn azure(account: &str, key: &str) -> Result<KeyClient, AzureError> {
-        let client = hyper::Client::builder().build(HttpsConnector::new());
+pub fn with_access_key(account: &str, key: &str) -> KeyClient {
+    let client = hyper::Client::builder().build(HttpsConnector::new());
 
-        Ok(KeyClient::new(
-            account.to_owned(),
-            key.to_owned(),
-            None,
-            client,
-            format!("https://{}.blob.core.windows.net", account),
-            format!("https://{}.table.core.windows.net", account),
-        ))
-    }
+    KeyClient::new(
+        account.to_owned(),
+        key.to_owned(),
+        None,
+        client,
+        format!("https://{}.blob.core.windows.net", account),
+        format!("https://{}.table.core.windows.net", account),
+    )
+}
 
-    fn from_connection_string(connection_string: &str) -> Result<KeyClient, AzureError> {
-        let client = hyper::Client::builder().build(HttpsConnector::new());
+pub fn from_connection_string(connection_string: &str) -> Result<KeyClient, AzureError> {
+    let client = hyper::Client::builder().build(HttpsConnector::new());
 
-        match ConnectionString::new(connection_string)? {
+    match ConnectionString::new(connection_string)? {
             ConnectionString {
                 account_name: Some(account),
                 account_key: Some(_),
@@ -114,23 +120,33 @@ pub trait Client {
                 ))
             }
         }
-    }
+}
 
-    fn emulator(blob_storage_url: &Url, table_storage_url: &Url) -> Result<KeyClient, AzureError> {
-        let client = hyper::Client::builder().build(HttpsConnector::new());
+pub fn with_bearer_token<'a, A, BT>(account: A, bearer_token: BT) -> BearerTokenClient<'a>
+where
+    A: Into<Cow<'a, str>>,
+    BT: Into<Cow<'a, str>>,
+{
+    let client = hyper::Client::builder().build(HttpsConnector::new());
 
-        let blob_uri = format!("{}devstoreaccount1", blob_storage_url.as_str());
-        debug!("blob_uri == {}", blob_uri);
-        let table_uri = format!("{}devstoreaccount1", table_storage_url.as_str());
-        debug!("table_uri == {}", table_uri);
+    BearerTokenClient::new(account.into(), bearer_token.into(), client)
+}
 
-        Ok(KeyClient::new(
-            "devstoreaccount1".to_owned(),
-            "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==".to_owned(),
-            None,
-            client,
-            blob_uri,
-            table_uri,
-        ))
-    }
+pub fn with_emulator(blob_storage_url: &Url, table_storage_url: &Url) -> KeyClient {
+    let client = hyper::Client::builder().build(HttpsConnector::new());
+
+    let blob_uri = format!("{}devstoreaccount1", blob_storage_url.as_str());
+    debug!("blob_uri == {}", blob_uri);
+    let table_uri = format!("{}devstoreaccount1", table_storage_url.as_str());
+    debug!("table_uri == {}", table_uri);
+
+    KeyClient::new(
+        "devstoreaccount1".to_owned(),
+        "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
+            .to_owned(),
+        None,
+        client,
+        blob_uri,
+        table_uri,
+    )
 }
