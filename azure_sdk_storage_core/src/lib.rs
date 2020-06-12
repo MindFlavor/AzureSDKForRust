@@ -18,8 +18,9 @@ mod into_azure_path;
 pub mod prelude;
 pub use self::into_azure_path::IntoAzurePath;
 mod blob_sas_builder;
+mod client;
+pub use client::Client;
 use http::HeaderMap;
-use hyper::{self, Method};
 mod connection_string;
 mod connection_string_builder;
 pub use self::connection_string::{ConnectionString, EndpointProtocol};
@@ -30,31 +31,6 @@ mod hyper_client_endpoint;
 pub mod shared_access_signature;
 pub use client_endpoint::ClientEndpoint;
 pub use hyper_client_endpoint::HyperClientEndpoint;
-
-pub trait Client {
-    fn blob_uri(&self) -> &str;
-    fn table_uri(&self) -> &str;
-
-    fn perform_request<F>(
-        &self,
-        uri: &str,
-        method: &Method,
-        headers_func: F,
-        request_body: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder;
-
-    fn perform_table_request<F>(
-        &self,
-        segment: &str,
-        method: &Method,
-        headers_func: F,
-        request_str: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder;
-}
 
 pub trait ClientRequired<'a, C>
 where
