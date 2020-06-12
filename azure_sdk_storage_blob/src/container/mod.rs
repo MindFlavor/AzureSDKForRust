@@ -1,5 +1,5 @@
-pub mod requests;
-pub mod responses;
+//pub mod requests;
+//pub mod responses;
 
 use azure_sdk_core::{
     errors::AzureError,
@@ -9,9 +9,8 @@ use azure_sdk_core::{
     },
     lease::{LeaseDuration, LeaseState, LeaseStatus},
     parsing::{cast_must, cast_optional, traverse},
-    ContainerNameRequired,
 };
-use azure_sdk_storage_core::ClientRequired;
+use azure_sdk_storage_core::prelude::*;
 use chrono::{DateTime, Utc};
 use http::request::Builder;
 use http::HeaderMap;
@@ -244,21 +243,25 @@ impl Container {
 }
 
 #[inline]
-pub(crate) fn generate_container_uri<'a, T>(t: &T, params: Option<&str>) -> String
+pub(crate) fn generate_container_uri<'a, C>(
+    c: &C,
+    container_name: &str,
+    params: Option<&str>,
+) -> String
 where
-    T: ClientRequired<'a> + ContainerNameRequired<'a>,
+    C: Client,
 {
     match params {
         Some(ref params) => format!(
             "{}/{}?{}",
-            t.client().blob_uri(),
-            form_urlencoded::byte_serialize(t.container_name().as_bytes()).collect::<String>(),
+            c.blob_uri(),
+            form_urlencoded::byte_serialize(container_name.as_bytes()).collect::<String>(),
             params
         ),
         None => format!(
             "{}/{}",
-            t.client().blob_uri(),
-            form_urlencoded::byte_serialize(t.container_name().as_bytes()).collect::<String>(),
+            c.blob_uri(),
+            form_urlencoded::byte_serialize(container_name.as_bytes()).collect::<String>(),
         ),
     }
 }

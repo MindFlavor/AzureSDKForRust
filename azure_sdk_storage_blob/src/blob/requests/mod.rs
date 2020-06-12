@@ -11,11 +11,11 @@
 //mod delete_blob_snapshot_builder;
 //pub use self::delete_blob_snapshot_builder::DeleteBlobSnapshotBuilder;
 mod get_blob_builder;
-pub use self::get_blob_builder::GetBlobBuilder;
 //mod get_block_list_builder;
 //pub use self::get_block_list_builder::GetBlockListBuilder;
-//mod list_blobs_builder;
-//pub use self::list_blobs_builder::ListBlobBuilder;
+mod list_blobs_builder;
+pub use self::get_blob_builder::GetBlobBuilder;
+pub use self::list_blobs_builder::ListBlobBuilder;
 //mod put_append_blob_builder;
 //pub use self::put_append_blob_builder::PutAppendBlobBuilder;
 //mod put_append_block_builder;

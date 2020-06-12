@@ -8,7 +8,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate azure_sdk_core;
 pub mod blob;
-//pub mod container;
+pub mod container;
 pub mod prelude;
 use azure_sdk_core::No;
 use azure_sdk_storage_core::Client;
@@ -18,7 +18,7 @@ pub trait Blob<C>
 where
     C: Client,
 {
-    //fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, No>;
+    fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, C, No>;
     fn get_blob<'a>(&'a self) -> blob::requests::GetBlobBuilder<'a, C, No, No>;
     //fn put_block_blob<'a>(&'a self) -> blob::requests::PutBlockBlobBuilder<'a, No, No, No>;
     //fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, No, No, No>;
@@ -69,9 +69,9 @@ impl<C> Blob<C> for C
 where
     C: Client,
 {
-    //fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, No> {
-    //    blob::requests::ListBlobBuilder::new(self)
-    //}
+    fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, C, No> {
+        blob::requests::ListBlobBuilder::new(self)
+    }
 
     fn get_blob<'a>(&'a self) -> blob::requests::GetBlobBuilder<'a, C, No, No> {
         blob::requests::GetBlobBuilder::new(self)
