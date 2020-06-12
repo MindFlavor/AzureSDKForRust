@@ -38,12 +38,14 @@ where
     fn change_blob_lease<'a>(
         &'a self,
     ) -> blob::requests::ChangeBlobLeaseBuilder<'a, C, No, No, No, No>;
-    //fn release_blob_lease<'a>(&'a self) -> blob::requests::ReleaseBlobLeaseBuilder<'a, No, No, No>;
-    //fn break_blob_lease<'a>(&'a self) -> blob::requests::BreakBlobLeaseBuilder<'a, No, No, No>;
-    //fn delete_blob_snapshot<'a>(
-    //    &'a self,
-    //) -> blob::requests::DeleteBlobSnapshotBuilder<'a, No, No, No>;
-    //fn delete_blob<'a>(&'a self) -> blob::requests::DeleteBlobBuilder<'a, No, No, No>;
+    fn release_blob_lease<'a>(
+        &'a self,
+    ) -> blob::requests::ReleaseBlobLeaseBuilder<'a, C, No, No, No>;
+    fn break_blob_lease<'a>(&'a self) -> blob::requests::BreakBlobLeaseBuilder<'a, C, No, No, No>;
+    fn delete_blob_snapshot<'a>(
+        &'a self,
+    ) -> blob::requests::DeleteBlobSnapshotBuilder<'a, C, No, No, No>;
+    fn delete_blob<'a>(&'a self) -> blob::requests::DeleteBlobBuilder<'a, C, No, No, No>;
     //fn stream_list_blobs<'a>(&'a self) -> blob::ListBlobStreamBuilder<'a, No>;
     //fn stream_blob<'a>(&'a self) -> blob::BlobStreamBuilder<'a, No, No, No>;
     //fn generate_signed_blob_url<'a>(&'a self) -> blob::SignedUrlBuilder<'a, No, No, No>;
@@ -133,23 +135,25 @@ where
         blob::requests::ChangeBlobLeaseBuilder::new(self)
     }
 
-    //fn release_blob_lease<'a>(&'a self) -> blob::requests::ReleaseBlobLeaseBuilder<'a, No, No, No> {
-    //    blob::requests::ReleaseBlobLeaseBuilder::new(self)
-    //}
+    fn release_blob_lease<'a>(
+        &'a self,
+    ) -> blob::requests::ReleaseBlobLeaseBuilder<'a, C, No, No, No> {
+        blob::requests::ReleaseBlobLeaseBuilder::new(self)
+    }
 
-    //fn break_blob_lease<'a>(&'a self) -> blob::requests::BreakBlobLeaseBuilder<'a, No, No, No> {
-    //    blob::requests::BreakBlobLeaseBuilder::new(self)
-    //}
+    fn break_blob_lease<'a>(&'a self) -> blob::requests::BreakBlobLeaseBuilder<'a, C, No, No, No> {
+        blob::requests::BreakBlobLeaseBuilder::new(self)
+    }
 
-    //fn delete_blob_snapshot<'a>(
-    //    &'a self,
-    //) -> blob::requests::DeleteBlobSnapshotBuilder<'a, No, No, No> {
-    //    blob::requests::DeleteBlobSnapshotBuilder::new(self)
-    //}
+    fn delete_blob_snapshot<'a>(
+        &'a self,
+    ) -> blob::requests::DeleteBlobSnapshotBuilder<'a, C, No, No, No> {
+        blob::requests::DeleteBlobSnapshotBuilder::new(self)
+    }
 
-    //fn delete_blob<'a>(&'a self) -> blob::requests::DeleteBlobBuilder<'a, No, No, No> {
-    //    blob::requests::DeleteBlobBuilder::new(self)
-    //}
+    fn delete_blob<'a>(&'a self) -> blob::requests::DeleteBlobBuilder<'a, C, No, No, No> {
+        blob::requests::DeleteBlobBuilder::new(self)
+    }
 
     //fn stream_list_blobs<'a>(&'a self) -> blob::ListBlobStreamBuilder<'a, No> {
     //    blob::ListBlobStreamBuilder::new(self)
