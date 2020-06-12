@@ -1,7 +1,7 @@
 pub use crate::blob_sas_builder::BlobSASBuilder;
-pub use crate::client::Client;
 pub use crate::container_sas_builder::ContainerSASBuilder;
-pub use crate::ClientRequired;
+pub use crate::key_client::KeyClient;
+pub use crate::{Client, ClientRequired, KeyClientRequired};
 pub use crate::{CopyId, IPRange};
 
 pub use crate::SharedAccessSignatureSupport;

@@ -3,9 +3,9 @@ use azure_sdk_core::{
     BlobNameRequired, BlobNameSupport, ContainerNameRequired, ContainerNameSupport, No, ToAssign,
     Yes,
 };
-use azure_sdk_storage_core::client::Client;
+use azure_sdk_storage_core::prelude::*;
 use azure_sdk_storage_core::{
-    shared_access_signature::SharedAccessSignature, ClientRequired, SharedAccessSignatureRequired,
+    shared_access_signature::SharedAccessSignature, SharedAccessSignatureRequired,
     SharedAccessSignatureSupport,
 };
 use std::marker::PhantomData;
@@ -16,7 +16,7 @@ where
     ContainerNameSet: ToAssign,
     BlobNameSet: ToAssign,
 {
-    client: &'a Client,
+    client: &'a KeyClient,
     p_container_name: PhantomData<ContainerNameSet>,
     p_blob_name: PhantomData<BlobNameSet>,
     p_signature: PhantomData<SignatureSet>,
@@ -26,7 +26,7 @@ where
 }
 
 impl<'a> SignedUrlBuilder<'a, No, No, No> {
-    pub fn new(client: &'a Client) -> SignedUrlBuilder<'a, No, No, No> {
+    pub fn new(client: &'a KeyClient) -> SignedUrlBuilder<'a, No, No, No> {
         SignedUrlBuilder {
             client,
             p_container_name: PhantomData {},
@@ -39,7 +39,7 @@ impl<'a> SignedUrlBuilder<'a, No, No, No> {
     }
 }
 
-impl<'a, ContainerNameSet, BlobNameSet, SignatureSet> ClientRequired<'a>
+impl<'a, ContainerNameSet, BlobNameSet, SignatureSet> KeyClientRequired<'a>
     for SignedUrlBuilder<'a, ContainerNameSet, BlobNameSet, SignatureSet>
 where
     ContainerNameSet: ToAssign,
@@ -47,7 +47,7 @@ where
     SignatureSet: ToAssign,
 {
     #[inline]
-    fn client(&self) -> &'a Client {
+    fn key_client(&self) -> &'a KeyClient {
         self.client
     }
 }
@@ -160,6 +160,11 @@ where
 impl<'a> SignedUrlBuilder<'a, Yes, Yes, Yes> {
     #[inline]
     pub fn finalize(self) -> String {
-        generate_blob_uri(&self, Some(&self.signature.unwrap().token()))
+        generate_blob_uri(
+            self.key_client(),
+            self.container_name(),
+            self.blob_name(),
+            Some(&self.signature.unwrap().token()),
+        )
     }
 }

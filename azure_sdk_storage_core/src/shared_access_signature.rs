@@ -1,4 +1,4 @@
-use super::{Client, ClientRequired};
+use super::{KeyClient, KeyClientRequired};
 use crate::client_endpoint::ClientEndpoint;
 use azure_sdk_core::{No, ToAssign};
 use base64::encode;
@@ -143,7 +143,7 @@ pub struct SharedAccessSignature {
 }
 
 impl SharedAccessSignature {
-    pub fn new(client: &Client) -> SharedAccessSignatureBuilder<No, No, No, No> {
+    pub fn new(client: &KeyClient) -> SharedAccessSignatureBuilder<No, No, No, No> {
         SharedAccessSignatureBuilder::new(client)
     }
 
@@ -249,7 +249,7 @@ pub struct SharedAccessSignatureBuilder<
     SasExpirySet: ToAssign,
     SasPermissionsSet: ToAssign,
 {
-    client: &'a Client,
+    client: &'a KeyClient,
     signed_version: SasVersion,
     p_signed_resource: PhantomData<SasResourceSet>,
     signed_resource: Option<SasResource>,
@@ -265,7 +265,7 @@ pub struct SharedAccessSignatureBuilder<
 }
 
 impl<'a> SharedAccessSignatureBuilder<'a, No, No, No, No> {
-    pub fn new(client: &'a Client) -> Self {
+    pub fn new(client: &'a KeyClient) -> Self {
         Self {
             client,
             signed_version: SasVersion::V20181109,
@@ -300,7 +300,7 @@ impl<'a> SharedAccessSignatureBuilder<'a, No, No, No, No> {
     }
 }
 
-impl<'a, SasResourceSet, SasResourceTypeSet, SasExpirySet, SasPermissionsSet> ClientRequired<'a>
+impl<'a, SasResourceSet, SasResourceTypeSet, SasExpirySet, SasPermissionsSet> KeyClientRequired<'a>
     for SharedAccessSignatureBuilder<
         'a,
         SasResourceSet,
@@ -315,7 +315,7 @@ where
     SasPermissionsSet: ToAssign,
 {
     #[inline]
-    fn client(&self) -> &'a Client {
+    fn key_client(&self) -> &'a KeyClient {
         self.client
     }
 }
@@ -324,7 +324,7 @@ pub trait ClientSharedAccessSignature {
     fn shared_access_signature(&self) -> SharedAccessSignatureBuilder<'_, No, No, No, No>;
 }
 
-impl ClientSharedAccessSignature for Client {
+impl ClientSharedAccessSignature for KeyClient {
     /// Grant restricted access rights to Azure Storage resources ([Azure documentation](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature)).
     fn shared_access_signature(&self) -> SharedAccessSignatureBuilder<'_, No, No, No, No> {
         SharedAccessSignature::new(self)
