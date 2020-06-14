@@ -55,22 +55,25 @@ where
     ) -> blob::requests::SignedUrlBuilder<'a, C, No, No, No>;
 }
 
-//pub trait Container {
-//    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, No, No>;
-//    fn delete_container<'a>(&'a self) -> container::requests::DeleteBuilder<'a, No>;
-//    fn list_containers<'a>(&'a self) -> container::requests::ListBuilder<'a>;
-//    fn get_container_acl<'a>(&'a self) -> container::requests::GetACLBuilder<'a, No>;
-//    fn set_container_acl<'a>(&'a self) -> container::requests::SetACLBuilder<'a, No, No>;
-//    fn get_container_properties<'a>(&'a self) -> container::requests::GetPropertiesBuilder<'a, No>;
-//    fn acquire_container_lease<'a>(
-//        &'a self,
-//    ) -> container::requests::AcquireLeaseBuilder<'a, No, No>;
-//    fn renew_container_lease<'a>(&'a self) -> container::requests::RenewLeaseBuilder<'a, No, No>;
-//    fn release_container_lease<'a>(
-//        &'a self,
-//    ) -> container::requests::ReleaseLeaseBuilder<'a, No, No>;
-//    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, No>;
-//}
+pub trait Container<C>
+where
+    C: Client,
+{
+    //    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, No, No>;
+    //    fn delete_container<'a>(&'a self) -> container::requests::DeleteBuilder<'a, No>;
+    //    fn list_containers<'a>(&'a self) -> container::requests::ListBuilder<'a>;
+    //    fn get_container_acl<'a>(&'a self) -> container::requests::GetACLBuilder<'a, No>;
+    //    fn set_container_acl<'a>(&'a self) -> container::requests::SetACLBuilder<'a, No, No>;
+    //    fn get_container_properties<'a>(&'a self) -> container::requests::GetPropertiesBuilder<'a, No>;
+    fn acquire_container_lease<'a>(
+        &'a self,
+    ) -> container::requests::AcquireLeaseBuilder<'a, C, No, No>;
+    //    fn renew_container_lease<'a>(&'a self) -> container::requests::RenewLeaseBuilder<'a, No, No>;
+    //    fn release_container_lease<'a>(
+    //        &'a self,
+    //    ) -> container::requests::ReleaseLeaseBuilder<'a, No, No>;
+    //    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, No>;
+}
 
 impl<C> Blob<C> for C
 where
@@ -175,48 +178,51 @@ where
     }
 }
 
-//impl Container for Client {
-//    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, No, No> {
-//        container::requests::CreateBuilder::new(self)
-//    }
-//
-//    fn delete_container<'a>(&'a self) -> container::requests::DeleteBuilder<'a, No> {
-//        container::requests::DeleteBuilder::new(self)
-//    }
-//
-//    fn list_containers<'a>(&'a self) -> container::requests::ListBuilder<'a> {
-//        container::requests::ListBuilder::new(self)
-//    }
-//
-//    fn get_container_acl<'a>(&'a self) -> container::requests::GetACLBuilder<'a, No> {
-//        container::requests::GetACLBuilder::new(self)
-//    }
-//
-//    fn set_container_acl<'a>(&'a self) -> container::requests::SetACLBuilder<'a, No, No> {
-//        container::requests::SetACLBuilder::new(self)
-//    }
-//
-//    fn get_container_properties<'a>(&'a self) -> container::requests::GetPropertiesBuilder<'a, No> {
-//        container::requests::GetPropertiesBuilder::new(self)
-//    }
-//
-//    fn acquire_container_lease<'a>(
-//        &'a self,
-//    ) -> container::requests::AcquireLeaseBuilder<'a, No, No> {
-//        container::requests::AcquireLeaseBuilder::new(self)
-//    }
-//
-//    fn renew_container_lease<'a>(&'a self) -> container::requests::RenewLeaseBuilder<'a, No, No> {
-//        container::requests::RenewLeaseBuilder::new(self)
-//    }
-//
-//    fn release_container_lease<'a>(
-//        &'a self,
-//    ) -> container::requests::ReleaseLeaseBuilder<'a, No, No> {
-//        container::requests::ReleaseLeaseBuilder::new(self)
-//    }
-//
-//    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, No> {
-//        container::requests::BreakLeaseBuilder::new(self)
-//    }
-//}
+impl<C> Container<C> for C
+where
+    C: Client,
+{
+    //    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, No, No> {
+    //        container::requests::CreateBuilder::new(self)
+    //    }
+    //
+    //    fn delete_container<'a>(&'a self) -> container::requests::DeleteBuilder<'a, No> {
+    //        container::requests::DeleteBuilder::new(self)
+    //    }
+    //
+    //    fn list_containers<'a>(&'a self) -> container::requests::ListBuilder<'a> {
+    //        container::requests::ListBuilder::new(self)
+    //    }
+    //
+    //    fn get_container_acl<'a>(&'a self) -> container::requests::GetACLBuilder<'a, No> {
+    //        container::requests::GetACLBuilder::new(self)
+    //    }
+    //
+    //    fn set_container_acl<'a>(&'a self) -> container::requests::SetACLBuilder<'a, No, No> {
+    //        container::requests::SetACLBuilder::new(self)
+    //    }
+    //
+    //    fn get_container_properties<'a>(&'a self) -> container::requests::GetPropertiesBuilder<'a, No> {
+    //        container::requests::GetPropertiesBuilder::new(self)
+    //    }
+    //
+    fn acquire_container_lease<'a>(
+        &'a self,
+    ) -> container::requests::AcquireLeaseBuilder<'a, C, No, No> {
+        container::requests::AcquireLeaseBuilder::new(self)
+    }
+    //
+    //    fn renew_container_lease<'a>(&'a self) -> container::requests::RenewLeaseBuilder<'a, No, No> {
+    //        container::requests::RenewLeaseBuilder::new(self)
+    //    }
+    //
+    //    fn release_container_lease<'a>(
+    //        &'a self,
+    //    ) -> container::requests::ReleaseLeaseBuilder<'a, No, No> {
+    //        container::requests::ReleaseLeaseBuilder::new(self)
+    //    }
+    //
+    //    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, No> {
+    //        container::requests::BreakLeaseBuilder::new(self)
+    //
+}

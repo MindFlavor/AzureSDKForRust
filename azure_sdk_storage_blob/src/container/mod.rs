@@ -1,5 +1,5 @@
-//pub mod requests;
-//pub mod responses;
+pub mod requests;
+pub mod responses;
 
 use azure_sdk_core::{
     errors::AzureError,
