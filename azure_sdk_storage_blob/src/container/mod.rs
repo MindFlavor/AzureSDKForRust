@@ -1,6 +1,7 @@
 pub mod requests;
 pub mod responses;
 
+use azure_sdk_core::incompletevector::IncompleteVector;
 use azure_sdk_core::{
     errors::AzureError,
     headers::{
@@ -76,7 +77,7 @@ impl AsRef<str> for Container {
 }
 
 impl Container {
-    pub fn new(name: &str) -> Container {
+    pub(crate) fn new(name: &str) -> Container {
         Container {
             name: name.to_owned(),
             last_modified: Utc::now(),
@@ -91,7 +92,10 @@ impl Container {
         }
     }
 
-    pub fn from_response(name: String, headers: &HeaderMap) -> Result<Container, AzureError> {
+    pub(crate) fn from_response(
+        name: String,
+        headers: &HeaderMap,
+    ) -> Result<Container, AzureError> {
         let last_modified = match headers.get(header::LAST_MODIFIED) {
             Some(last_modified) => last_modified.to_str()?,
             None => {
@@ -240,6 +244,26 @@ impl Container {
             metadata,
         })
     }
+}
+
+pub(crate) fn incomplete_vector_from_container_response(
+    body: &str,
+) -> Result<IncompleteVector<Container>, AzureError> {
+    let elem: Element = body.parse()?;
+
+    let mut v = Vec::new();
+
+    for container in traverse(&elem, &["Containers", "Container"], true)? {
+        v.push(Container::parse(container)?);
+    }
+
+    let next_marker = match cast_optional::<String>(&elem, &["NextMarker"])? {
+        Some(ref nm) if nm == "" => None,
+        Some(nm) => Some(nm),
+        None => None,
+    };
+
+    Ok(IncompleteVector::new(next_marker, v))
 }
 
 #[inline]
