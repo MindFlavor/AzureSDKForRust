@@ -1,11 +1,10 @@
 {
-	"name": "BreakLeaseBuilder",
+	"name": "CreateBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::container::responses::BreakLeaseResponse",
-		"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
-		"azure_sdk_core::headers::LEASE_ACTION",
-		"azure_sdk_core::lease::LeaseId",
+		"std::collections::HashMap",
+		"crate::container::{PublicAccess, PublicAccessRequired, PublicAccessSupport}",
+		"azure_sdk_core::errors::{check_status_extract_body, AzureError}",
 		"azure_sdk_core::prelude::*",
 		"azure_sdk_core::{No, ToAssign, Yes}",
 		"azure_sdk_storage_core::prelude::*",
@@ -32,6 +31,22 @@
 			"trait_set": "ContainerNameSupport<'a>"
 		},
 		{
+			"name": "public_access",
+			"field_type": "PublicAccess",
+			"builder_type": "PublicAccessSet",
+			"optional": false,
+			"initializer": "PublicAccess::None",
+			"trait_get": "PublicAccessRequired",
+			"trait_set": "PublicAccessSupport"
+		},
+		{
+			"name": "metadata",
+			"field_type": "&'a HashMap<&'a str, &'a str>",
+			"optional": true,
+			"trait_get": "MetadataOption<'a>",
+			"trait_set": "MetadataSupport<'a>"
+		},
+		{
 			"name": "client_request_id",
 			"field_type": "&'a str",
 			"optional": true,
@@ -44,20 +59,6 @@
 			"optional": true,
 			"trait_get": "TimeoutOption",
 			"trait_set": "TimeoutSupport"
-		},
-		{
-			"name": "lease_break_period",
-			"field_type": "u8",
-			"optional": true,
-			"trait_get": "LeaseBreakPeriodOption",
-			"trait_set": "LeaseBreakPeriodSupport"
-		},
-		{
-			"name": "lease_id",
-			"field_type": "&'a LeaseId",
-			"optional": true,
-			"trait_get": "LeaseIdOption<'a>",
-			"trait_set": "LeaseIdSupport<'a>"
 		}
 	]
 }

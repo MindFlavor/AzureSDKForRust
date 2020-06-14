@@ -59,7 +59,7 @@ pub trait Container<C>
 where
     C: Client,
 {
-    //    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, No, No>;
+    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, C, No, No>;
     //    fn delete_container<'a>(&'a self) -> container::requests::DeleteBuilder<'a, No>;
     //    fn list_containers<'a>(&'a self) -> container::requests::ListBuilder<'a>;
     //    fn get_container_acl<'a>(&'a self) -> container::requests::GetACLBuilder<'a, No>;
@@ -72,7 +72,7 @@ where
     //    fn release_container_lease<'a>(
     //        &'a self,
     //    ) -> container::requests::ReleaseLeaseBuilder<'a, No, No>;
-    //    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, No>;
+    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, C, No>;
 }
 
 impl<C> Blob<C> for C
@@ -182,9 +182,9 @@ impl<C> Container<C> for C
 where
     C: Client,
 {
-    //    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, No, No> {
-    //        container::requests::CreateBuilder::new(self)
-    //    }
+    fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, C, No, No> {
+        container::requests::CreateBuilder::new(self)
+    }
     //
     //    fn delete_container<'a>(&'a self) -> container::requests::DeleteBuilder<'a, No> {
     //        container::requests::DeleteBuilder::new(self)
@@ -222,7 +222,7 @@ where
     //        container::requests::ReleaseLeaseBuilder::new(self)
     //    }
     //
-    //    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, No> {
-    //        container::requests::BreakLeaseBuilder::new(self)
-    //
+    fn break_container_lease<'a>(&'a self) -> container::requests::BreakLeaseBuilder<'a, C, No> {
+        container::requests::BreakLeaseBuilder::new(self)
+    }
 }
