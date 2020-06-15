@@ -1,13 +1,11 @@
 {
-	"name": "ReleaseLeaseBuilder",
+	"name": "DeleteBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::container::responses::ReleaseLeaseResponse",
 		"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 		"azure_sdk_core::lease::LeaseId",
 		"azure_sdk_core::prelude::*",
 		"azure_sdk_core::{No, ToAssign, Yes}",
-		"azure_sdk_core::headers::LEASE_ACTION",
 		"azure_sdk_storage_core::prelude::*",
 		"hyper::{Method, StatusCode}",
 		"std::marker::PhantomData"
@@ -48,10 +46,9 @@
 		{
 			"name": "lease_id",
 			"field_type": "&'a LeaseId",
-			"builder_type": "LeaseIdSet",
-			"optional": false,
-			"trait_get": "LeaseIdRequired<'a>",
+			"optional": true,
+			"trait_get": "LeaseIdOption<'a>",
 			"trait_set": "LeaseIdSupport<'a>"
-		}
+		}	
 	]
 }

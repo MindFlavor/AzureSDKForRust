@@ -1,13 +1,14 @@
 {
-	"name": "ReleaseLeaseBuilder",
+	"name": "SetACLBuilder",
 	"derive": "Debug, Clone",
 	"uses": [
-		"crate::container::responses::ReleaseLeaseResponse",
+		"crate::container::public_access_from_header",
+		"crate::prelude::*",
 		"azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError}",
 		"azure_sdk_core::lease::LeaseId",
 		"azure_sdk_core::prelude::*",
-		"azure_sdk_core::{No, ToAssign, Yes}",
-		"azure_sdk_core::headers::LEASE_ACTION",
+		"crate::prelude::*",
+		"azure_sdk_core::{No, StoredAccessPolicyList, ToAssign, Yes}",
 		"azure_sdk_storage_core::prelude::*",
 		"hyper::{Method, StatusCode}",
 		"std::marker::PhantomData"
@@ -32,6 +33,22 @@
 			"trait_set": "ContainerNameSupport<'a>"
 		},
 		{
+			"name": "public_access",
+			"field_type": "PublicAccess",
+			"builder_type": "PublicAccessSet",
+			"optional": false,
+			"initializer": "PublicAccess::None",
+			"trait_get": "PublicAccessRequired",
+			"trait_set": "PublicAccessSupport"
+		},
+		{
+			"name": "stored_access_policy_list",
+			"field_type": "&'a StoredAccessPolicyList",
+			"optional": true,
+			"trait_get": "StoredAccessPolicyListOption<'a>",
+			"trait_set": "StoredAccessPolicyListSupport<'a>"
+		},
+		{
 			"name": "client_request_id",
 			"field_type": "&'a str",
 			"optional": true,
@@ -48,10 +65,9 @@
 		{
 			"name": "lease_id",
 			"field_type": "&'a LeaseId",
-			"builder_type": "LeaseIdSet",
-			"optional": false,
-			"trait_get": "LeaseIdRequired<'a>",
+			"optional": true,
+			"trait_get": "LeaseIdOption<'a>",
 			"trait_set": "LeaseIdSupport<'a>"
-		}
+		}	
 	]
 }

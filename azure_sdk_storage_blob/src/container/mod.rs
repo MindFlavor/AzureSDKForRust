@@ -2,6 +2,7 @@ pub mod requests;
 pub mod responses;
 
 use azure_sdk_core::incompletevector::IncompleteVector;
+use azure_sdk_core::StoredAccessPolicyList;
 use azure_sdk_core::{
     errors::AzureError,
     headers::{
@@ -54,6 +55,15 @@ pub trait PublicAccessRequired {
         }
         builder
     }
+}
+
+pub trait StoredAccessPolicyListOption<'a> {
+    fn stored_access_policy_list(&self) -> Option<&'a StoredAccessPolicyList>;
+}
+
+pub trait StoredAccessPolicyListSupport<'a> {
+    type O;
+    fn with_stored_access_policy_list(self, sapl: &'a StoredAccessPolicyList) -> Self::O;
 }
 
 #[derive(Debug, Clone)]
