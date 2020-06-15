@@ -17,7 +17,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let client = client::with_access_key(&account, &master_key);
 
-    let iv = client.list_containers().finalize().await?;
+    let iv = client
+        .list_containers()
+        .with_max_results(2)
+        .finalize()
+        .await?;
     println!(
         "List containers returned {} containers.",
         iv.incomplete_vector.len()
@@ -29,6 +33,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let iv = client
         .list_blobs()
         .with_container_name(&container)
+        .with_max_results(2)
         .finalize()
         .await?;
 

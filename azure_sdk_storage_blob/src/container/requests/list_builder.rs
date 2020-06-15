@@ -237,15 +237,7 @@ where
     C: Client,
 {
     pub async fn finalize(self) -> Result<ListContainersResponse, AzureError> {
-        let mut uri = if let Some(max_results) = self.max_results() {
-            format!(
-                "{}?comp=list&maxresults={}",
-                self.client().blob_uri(),
-                max_results
-            )
-        } else {
-            format!("{}?comp=list", self.client().blob_uri())
-        };
+        let mut uri = format!("{}?comp=list", self.client().blob_uri());
 
         if self.include_metadata() {
             uri = format!("{}&include=metadata", uri);
@@ -263,6 +255,8 @@ where
         if let Some(nm) = PrefixOption::to_uri_parameter(&self) {
             uri = format!("{}&{}", uri, nm);
         }
+
+        debug!("generated uri = {}", uri);
 
         let future_response = self.client().perform_request(
             &uri,
