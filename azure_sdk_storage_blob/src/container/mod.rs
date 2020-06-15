@@ -87,21 +87,6 @@ impl AsRef<str> for Container {
 }
 
 impl Container {
-    pub(crate) fn new(name: &str) -> Container {
-        Container {
-            name: name.to_owned(),
-            last_modified: Utc::now(),
-            e_tag: "".to_owned(),
-            lease_status: LeaseStatus::Unlocked,
-            lease_state: LeaseState::Available,
-            lease_duration: None,
-            public_access: PublicAccess::None,
-            has_immutability_policy: false,
-            has_legal_hold: false,
-            metadata: HashMap::new(),
-        }
-    }
-
     pub(crate) fn from_response(
         name: String,
         headers: &HeaderMap,

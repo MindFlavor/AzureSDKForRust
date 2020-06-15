@@ -18,7 +18,6 @@ pub trait Blob<C>
 where
     C: Client,
 {
-    fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, C, No>;
     fn get_blob<'a>(&'a self) -> blob::requests::GetBlobBuilder<'a, C, No, No>;
     fn put_block_blob<'a>(&'a self) -> blob::requests::PutBlockBlobBuilder<'a, C, No, No, No>;
     fn put_page_blob<'a>(&'a self) -> blob::requests::PutPageBlobBuilder<'a, C, No, No, No>;
@@ -61,6 +60,7 @@ where
 {
     fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, C, No, No>;
     fn delete_container<'a>(&'a self) -> container::requests::DeleteBuilder<'a, C, No>;
+    fn list_blobs<'a>(&'a self) -> container::requests::ListBlobBuilder<'a, C, No>;
     fn list_containers<'a>(&'a self) -> container::requests::ListBuilder<'a, C>;
     fn get_container_acl<'a>(&'a self) -> container::requests::GetACLBuilder<'a, C, No>;
     fn set_container_acl<'a>(&'a self) -> container::requests::SetACLBuilder<'a, C, No, No>;
@@ -82,10 +82,6 @@ impl<C> Blob<C> for C
 where
     C: Client,
 {
-    fn list_blobs<'a>(&'a self) -> blob::requests::ListBlobBuilder<'a, C, No> {
-        blob::requests::ListBlobBuilder::new(self)
-    }
-
     fn get_blob<'a>(&'a self) -> blob::requests::GetBlobBuilder<'a, C, No, No> {
         blob::requests::GetBlobBuilder::new(self)
     }
@@ -185,6 +181,10 @@ impl<C> Container<C> for C
 where
     C: Client,
 {
+    fn list_blobs<'a>(&'a self) -> container::requests::ListBlobBuilder<'a, C, No> {
+        container::requests::ListBlobBuilder::new(self)
+    }
+
     fn create_container<'a>(&'a self) -> container::requests::CreateBuilder<'a, C, No, No> {
         container::requests::CreateBuilder::new(self)
     }
