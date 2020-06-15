@@ -10,6 +10,7 @@ use azure_sdk_storage_blob::{
     container::{Container, PublicAccess, PublicAccessSupport},
     prelude::*,
 };
+use azure_sdk_storage_core::key_client::KeyClient;
 use azure_sdk_storage_core::prelude::*;
 use chrono::{Duration, FixedOffset, Utc};
 use std::ops::Add;
@@ -328,11 +329,11 @@ async fn put_block_blob() {
     trace!("created {:?}", blob_name);
 }
 
-fn initialize() -> Result<Client, AzureError> {
+fn initialize() -> Result<KeyClient, AzureError> {
     let account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
     let master_key =
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    Ok(Client::new(&account, &master_key)?)
+    Ok(client::with_access_key(&account, &master_key))
 }

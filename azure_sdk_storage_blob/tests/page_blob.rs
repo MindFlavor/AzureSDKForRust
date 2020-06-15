@@ -4,6 +4,7 @@ extern crate log;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
+use azure_sdk_storage_core::key_client::KeyClient;
 use azure_sdk_storage_core::prelude::*;
 use std::collections::HashMap;
 
@@ -48,7 +49,6 @@ async fn put_page_blob() {
         .with_content_type("text/plain")
         .with_metadata(&metadata)
         .with_content_length(1024 * 64)
-        .unwrap()
         .finalize()
         .await
         .unwrap();
@@ -56,11 +56,11 @@ async fn put_page_blob() {
     trace!("created {:?}", blob_name);
 }
 
-fn initialize() -> Result<Client, AzureError> {
+fn initialize() -> Result<KeyClient, AzureError> {
     let account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
     let master_key =
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    Ok(Client::new(&account, &master_key)?)
+    Ok(client::with_access_key(&account, &master_key))
 }
