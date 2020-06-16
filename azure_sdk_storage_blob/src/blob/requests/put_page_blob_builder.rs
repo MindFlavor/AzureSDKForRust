@@ -782,7 +782,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::PUT,
-            |mut request| {
+            &|mut request| {
                 request = PageBlobLengthRequired::add_header(&self, request);
                 request = SequenceNumberOption::add_header(&self, request);
                 request = AccessTierOption::add_header(&self, request);

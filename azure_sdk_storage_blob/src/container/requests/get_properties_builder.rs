@@ -196,7 +196,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::HEAD,
-            |mut request| {
+            &|mut request| {
                 request = ClientRequestIdOption::add_header(&self, request);
                 request = LeaseIdOption::add_header(&self, request);
                 request

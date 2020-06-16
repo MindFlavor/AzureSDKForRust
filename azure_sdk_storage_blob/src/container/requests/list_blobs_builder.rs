@@ -577,7 +577,7 @@ where
 
         let future_response =
             self.client()
-                .perform_request(&uri, &Method::GET, |request| request, None)?;
+                .perform_request(&uri, &Method::GET, &|request| request, None)?;
 
         let (headers, body_as_str) =
             check_status_extract_headers_and_body_as_string(future_response, StatusCode::OK)

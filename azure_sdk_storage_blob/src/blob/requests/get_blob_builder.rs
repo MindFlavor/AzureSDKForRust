@@ -360,7 +360,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::GET,
-            |mut request| {
+            &|mut request| {
                 if let Some(r) = self.range() {
                     request = LeaseIdOption::add_header(&self, request);
                     request = RangeOption::add_header(&self, request);

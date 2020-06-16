@@ -215,7 +215,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::PUT,
-            |mut request| {
+            &|mut request| {
                 request = ClientRequestIdOption::add_header(&self, request);
                 request = LeaseIdRequired::add_header(&self, request);
                 request = request.header(LEASE_ACTION, "release");

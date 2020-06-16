@@ -705,7 +705,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::PUT,
-            |mut request| {
+            &|mut request| {
                 request = ContentTypeOption::add_header(&self, request);
                 request = ContentEncodingOption::add_header(&self, request);
                 request = ContentLanguageOption::add_header(&self, request);

@@ -328,7 +328,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::DELETE,
-            |mut request| {
+            &|mut request| {
                 request = DeleteSnapshotsMethodRequired::add_header(&self, request);
                 request = LeaseIdOption::add_header(&self, request);
                 request = ClientRequestIdOption::add_header(&self, request);

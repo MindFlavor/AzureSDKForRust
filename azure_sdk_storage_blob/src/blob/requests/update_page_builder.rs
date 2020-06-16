@@ -643,7 +643,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::PUT,
-            |mut request| {
+            &|mut request| {
                 request = BA512RangeRequired::add_header(&self, request);
                 request = ContentMD5Option::add_header(&self, request);
                 request = request.header(PAGE_WRITE, "update");

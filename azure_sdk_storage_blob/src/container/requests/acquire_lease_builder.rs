@@ -302,10 +302,10 @@ where
             uri = format!("{}&{}", uri, nm);
         }
 
-        let future_response = self.client().perform_request_trait_object(
+        let future_response = self.client().perform_request(
             &uri,
             &Method::PUT,
-            |mut request| {
+            &|mut request| {
                 request = ClientRequestIdOption::add_header(&self, request);
                 request = LeaseIdOption::add_header(&self, request);
                 request = request.header(LEASE_ACTION, "acquire");

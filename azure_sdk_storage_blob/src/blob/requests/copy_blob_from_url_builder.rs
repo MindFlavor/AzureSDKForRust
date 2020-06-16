@@ -916,7 +916,7 @@ where
         let future_response = self.client().perform_request(
             &uri,
             &Method::PUT,
-            |mut request| {
+            &|mut request| {
                 request = SourceUrlRequired::add_header(&self, request);
                 request = IsSynchronousOption::add_header(&self, request);
                 request = SourceContentMD5Option::add_header(&self, request);
