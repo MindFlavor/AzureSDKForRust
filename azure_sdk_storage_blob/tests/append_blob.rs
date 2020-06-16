@@ -5,7 +5,6 @@ extern crate log;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::container::PublicAccess;
 use azure_sdk_storage_blob::prelude::*;
-use azure_sdk_storage_core::key_client::KeyClient;
 use azure_sdk_storage_core::prelude::*;
 use std::collections::HashMap;
 

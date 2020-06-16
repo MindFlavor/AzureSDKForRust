@@ -1,6 +1,7 @@
+use crate::bearer_token_client::BearerTokenClient;
 use crate::key_client::get_sas_token_parms;
 use crate::rest_client::ServiceType;
-use crate::{BearerTokenClient, ConnectionString, KeyClient};
+use crate::{ConnectionString, KeyClient};
 use azure_sdk_core::errors::AzureError;
 use http::request::Builder;
 use hyper::{self, Method};
@@ -40,6 +41,37 @@ pub trait Client {
         http_header_adder: &dyn Fn(Builder) -> Builder,
         request_str: Option<&[u8]>,
     ) -> Result<hyper::client::ResponseFuture, AzureError>;
+}
+
+impl Client for Box<dyn Client> {
+    fn blob_uri(&self) -> &str {
+        self.as_ref().blob_uri()
+    }
+    fn table_uri(&self) -> &str {
+        self.as_ref().table_uri()
+    }
+
+    fn perform_request(
+        &self,
+        uri: &str,
+        method: &Method,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
+        request_body: Option<&[u8]>,
+    ) -> Result<hyper::client::ResponseFuture, AzureError> {
+        self.as_ref()
+            .perform_request(uri, method, http_header_adder, request_body)
+    }
+
+    fn perform_table_request(
+        &self,
+        segment: &str,
+        method: &Method,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
+        request_str: Option<&[u8]>,
+    ) -> Result<hyper::client::ResponseFuture, AzureError> {
+        self.as_ref()
+            .perform_table_request(segment, method, http_header_adder, request_str)
+    }
 }
 
 //

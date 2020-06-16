@@ -28,7 +28,6 @@ use crate::key_client::KeyClient;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::headers::COPY_ID;
 use azure_sdk_core::util::HeaderMapExt;
-pub use bearer_token_client::BearerTokenClient;
 pub use client::Client;
 pub use client_endpoint::ClientEndpoint;
 use http::HeaderMap;

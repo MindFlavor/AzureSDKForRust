@@ -1,18 +1,16 @@
 #![cfg(all(test, feature = "test_e2e"))]
-use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::{
     ContainerNameSupport, LeaseBreakPeriodSupport, LeaseDurationSupport, LeaseIdSupport,
 };
 use azure_sdk_storage_blob::container::{PublicAccess, PublicAccessSupport};
 use azure_sdk_storage_blob::prelude::*;
-use azure_sdk_storage_core::key_client::KeyClient;
 use azure_sdk_storage_core::prelude::*;
 
 #[tokio::test]
 async fn lease() {
     let container_name: &'static str = "azuresdkrustetoets2";
 
-    let client = initialize().unwrap();
+    let client = initialize();
     client
         .create_container()
         .with_container_name(container_name)
@@ -58,7 +56,7 @@ async fn lease() {
 async fn break_lease() {
     let container_name: &'static str = "azuresdkrustetoets3";
 
-    let client = initialize().unwrap();
+    let client = initialize();
     client
         .create_container()
         .with_container_name(container_name)
@@ -92,11 +90,11 @@ async fn break_lease() {
         .unwrap();
 }
 
-fn initialize() -> Result<KeyClient, AzureError> {
+fn initialize() -> Box<dyn Client> {
     let account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
     let master_key =
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    Ok(client::with_access_key(&account, &master_key))
+    Box::new(client::with_access_key(&account, &master_key))
 }

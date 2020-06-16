@@ -2,7 +2,6 @@
 #[macro_use]
 extern crate log;
 
-use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::prelude::*;
 use azure_sdk_core::DeleteSnapshotsMethod;
 use azure_sdk_storage_blob::{
@@ -10,7 +9,6 @@ use azure_sdk_storage_blob::{
     container::{Container, PublicAccess, PublicAccessSupport},
     prelude::*,
 };
-use azure_sdk_storage_core::key_client::KeyClient;
 use azure_sdk_storage_core::prelude::*;
 use chrono::{Duration, FixedOffset, Utc};
 use std::ops::Add;
@@ -21,7 +19,7 @@ use uuid::Uuid;
 async fn create_and_delete_container() {
     let name: &'static str = "azuresdkrustetoets";
 
-    let client = initialize().unwrap();
+    let client = initialize();
     client
         .create_container()
         .with_container_name(name)
@@ -134,7 +132,7 @@ async fn put_and_get_block_list() {
     let container = Container::new(&format!("sdkrust{}", u));
     let name = "asd - ()krustputblock.txt";
 
-    let client = initialize().unwrap();
+    let client = initialize();
 
     client
         .create_container()
@@ -260,7 +258,7 @@ async fn put_and_get_block_list() {
 
 #[tokio::test]
 async fn list_containers() {
-    let client = initialize().unwrap();
+    let client = initialize();
 
     trace!("running list_containers");
 
@@ -287,7 +285,7 @@ async fn list_containers() {
 
 #[tokio::test]
 async fn put_block_blob() {
-    let client = initialize().unwrap();
+    let client = initialize();
 
     let blob_name: &'static str = "m1";
     let container_name: &'static str = "rust-upload-test";
@@ -329,11 +327,11 @@ async fn put_block_blob() {
     trace!("created {:?}", blob_name);
 }
 
-fn initialize() -> Result<KeyClient, AzureError> {
+fn initialize() -> Box<dyn Client> {
     let account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
     let master_key =
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    Ok(client::with_access_key(&account, &master_key))
+    Box::new(client::with_access_key(&account, &master_key))
 }

@@ -7,7 +7,7 @@ use hyper_rustls::HttpsConnector;
 use url::Url;
 
 #[derive(Debug, Clone)]
-pub struct KeyClient {
+pub(crate) struct KeyClient {
     account: String,
     key: String,
     sas_token: Option<Vec<(String, String)>>,
