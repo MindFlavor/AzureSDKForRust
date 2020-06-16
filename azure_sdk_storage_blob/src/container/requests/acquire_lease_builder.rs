@@ -302,7 +302,7 @@ where
             uri = format!("{}&{}", uri, nm);
         }
 
-        let future_response = self.client().perform_request(
+        let future_response = self.client().perform_request_trait_object(
             &uri,
             &Method::PUT,
             |mut request| {

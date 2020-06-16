@@ -1,7 +1,8 @@
+use crate::prelude::*;
 use crate::rest_client::{AZURE_VERSION, HEADER_DATE, HEADER_VERSION};
-use crate::Client;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::util::{format_header_value, RequestBuilderExt};
+use http::request::Builder;
 use hyper::{header, Method};
 use hyper_rustls::HttpsConnector;
 use std::borrow::Cow;
@@ -34,16 +35,13 @@ impl<'a> BearerTokenClient<'a> {
         }
     }
 
-    fn perform_request_inernal<F>(
+    fn perform_request_internal(
         &self,
         uri: &str,
         method: &Method,
-        headers_func: F,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
         request_body: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder,
-    {
+    ) -> Result<hyper::client::ResponseFuture, AzureError> {
         let dt = chrono::Utc::now();
         let time = format!("{}", dt.format("%a, %d %h %Y %T GMT"));
 
@@ -61,7 +59,7 @@ impl<'a> BearerTokenClient<'a> {
         // This will give the caller the ability to add custom headers.
         // The closure is needed to because request.headers_mut().set_raw(...) requires
         // a Cow with 'static lifetime...
-        request = headers_func(request);
+        request = http_header_adder(request);
 
         request = request
             .header_bytes(HEADER_DATE, time)
@@ -93,30 +91,24 @@ impl<'a> Client for BearerTokenClient<'a> {
     }
 
     #[inline]
-    fn perform_request<F>(
+    fn perform_request(
         &self,
         uri: &str,
         method: &Method,
-        headers_func: F,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
         request_body: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder,
-    {
-        self.perform_request_inernal(uri, method, headers_func, request_body)
+    ) -> Result<hyper::client::ResponseFuture, AzureError> {
+        self.perform_request_internal(uri, method, http_header_adder, request_body)
     }
 
     #[inline]
-    fn perform_table_request<F>(
+    fn perform_table_request(
         &self,
         segment: &str,
         method: &Method,
-        headers_func: F,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
         request_body: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder,
-    {
-        self.perform_request_inernal(segment, method, headers_func, request_body)
+    ) -> Result<hyper::client::ResponseFuture, AzureError> {
+        self.perform_request_internal(segment, method, http_header_adder, request_body)
     }
 }

@@ -1,6 +1,7 @@
 use crate::rest_client::{perform_request, ServiceType};
 use crate::{Client, ClientEndpoint, HyperClientEndpoint};
 use azure_sdk_core::errors::AzureError;
+use http::request::Builder;
 use hyper::{self, Method};
 use hyper_rustls::HttpsConnector;
 use url::Url;
@@ -66,38 +67,32 @@ impl Client for KeyClient {
         &self.table_uri
     }
 
-    fn perform_request<F>(
+    fn perform_request(
         &self,
         uri: &str,
         method: &Method,
-        headers_func: F,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
         request_body: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder,
-    {
+    ) -> Result<hyper::client::ResponseFuture, AzureError> {
         let uri = self.add_sas_token_to_uri(uri);
 
         perform_request(
             self,
             &uri,
             method,
-            headers_func,
+            http_header_adder,
             request_body,
             ServiceType::Blob,
         )
     }
 
-    fn perform_table_request<F>(
+    fn perform_table_request(
         &self,
         segment: &str,
         method: &Method,
-        headers_func: F,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
         request_str: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder,
-    {
+    ) -> Result<hyper::client::ResponseFuture, AzureError> {
         debug!("segment: {}, method: {:?}", segment, method,);
 
         let uri =
@@ -107,7 +102,7 @@ impl Client for KeyClient {
             self,
             &uri,
             method,
-            headers_func,
+            http_header_adder,
             request_str,
             ServiceType::Table,
         )

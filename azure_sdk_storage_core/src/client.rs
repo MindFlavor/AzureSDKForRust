@@ -2,10 +2,15 @@ use crate::key_client::get_sas_token_parms;
 use crate::rest_client::ServiceType;
 use crate::{BearerTokenClient, ConnectionString, KeyClient};
 use azure_sdk_core::errors::AzureError;
+use http::request::Builder;
 use hyper::{self, Method};
 use hyper_rustls::HttpsConnector;
 use std::borrow::Cow;
 use url::Url;
+
+pub trait HttpHeaderAdder {
+    fn add_headers(&self, builder: ::http::request::Builder) -> ::http::request::Builder;
+}
 
 pub trait Client {
     fn blob_uri(&self) -> &str;
@@ -20,25 +25,21 @@ pub trait Client {
         }
     }
 
-    fn perform_request<F>(
+    fn perform_request(
         &self,
         uri: &str,
         method: &Method,
-        headers_func: F,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
         request_body: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder;
+    ) -> Result<hyper::client::ResponseFuture, AzureError>;
 
-    fn perform_table_request<F>(
+    fn perform_table_request(
         &self,
         segment: &str,
         method: &Method,
-        headers_func: F,
+        http_header_adder: &dyn Fn(Builder) -> Builder,
         request_str: Option<&[u8]>,
-    ) -> Result<hyper::client::ResponseFuture, AzureError>
-    where
-        F: FnOnce(::http::request::Builder) -> ::http::request::Builder;
+    ) -> Result<hyper::client::ResponseFuture, AzureError>;
 }
 
 //
