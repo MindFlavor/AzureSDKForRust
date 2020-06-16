@@ -8,7 +8,7 @@ use hyper_rustls::HttpsConnector;
 use std::borrow::Cow;
 
 #[derive(Debug, Clone)]
-pub(crate) struct BearerTokenClient<'a> {
+pub struct BearerTokenClient<'a> {
     account: Cow<'a, str>,
     bearer_token: Cow<'a, str>,
     hc: hyper::Client<HttpsConnector<hyper::client::HttpConnector>>,
