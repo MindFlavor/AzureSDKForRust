@@ -1,4 +1,5 @@
 use crate::key_client::get_sas_token_parms;
+use crate::rest_client::ServiceType;
 use crate::{BearerTokenClient, ConnectionString, KeyClient};
 use azure_sdk_core::errors::AzureError;
 use hyper::{self, Method};
@@ -9,6 +10,15 @@ use url::Url;
 pub trait Client {
     fn blob_uri(&self) -> &str;
     fn table_uri(&self) -> &str;
+
+    /// Uri scheme + authority e.g. http://myaccount.table.core.windows.net/
+    #[inline]
+    fn get_uri_prefix(&self, service_type: ServiceType) -> String {
+        match service_type {
+            ServiceType::Blob => format!("{}/", self.blob_uri()),
+            ServiceType::Table => format!("{}/", self.table_uri()),
+        }
+    }
 
     fn perform_request<F>(
         &self,

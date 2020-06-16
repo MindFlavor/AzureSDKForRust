@@ -53,14 +53,6 @@ impl KeyClient {
             None => String::from(uri),
         }
     }
-
-    /// Uri scheme + authority e.g. http://myaccount.table.core.windows.net/
-    pub fn get_uri_prefix(&self, service_type: ServiceType) -> String {
-        match service_type {
-            ServiceType::Blob => format!("{}/", self.blob_uri()),
-            ServiceType::Table => format!("{}/", self.table_uri()),
-        }
-    }
 }
 
 impl Client for KeyClient {

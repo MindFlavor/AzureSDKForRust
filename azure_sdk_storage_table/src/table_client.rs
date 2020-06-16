@@ -1,9 +1,9 @@
 use azure_sdk_core::errors::{check_status_extract_body, AzureError};
+use azure_sdk_storage_core::prelude::*;
 use azure_sdk_storage_core::{
     client, get_default_json_mime, get_json_mime_fullmetadata, get_json_mime_nometadata,
     ConnectionString, ServiceType,
 };
-use azure_sdk_storage_core::{Client, KeyClient};
 use hyper::{
     client::ResponseFuture,
     header::{self, HeaderValue},
@@ -69,7 +69,7 @@ impl TableClient<KeyClient> {
                 account_key: Some(key),
                 ..
             } => Ok(TableClient {
-                client: client::with_azure(account, key)?,
+                client: client::with_access_key(account, key),
             }),
             _ => {
                 return Err(AzureError::GenericErrorWithText(
@@ -79,7 +79,12 @@ impl TableClient<KeyClient> {
             }
         }
     }
+}
 
+impl<C> TableClient<C>
+where
+    C: Client,
+{
     pub async fn list_tables(&self) -> Result<Vec<String>, AzureError> {
         let future_response = self.request_with_default_header(
             TABLE_TABLES,
