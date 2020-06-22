@@ -1,6 +1,5 @@
 use crate::prelude::*;
 use crate::responses::CreateDatabaseResponse;
-use crate::ResourceType;
 use azure_sdk_core::errors::{check_status_extract_headers_and_body, AzureError};
 use azure_sdk_core::prelude::*;
 use azure_sdk_core::{No, ToAssign, Yes};
@@ -9,20 +8,26 @@ use std::convert::TryInto;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct CreateDatabaseBuilder<'a, DatabaseNameSet>
+pub struct CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    cosmos_client: &'a dyn CosmosClient,
+    cosmos_client: &'b CosmosClient<'a, CUB>,
     p_database_name: PhantomData<DatabaseNameSet>,
-    database_name: Option<&'a dyn DatabaseName>,
-    user_agent: Option<&'a str>,
-    activity_id: Option<&'a str>,
-    consistency_level: Option<ConsistencyLevel<'a>>,
+    database_name: Option<&'b dyn DatabaseName>,
+    user_agent: Option<&'b str>,
+    activity_id: Option<&'b str>,
+    consistency_level: Option<ConsistencyLevel<'b>>,
 }
 
-impl<'a> CreateDatabaseBuilder<'a, No> {
-    pub(crate) fn new(cosmos_client: &'a dyn CosmosClient) -> CreateDatabaseBuilder<'a, No> {
+impl<'a, 'b, CUB> CreateDatabaseBuilder<'a, 'b, CUB, No>
+where
+    CUB: CosmosUriBuilder,
+{
+    pub(crate) fn new(
+        cosmos_client: &'b CosmosClient<'a, CUB>,
+    ) -> CreateDatabaseBuilder<'a, 'b, CUB, No> {
         CreateDatabaseBuilder {
             cosmos_client,
             p_database_name: PhantomData {},
@@ -34,11 +39,13 @@ impl<'a> CreateDatabaseBuilder<'a, No> {
     }
 }
 
-impl<'a, DatabaseNameSet> CosmosClientRequired<'a> for CreateDatabaseBuilder<'a, DatabaseNameSet>
+impl<'a, 'b, CUB, DatabaseNameSet> CosmosClientRequired<'a, 'b, CUB>
+    for CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    fn cosmos_client(&self) -> &'a dyn CosmosClient {
+    fn cosmos_client(&self) -> &'b CosmosClient<'a, CUB> {
         self.cosmos_client
     }
 }
@@ -46,43 +53,55 @@ where
 //get mandatory no traits methods
 
 //set mandatory no traits methods
-impl<'a> DatabaseNameRequired<'a> for CreateDatabaseBuilder<'a, Yes> {
-    fn database_name(&self) -> &'a dyn DatabaseName {
+impl<'a, 'b, CUB> DatabaseNameRequired<'b> for CreateDatabaseBuilder<'a, 'b, CUB, Yes>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn database_name(&self) -> &'b dyn DatabaseName {
         self.database_name.unwrap()
     }
 }
 
-impl<'a, DatabaseNameSet> UserAgentOption<'a> for CreateDatabaseBuilder<'a, DatabaseNameSet>
+impl<'a, 'b, CUB, DatabaseNameSet> UserAgentOption<'b>
+    for CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    fn user_agent(&self) -> Option<&'a str> {
+    fn user_agent(&self) -> Option<&'b str> {
         self.user_agent
     }
 }
 
-impl<'a, DatabaseNameSet> ActivityIdOption<'a> for CreateDatabaseBuilder<'a, DatabaseNameSet>
+impl<'a, 'b, CUB, DatabaseNameSet> ActivityIdOption<'b>
+    for CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    fn activity_id(&self) -> Option<&'a str> {
+    fn activity_id(&self) -> Option<&'b str> {
         self.activity_id
     }
 }
 
-impl<'a, DatabaseNameSet> ConsistencyLevelOption<'a> for CreateDatabaseBuilder<'a, DatabaseNameSet>
+impl<'a, 'b, CUB, DatabaseNameSet> ConsistencyLevelOption<'b>
+    for CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    fn consistency_level(&self) -> Option<ConsistencyLevel<'a>> {
+    fn consistency_level(&self) -> Option<ConsistencyLevel<'b>> {
         self.consistency_level.clone()
     }
 }
 
-impl<'a> DatabaseNameSupport<'a> for CreateDatabaseBuilder<'a, No> {
-    type O = CreateDatabaseBuilder<'a, Yes>;
+impl<'a, 'b, CUB> DatabaseNameSupport<'b> for CreateDatabaseBuilder<'a, 'b, CUB, No>
+where
+    CUB: CosmosUriBuilder,
+{
+    type O = CreateDatabaseBuilder<'a, 'b, CUB, Yes>;
 
-    fn with_database_name(self, database_name: &'a dyn DatabaseName) -> Self::O {
+    fn with_database_name(self, database_name: &'b dyn DatabaseName) -> Self::O {
         CreateDatabaseBuilder {
             cosmos_client: self.cosmos_client,
             p_database_name: PhantomData {},
@@ -94,13 +113,15 @@ impl<'a> DatabaseNameSupport<'a> for CreateDatabaseBuilder<'a, No> {
     }
 }
 
-impl<'a, DatabaseNameSet> UserAgentSupport<'a> for CreateDatabaseBuilder<'a, DatabaseNameSet>
+impl<'a, 'b, CUB, DatabaseNameSet> UserAgentSupport<'b>
+    for CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    type O = CreateDatabaseBuilder<'a, DatabaseNameSet>;
+    type O = CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>;
 
-    fn with_user_agent(self, user_agent: &'a str) -> Self::O {
+    fn with_user_agent(self, user_agent: &'b str) -> Self::O {
         CreateDatabaseBuilder {
             cosmos_client: self.cosmos_client,
             p_database_name: PhantomData {},
@@ -112,13 +133,15 @@ where
     }
 }
 
-impl<'a, DatabaseNameSet> ActivityIdSupport<'a> for CreateDatabaseBuilder<'a, DatabaseNameSet>
+impl<'a, 'b, CUB, DatabaseNameSet> ActivityIdSupport<'b>
+    for CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    type O = CreateDatabaseBuilder<'a, DatabaseNameSet>;
+    type O = CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>;
 
-    fn with_activity_id(self, activity_id: &'a str) -> Self::O {
+    fn with_activity_id(self, activity_id: &'b str) -> Self::O {
         CreateDatabaseBuilder {
             cosmos_client: self.cosmos_client,
             p_database_name: PhantomData {},
@@ -130,13 +153,15 @@ where
     }
 }
 
-impl<'a, DatabaseNameSet> ConsistencyLevelSupport<'a> for CreateDatabaseBuilder<'a, DatabaseNameSet>
+impl<'a, 'b, CUB, DatabaseNameSet> ConsistencyLevelSupport<'b>
+    for CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>
 where
     DatabaseNameSet: ToAssign,
+    CUB: CosmosUriBuilder,
 {
-    type O = CreateDatabaseBuilder<'a, DatabaseNameSet>;
+    type O = CreateDatabaseBuilder<'a, 'b, CUB, DatabaseNameSet>;
 
-    fn with_consistency_level(self, consistency_level: ConsistencyLevel<'a>) -> Self::O {
+    fn with_consistency_level(self, consistency_level: ConsistencyLevel<'b>) -> Self::O {
         CreateDatabaseBuilder {
             cosmos_client: self.cosmos_client,
             p_database_name: PhantomData {},
@@ -149,7 +174,10 @@ where
 }
 
 // methods callable only when every mandatory field has been filled
-impl<'a> CreateDatabaseBuilder<'a, Yes> {
+impl<'a, 'b, CUB> CreateDatabaseBuilder<'a, 'b, CUB, Yes>
+where
+    CUB: CosmosUriBuilder,
+{
     pub async fn execute(&self) -> Result<CreateDatabaseResponse, AzureError> {
         trace!("CreateDatabaseBuilder::execute called");
 
@@ -165,7 +193,7 @@ impl<'a> CreateDatabaseBuilder<'a, Yes> {
         let request = self.cosmos_client().prepare_request(
             "dbs",
             hyper::Method::POST,
-            ResourceType::Databases,
+            crate::ResourceType::Databases,
         );
 
         let request = UserAgentOption::add_header(self, request);
