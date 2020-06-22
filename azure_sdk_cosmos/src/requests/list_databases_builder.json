@@ -45,10 +45,10 @@
 		},
 		{
 			"name": "continuation",
-			"field_type": "&'b str",
+			"field_type": "String",
 			"optional": true,
-			"trait_get": "ContinuationOption<'b>",
-			"trait_set": "ContinuationSupport<'b>"
+			"trait_get": "ContinuationOption",
+			"trait_set": "ContinuationSupport"
 		},
 		{
 			"name": "max_item_count",

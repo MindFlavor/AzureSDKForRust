@@ -11,13 +11,13 @@
 			"hyper::StatusCode",
 			"std::convert::TryInto"
 	],
-	"extra_types": [ "'a", "C" ],
-	"extra_wheres": ["C: CosmosClient" ],
+	"extra_types": [ "'a", "CUB" ],
+	"extra_wheres": [ "CUB: CosmosUriBuilder" ],
 	"constructor_fields": [
 		{
 			"name": "database_client",
-			"field_type": "&'a dyn DatabaseClient<C>",
-			"trait_get": "DatabaseClientRequired<'a, C>"
+			"field_type": "&'a DatabaseClient<'a, CUB>",
+			"trait_get": "DatabaseClientRequired<'a, CUB>"
 		}
 	],
 	"fields": [
@@ -45,10 +45,10 @@
 		},
 		{
 			"name": "continuation",
-			"field_type": "&'a str",
+			"field_type": "String",
 			"optional": true,
-			"trait_get": "ContinuationOption<'a>",
-			"trait_set": "ContinuationSupport<'a>"
+			"trait_get": "ContinuationOption",
+			"trait_set": "ContinuationSupport"
 		},
 		{
 			"name": "max_item_count",

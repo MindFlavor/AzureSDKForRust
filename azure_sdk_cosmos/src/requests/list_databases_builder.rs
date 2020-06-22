@@ -7,7 +7,7 @@ use futures::stream::{unfold, Stream};
 use hyper::StatusCode;
 use std::convert::TryInto;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ListDatabasesBuilder<'a, 'b, CUB>
 where
     CUB: CosmosUriBuilder,
@@ -16,7 +16,7 @@ where
     user_agent: Option<&'b str>,
     activity_id: Option<&'b str>,
     consistency_level: Option<ConsistencyLevel<'b>>,
-    continuation: Option<&'b str>,
+    continuation: Option<String>,
     max_item_count: i32,
 }
 
@@ -34,22 +34,6 @@ where
             consistency_level: None,
             continuation: None,
             max_item_count: -1,
-        }
-    }
-}
-
-impl<'a, 'b, CUB> Clone for ListDatabasesBuilder<'a, 'b, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn clone(&self) -> Self {
-        Self {
-            cosmos_client: self.cosmos_client,
-            user_agent: self.user_agent,
-            activity_id: self.activity_id,
-            consistency_level: self.consistency_level.clone(),
-            continuation: self.continuation,
-            max_item_count: self.max_item_count,
         }
     }
 }
@@ -93,12 +77,15 @@ where
     }
 }
 
-impl<'a, 'b, CUB> ContinuationOption<'b> for ListDatabasesBuilder<'a, 'b, CUB>
+impl<'a, 'b, CUB> ContinuationOption for ListDatabasesBuilder<'a, 'b, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    fn continuation(&self) -> Option<&'b str> {
-        self.continuation
+    fn continuation(&self) -> Option<&str> {
+        match &self.continuation {
+            Some(continuation) => Some(continuation),
+            None => None,
+        }
     }
 }
 
@@ -165,13 +152,13 @@ where
     }
 }
 
-impl<'a, 'b, CUB> ContinuationSupport<'b> for ListDatabasesBuilder<'a, 'b, CUB>
+impl<'a, 'b, CUB> ContinuationSupport for ListDatabasesBuilder<'a, 'b, CUB>
 where
     CUB: CosmosUriBuilder,
 {
     type O = ListDatabasesBuilder<'a, 'b, CUB>;
 
-    fn with_continuation(self, continuation: &'b str) -> Self::O {
+    fn with_continuation(self, continuation: String) -> Self::O {
         ListDatabasesBuilder {
             cosmos_client: self.cosmos_client,
             user_agent: self.user_agent,
@@ -244,7 +231,7 @@ where
                         Some(States::Init) => self.execute().await,
                         Some(States::Continuation(continuation_token)) => {
                             self.clone()
-                                .with_continuation(&continuation_token)
+                                .with_continuation(continuation_token)
                                 .execute()
                                 .await
                         }

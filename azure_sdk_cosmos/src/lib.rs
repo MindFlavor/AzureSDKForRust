@@ -89,6 +89,13 @@ where
     fn cosmos_client(&'b self) -> &'b CosmosClient<'a, CUB>;
 }
 
+pub trait DatabaseClientRequired<'a, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
+    fn database_client(&'a self) -> &'a DatabaseClient<'a, CUB>;
+}
+
 pub trait DatabaseRequired<'a> {
     fn database(&self) -> &'a str;
 }
@@ -243,13 +250,13 @@ pub trait PartitionRangeIdOption<'a> {
     }
 }
 
-pub trait ContinuationSupport<'a> {
+pub trait ContinuationSupport {
     type O;
-    fn with_continuation(self, continuation: &'a str) -> Self::O;
+    fn with_continuation(self, continuation: String) -> Self::O;
 }
 
-pub trait ContinuationOption<'a> {
-    fn continuation(&self) -> Option<&'a str>;
+pub trait ContinuationOption {
+    fn continuation(&self) -> Option<&str>;
 
     #[must_use]
     fn add_header(&self, builder: Builder) -> Builder {
@@ -412,13 +419,6 @@ pub trait ExpirySecondsOption {
 pub trait ExpirySecondsSupport {
     type O;
     fn with_expiry_seconds(self, expiry_seconds: u64) -> Self::O;
-}
-
-pub trait DatabaseClientRequired<'a, CUB>
-where
-    CUB: CosmosUriBuilder,
-{
-    fn database_client(&self) -> &CosmosClient<'a, CUB>;
 }
 
 pub trait DatabaseSupport<'a> {

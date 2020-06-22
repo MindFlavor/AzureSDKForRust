@@ -1,4 +1,4 @@
-//use crate::clients::DatabaseStruct;
+use crate::clients::DatabaseClient;
 use crate::headers::*;
 use crate::requests;
 use crate::{AuthorizationToken, ResourceType};
@@ -21,7 +21,7 @@ const AZURE_VERSION: &str = "2018-12-31";
 const VERSION: &str = "1.0";
 const TIME_FORMAT: &str = "%a, %d %h %Y %T GMT";
 
-pub trait CosmosUriBuilder: Send + Sync {
+pub trait CosmosUriBuilder: Send + Sync + Clone {
     fn build_base_uri(&self) -> &str;
 }
 
@@ -38,7 +38,7 @@ where
 
 impl<'a, CUB> CosmosClient<'a, CUB>
 where
-    CUB: CosmosUriBuilder + Clone,
+    CUB: CosmosUriBuilder,
 {
     pub fn with_auth_token(&self, auth_token: AuthorizationToken) -> Self {
         Self {
@@ -47,6 +47,26 @@ where
             auth_token,
             cosmos_uri_builder: self.cosmos_uri_builder.clone(),
         }
+    }
+
+    //pub fn into_database_client<'db, IntoCowStr>(
+    //    self,
+    //    database_name: IntoCowStr,
+    //) -> DatabaseClient<'a, 'db, CUB>
+    //where
+    //    IntoCowStr: Into<Cow<'db, str>>,
+    //{
+    //    DatabaseClient::new(Cow::Owned(self), database_name.into())
+    //}
+
+    pub fn with_database_client<IntoCowStr>(
+        &'a self,
+        database_name: IntoCowStr,
+    ) -> DatabaseClient<'a, CUB>
+    where
+        IntoCowStr: Into<Cow<'a, str>>,
+    {
+        DatabaseClient::new(Cow::Borrowed(self), database_name.into())
     }
 }
 
@@ -112,23 +132,6 @@ where
             .header(HEADER_VERSION, HeaderValue::from_static(AZURE_VERSION))
             .header(header::AUTHORIZATION, signature)
     }
-
-    //fn into_database_client<IntoCowStr>(self, database_name: IntoCowStr) -> DatabaseStruct<'a, Self>
-    //where
-    //    IntoCowStr: Into<Cow<'a, str>>,
-    //{
-    //    DatabaseStruct::new(Cow::Owned(self), database_name.into())
-    //}
-
-    //fn with_database_client<IntoCowStr>(
-    //    &'a self,
-    //    database_name: IntoCowStr,
-    //) -> DatabaseStruct<'a, Self>
-    //where
-    //    IntoCowStr: Into<Cow<'a, str>>,
-    //{
-    //    DatabaseStruct::new(Cow::Borrowed(self), database_name.into())
-    //}
 }
 
 #[derive(Debug, Clone)]
