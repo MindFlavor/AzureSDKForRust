@@ -89,11 +89,11 @@ where
     fn cosmos_client(&'b self) -> &'b CosmosClient<'a, CUB>;
 }
 
-pub trait DatabaseClientRequired<'a, CUB>
+pub trait DatabaseClientRequired<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    fn database_client(&'a self) -> &'a DatabaseClient<'a, CUB>;
+    fn database_client(&'a self) -> &'a DatabaseClient<'c, 'db, CUB>;
 }
 
 pub trait DatabaseRequired<'a> {

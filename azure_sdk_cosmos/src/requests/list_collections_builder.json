@@ -11,13 +11,13 @@
 			"hyper::StatusCode",
 			"std::convert::TryInto"
 	],
-	"extra_types": [ "'a", "CUB" ],
+	"extra_types": [ "'a", "'c", "'db", "CUB" ],
 	"extra_wheres": [ "CUB: CosmosUriBuilder" ],
 	"constructor_fields": [
 		{
 			"name": "database_client",
-			"field_type": "&'a DatabaseClient<'a, CUB>",
-			"trait_get": "DatabaseClientRequired<'a, CUB>"
+			"field_type": "&'a DatabaseClient<'c, 'db, CUB>",
+			"trait_get": "DatabaseClientRequired<'c, 'db, CUB>"
 		}
 	],
 	"fields": [

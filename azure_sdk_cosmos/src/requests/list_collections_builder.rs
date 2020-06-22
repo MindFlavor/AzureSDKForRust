@@ -8,11 +8,11 @@ use hyper::StatusCode;
 use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
-pub struct ListCollectionsBuilder<'a, CUB>
+pub struct ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    database_client: &'a DatabaseClient<'a, CUB>,
+    database_client: &'a DatabaseClient<'c, 'db, CUB>,
     user_agent: Option<&'a str>,
     activity_id: Option<&'a str>,
     consistency_level: Option<ConsistencyLevel<'a>>,
@@ -20,13 +20,13 @@ where
     max_item_count: i32,
 }
 
-impl<'a, CUB> ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
     pub(crate) fn new(
-        database_client: &'a DatabaseClient<'a, CUB>,
-    ) -> ListCollectionsBuilder<'a, CUB> {
+        database_client: &'a DatabaseClient<'c, 'db, CUB>,
+    ) -> ListCollectionsBuilder<'a, 'c, 'db, CUB> {
         ListCollectionsBuilder {
             database_client,
             user_agent: None,
@@ -38,11 +38,12 @@ where
     }
 }
 
-impl<'a, CUB> DatabaseClientRequired<'a, CUB> for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> DatabaseClientRequired<'a, 'c, 'db, CUB>
+    for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    fn database_client(&self) -> &'a DatabaseClient<'a, CUB> {
+    fn database_client(&'a self) -> &'a DatabaseClient<'c, 'db, CUB> {
         self.database_client
     }
 }
@@ -50,7 +51,7 @@ where
 //get mandatory no traits methods
 
 //set mandatory no traits methods
-impl<'a, CUB> UserAgentOption<'a> for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> UserAgentOption<'a> for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
@@ -59,7 +60,7 @@ where
     }
 }
 
-impl<'a, CUB> ActivityIdOption<'a> for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ActivityIdOption<'a> for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
@@ -68,7 +69,7 @@ where
     }
 }
 
-impl<'a, CUB> ConsistencyLevelOption<'a> for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ConsistencyLevelOption<'a> for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
@@ -77,19 +78,19 @@ where
     }
 }
 
-impl<'a, CUB> ContinuationOption for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ContinuationOption for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
     fn continuation(&self) -> Option<&str> {
-        match &self.continuation {
-            Some(continuation) => Some(continuation),
+        match self.continuation.as_ref() {
+            Some(c) => Some(&c),
             None => None,
         }
     }
 }
 
-impl<'a, CUB> MaxItemCountOption for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> MaxItemCountOption for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
@@ -98,11 +99,11 @@ where
     }
 }
 
-impl<'a, CUB> UserAgentSupport<'a> for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> UserAgentSupport<'a> for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    type O = ListCollectionsBuilder<'a, CUB>;
+    type O = ListCollectionsBuilder<'a, 'c, 'db, CUB>;
 
     fn with_user_agent(self, user_agent: &'a str) -> Self::O {
         ListCollectionsBuilder {
@@ -116,11 +117,11 @@ where
     }
 }
 
-impl<'a, CUB> ActivityIdSupport<'a> for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ActivityIdSupport<'a> for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    type O = ListCollectionsBuilder<'a, CUB>;
+    type O = ListCollectionsBuilder<'a, 'c, 'db, CUB>;
 
     fn with_activity_id(self, activity_id: &'a str) -> Self::O {
         ListCollectionsBuilder {
@@ -134,11 +135,11 @@ where
     }
 }
 
-impl<'a, CUB> ConsistencyLevelSupport<'a> for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ConsistencyLevelSupport<'a> for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    type O = ListCollectionsBuilder<'a, CUB>;
+    type O = ListCollectionsBuilder<'a, 'c, 'db, CUB>;
 
     fn with_consistency_level(self, consistency_level: ConsistencyLevel<'a>) -> Self::O {
         ListCollectionsBuilder {
@@ -152,11 +153,11 @@ where
     }
 }
 
-impl<'a, CUB> ContinuationSupport for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ContinuationSupport for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    type O = ListCollectionsBuilder<'a, CUB>;
+    type O = ListCollectionsBuilder<'a, 'c, 'db, CUB>;
 
     fn with_continuation(self, continuation: String) -> Self::O {
         ListCollectionsBuilder {
@@ -170,11 +171,11 @@ where
     }
 }
 
-impl<'a, CUB> MaxItemCountSupport for ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> MaxItemCountSupport for ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
-    type O = ListCollectionsBuilder<'a, CUB>;
+    type O = ListCollectionsBuilder<'a, 'c, 'db, CUB>;
 
     fn with_max_item_count(self, max_item_count: i32) -> Self::O {
         ListCollectionsBuilder {
@@ -189,7 +190,7 @@ where
 }
 
 // methods callable only when every mandatory field has been filled
-impl<'a, CUB> ListCollectionsBuilder<'a, CUB>
+impl<'a, 'c, 'db, CUB> ListCollectionsBuilder<'a, 'c, 'db, CUB>
 where
     CUB: CosmosUriBuilder,
 {
@@ -216,7 +217,16 @@ where
             check_status_extract_headers_and_body(future_response, StatusCode::OK).await?;
         Ok((&headers, &body as &[u8]).try_into()?)
     }
+}
 
+// TODO: This should return ListCollectionsBuilder<'a, 'c, 'db, CUB>
+// Will be corrected as soon as the
+// "hidden type for `impl Trait` captures lifetime that does not appear in bounds"
+// bug will be fixed by the Rust team (issue #63033)
+impl<'a, 'db, CUB> ListCollectionsBuilder<'a, 'a, 'db, CUB>
+where
+    CUB: CosmosUriBuilder,
+{
     pub fn stream(
         &'a self,
     ) -> impl Stream<Item = Result<ListCollectionsResponse, AzureError>> + '_ {

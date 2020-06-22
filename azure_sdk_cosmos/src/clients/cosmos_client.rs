@@ -26,17 +26,17 @@ pub trait CosmosUriBuilder: Send + Sync + Clone {
 }
 
 #[derive(Debug, Clone)]
-pub struct CosmosClient<'a, CUB>
+pub struct CosmosClient<'c, CUB>
 where
     CUB: CosmosUriBuilder,
 {
     hyper_client: hyper::Client<HttpsConnector<hyper::client::HttpConnector>>,
-    account: Cow<'a, str>,
+    account: Cow<'c, str>,
     auth_token: AuthorizationToken,
     cosmos_uri_builder: CUB,
 }
 
-impl<'a, CUB> CosmosClient<'a, CUB>
+impl<'c, CUB> CosmosClient<'c, CUB>
 where
     CUB: CosmosUriBuilder,
 {
@@ -49,28 +49,28 @@ where
         }
     }
 
-    //pub fn into_database_client<'db, IntoCowStr>(
-    //    self,
-    //    database_name: IntoCowStr,
-    //) -> DatabaseClient<'a, 'db, CUB>
-    //where
-    //    IntoCowStr: Into<Cow<'db, str>>,
-    //{
-    //    DatabaseClient::new(Cow::Owned(self), database_name.into())
-    //}
-
-    pub fn with_database_client<IntoCowStr>(
-        &'a self,
+    pub fn into_database_client<IntoCowStr>(
+        self,
         database_name: IntoCowStr,
-    ) -> DatabaseClient<'a, CUB>
+    ) -> DatabaseClient<'c, 'c, CUB>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'c, str>>,
+    {
+        DatabaseClient::new(Cow::Owned(self), database_name.into())
+    }
+
+    pub fn with_database_client<'db, IntoCowStr>(
+        &'c self,
+        database_name: IntoCowStr,
+    ) -> DatabaseClient<'c, 'db, CUB>
+    where
+        IntoCowStr: Into<Cow<'db, str>>,
     {
         DatabaseClient::new(Cow::Borrowed(self), database_name.into())
     }
 }
 
-impl<'a, CUB> CosmosClient<'a, CUB>
+impl<'c, CUB> CosmosClient<'c, CUB>
 where
     CUB: CosmosUriBuilder,
 {
@@ -188,12 +188,12 @@ pub struct ClientBuilder {}
 
 impl ClientBuilder {
     #[allow(clippy::new_ret_no_self)]
-    pub fn new<'a, IntoCowStr>(
+    pub fn new<'c, IntoCowStr>(
         account: IntoCowStr,
         auth_token: AuthorizationToken,
-    ) -> Result<CosmosClient<'a, DefaultCosmosUri>, AzureError>
+    ) -> Result<CosmosClient<'c, DefaultCosmosUri>, AzureError>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'c, str>>,
     {
         let account = account.into();
         let client = hyper::Client::builder().build(HttpsConnector::new());
@@ -207,12 +207,12 @@ impl ClientBuilder {
         })
     }
 
-    pub fn new_china<'a, IntoCowStr>(
+    pub fn new_china<'c, IntoCowStr>(
         account: IntoCowStr,
         auth_token: AuthorizationToken,
-    ) -> Result<CosmosClient<'a, ChinaCosmosUri>, AzureError>
+    ) -> Result<CosmosClient<'c, ChinaCosmosUri>, AzureError>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'c, str>>,
     {
         let account = account.into();
         let client = hyper::Client::builder().build(HttpsConnector::new());
@@ -226,13 +226,13 @@ impl ClientBuilder {
         })
     }
 
-    pub fn new_custom<'a, IntoCowStr>(
+    pub fn new_custom<'c, IntoCowStr>(
         account: IntoCowStr,
         auth_token: AuthorizationToken,
         uri: String,
-    ) -> Result<CosmosClient<'a, CustomCosmosUri>, AzureError>
+    ) -> Result<CosmosClient<'c, CustomCosmosUri>, AzureError>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'c, str>>,
     {
         let client = hyper::Client::builder().build(HttpsConnector::new());
 
