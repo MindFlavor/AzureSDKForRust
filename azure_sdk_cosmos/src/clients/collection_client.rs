@@ -11,23 +11,18 @@ use std::borrow::Cow;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct CollectionStruct<'a, C, D>
-where
-    C: CosmosClient + Clone,
-    D: DatabaseClient<C> + Clone,
-{
-    database_client: Cow<'a, D>,
-    collection_name: Cow<'a, str>,
+pub struct CollectionClient<'c, 'db, 'coll> {
+    database_client: Cow<'coll, DatabaseClient<'c, 'db>>,
+    collection_name: Cow<'coll, str>,
     p_c: PhantomData<C>,
 }
 
-impl<'a, C, D> CollectionStruct<'a, C, D>
-where
-    C: CosmosClient + Clone,
-    D: DatabaseClient<C> + Clone,
-{
+impl<'c, 'db, 'coll> CollectionClient<'c, 'db, 'coll> {
     #[inline]
-    pub(crate) fn new(database_client: Cow<'a, D>, collection_name: Cow<'a, str>) -> Self {
+    pub(crate) fn new(
+        database_client: Cow<'coll, DatabaseClient<'c, 'db>>,
+        collection_name: Cow<'coll, str>,
+    ) -> Self {
         Self {
             database_client,
             collection_name,
@@ -36,7 +31,7 @@ where
     }
 }
 
-impl<'a, C, D> HasHyperClient for CollectionStruct<'a, C, D>
+impl<'coll, C, D> HasHyperClient for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -49,7 +44,7 @@ where
     }
 }
 
-impl<'a, C, D> HasCosmosClient<C> for CollectionStruct<'a, C, D>
+impl<'coll, C, D> HasCosmosClient<C> for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -60,7 +55,7 @@ where
     }
 }
 
-impl<'a, C, D> HasDatabaseClient<C, D> for CollectionStruct<'a, C, D>
+impl<'coll, C, D> HasDatabaseClient<C, D> for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -71,7 +66,7 @@ where
     }
 }
 
-impl<'a, C, D> CollectionClient<C, D> for CollectionStruct<'a, C, D>
+impl<'coll, C, D> CollectionClient<C, D> for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -128,8 +123,8 @@ where
     }
 }
 
-impl<'a, 'b, C, D> IntoDocumentClient<'b, C, D, Self, DocumentStruct<'a, 'b, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, 'b, C, D> IntoDocumentClient<'b, C, D, Self, DocumentStruct<'coll, 'b, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -138,7 +133,7 @@ where
         self,
         document_name: DocName,
         partition_keys: PartitionKeys,
-    ) -> DocumentStruct<'a, 'b, C, D, Self>
+    ) -> DocumentStruct<'coll, 'b, C, D, Self>
     where
         DocName: Into<Cow<'b, str>>,
     {
@@ -146,17 +141,18 @@ where
     }
 }
 
-impl<'a, 'b, C, D> WithDocumentClient<'a, 'b, C, D, Self, DocumentStruct<'a, 'b, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, 'b, C, D>
+    WithDocumentClient<'coll, 'b, C, D, Self, DocumentStruct<'coll, 'b, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
     fn with_document_client<DocName>(
-        &'a self,
+        &'coll self,
         document_name: DocName,
         partition_keys: PartitionKeys,
-    ) -> DocumentStruct<'a, 'b, C, D, Self>
+    ) -> DocumentStruct<'coll, 'b, C, D, Self>
     where
         DocName: Into<Cow<'b, str>>,
     {
@@ -164,25 +160,25 @@ where
     }
 }
 
-impl<'a, C, D> WithTriggerClient<'a, C, D, Self, TriggerStruct<'a, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, C, D> WithTriggerClient<'coll, C, D, Self, TriggerStruct<'coll, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
     fn with_trigger_client<IntoCowStr>(
-        &'a self,
+        &'coll self,
         trigger_name: IntoCowStr,
-    ) -> TriggerStruct<'a, C, D, Self>
+    ) -> TriggerStruct<'coll, C, D, Self>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'coll, str>>,
     {
         TriggerStruct::new(Cow::Borrowed(self), trigger_name.into())
     }
 }
 
-impl<'a, C, D> IntoTriggerClient<'a, C, D, Self, TriggerStruct<'a, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, C, D> IntoTriggerClient<'coll, C, D, Self, TriggerStruct<'coll, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -190,35 +186,35 @@ where
     fn into_trigger_client<IntoCowStr>(
         self,
         trigger_name: IntoCowStr,
-    ) -> TriggerStruct<'a, C, D, Self>
+    ) -> TriggerStruct<'coll, C, D, Self>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'coll, str>>,
     {
         TriggerStruct::new(Cow::Owned(self), trigger_name.into())
     }
 }
 
-impl<'a, C, D>
-    WithUserDefinedFunctionClient<'a, C, D, Self, UserDefinedFunctionStruct<'a, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, C, D>
+    WithUserDefinedFunctionClient<'coll, C, D, Self, UserDefinedFunctionStruct<'coll, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
     fn with_user_defined_function_client<IntoCowStr>(
-        &'a self,
+        &'coll self,
         user_defined_function_name: IntoCowStr,
-    ) -> UserDefinedFunctionStruct<'a, C, D, Self>
+    ) -> UserDefinedFunctionStruct<'coll, C, D, Self>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'coll, str>>,
     {
         UserDefinedFunctionStruct::new(Cow::Borrowed(self), user_defined_function_name.into())
     }
 }
 
-impl<'a, C, D>
-    IntoUserDefinedFunctionClient<'a, C, D, Self, UserDefinedFunctionStruct<'a, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, C, D>
+    IntoUserDefinedFunctionClient<'coll, C, D, Self, UserDefinedFunctionStruct<'coll, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -226,33 +222,35 @@ where
     fn into_user_defined_function_client<IntoCowStr>(
         self,
         user_defined_function_name: IntoCowStr,
-    ) -> UserDefinedFunctionStruct<'a, C, D, Self>
+    ) -> UserDefinedFunctionStruct<'coll, C, D, Self>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'coll, str>>,
     {
         UserDefinedFunctionStruct::new(Cow::Owned(self), user_defined_function_name.into())
     }
 }
 
-impl<'a, C, D> WithStoredProcedureClient<'a, C, D, Self, StoredProcedureStruct<'a, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, C, D>
+    WithStoredProcedureClient<'coll, C, D, Self, StoredProcedureStruct<'coll, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
 {
     fn with_stored_procedure_client<IntoCowStr>(
-        &'a self,
+        &'coll self,
         stored_procedure_name: IntoCowStr,
-    ) -> StoredProcedureStruct<'a, C, D, Self>
+    ) -> StoredProcedureStruct<'coll, C, D, Self>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'coll, str>>,
     {
         StoredProcedureStruct::new(Cow::Borrowed(self), stored_procedure_name.into())
     }
 }
 
-impl<'a, C, D> IntoStoredProcedureClient<'a, C, D, Self, StoredProcedureStruct<'a, C, D, Self>>
-    for CollectionStruct<'a, C, D>
+impl<'coll, C, D>
+    IntoStoredProcedureClient<'coll, C, D, Self, StoredProcedureStruct<'coll, C, D, Self>>
+    for CollectionClient<'c, 'db, 'coll>
 where
     C: CosmosClient + Clone,
     D: DatabaseClient<C> + Clone,
@@ -260,9 +258,9 @@ where
     fn into_stored_procedure_client<IntoCowStr>(
         self,
         stored_procedure_name: IntoCowStr,
-    ) -> StoredProcedureStruct<'a, C, D, Self>
+    ) -> StoredProcedureStruct<'coll, C, D, Self>
     where
-        IntoCowStr: Into<Cow<'a, str>>,
+        IntoCowStr: Into<Cow<'coll, str>>,
     {
         StoredProcedureStruct::new(Cow::Owned(self), stored_procedure_name.into())
     }
