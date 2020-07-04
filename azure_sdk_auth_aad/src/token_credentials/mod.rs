@@ -1,8 +1,10 @@
 mod cli_credentials;
+mod client_secret_credentials;
 mod default_credentials;
 mod environment_credentials;
 mod managed_identity_credentials;
 pub use crate::token_credentials::cli_credentials::*;
+pub use crate::token_credentials::client_secret_credentials::*;
 pub use crate::token_credentials::default_credentials::*;
 pub use crate::token_credentials::environment_credentials::*;
 pub use crate::token_credentials::managed_identity_credentials::*;
