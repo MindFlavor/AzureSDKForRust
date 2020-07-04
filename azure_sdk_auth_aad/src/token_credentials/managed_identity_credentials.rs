@@ -18,7 +18,10 @@ const MSI_ENDPOINT_ENV_KEY: &str = "IDENTITY_ENDPOINT";
 const MSI_SECRET_ENV_KEY: &str = "IDENTITY_HEADER";
 const MSI_API_VERSION: &str = "2019-08-01";
 
-/// Built up from docs at https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity#using-the-rest-protocol
+/// Attempts authentication using a managed identity that has been assigned to the deployment environment. This authentication type works in Azure VMs,
+/// App Service and Azure Functions applications, as well as the Azure Cloud Shell
+///
+/// Built up from docs at [https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity#using-the-rest-protocol](https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity#using-the-rest-protocol)
 pub struct ManagedIdentityCredential;
 
 #[async_trait::async_trait]

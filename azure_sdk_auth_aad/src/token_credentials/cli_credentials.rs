@@ -33,6 +33,7 @@ struct CliTokenResponse {
     pub token_type: String,
 }
 
+/// Enables authentication to Azure Active Directory using Azure CLI to obtain an access token.
 pub struct AzureCliCredential;
 
 #[async_trait::async_trait]

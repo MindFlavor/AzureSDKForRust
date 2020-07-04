@@ -8,6 +8,18 @@ const AZURE_USERNAME_ENV_KEY: &str = "AZURE_USERNAME";
 const AZURE_PASSWORD_ENV_KEY: &str = "AZURE_PASSWORD";
 const AZURE_CLIENT_CERTIFICATE_PATH_ENV_KEY: &str = "AZURE_CLIENT_CERTIFICATE_PATH";
 
+/// Enables authentication to Azure Active Directory using client secret, or username and password,
+/// details configured in the following environment variables:
+///
+/// | Variable                            | Description                                      |
+/// |-------------------------------------|--------------------------------------------------|
+/// | `AZURE_TENANT_ID`                   | The Azure Active Directory tenant(directory) ID. |
+/// | `AZURE_CLIENT_ID`                   | The client(application) ID of an App Registration in the tenant. |
+/// | `AZURE_CLIENT_SECRET`               | A client secret that was generated for the App Registration. |
+///
+/// This credential ultimately uses a `ClientSecretCredential` to
+/// perform the authentication using these details. Please consult the
+/// documentation of that class for more details.
 pub struct EnvironmentCredential;
 
 #[async_trait::async_trait]

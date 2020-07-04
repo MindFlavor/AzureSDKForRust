@@ -9,6 +9,9 @@ use oauth2::{
 use std::{str, time::Duration};
 use url::Url;
 
+/// Enables authentication to Azure Active Directory using a client secret that was generated for an App Registration. More information on how
+/// to configure a client secret can be found here:
+/// https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#add-credentials-to-your-web-application
 pub struct ClientSecretCredential {
     tenant_id: String,
     client_id: oauth2::ClientId,

@@ -6,6 +6,7 @@ use crate::{
 use azure_sdk_core::errors::AzureError;
 use log::debug;
 
+/// Provides a mechanism of selectively disabling credentials used for a `DefaultCredential` instance
 pub struct DefaultCredentialBuilder {
     include_environment_credential: bool,
     include_managed_identity_credential: bool,
@@ -54,6 +55,12 @@ impl DefaultCredentialBuilder {
     }
 }
 
+/// Provides a default `TokenCredential` authentication flow for applications that will be deployed to Azure.  The following credential
+/// types if enabled will be tried, in order:
+/// - EnvironmentCredential
+/// - ManagedIdentityCredential
+/// - AzureCliCredential
+/// Consult the documentation of these credential types for more information on how they attempt authentication.
 pub struct DefaultCredential {
     sources: Vec<Box<dyn TokenCredential + Send + Sync>>,
 }
