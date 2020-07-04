@@ -1,4 +1,4 @@
-use crate::token_credentials::TokenCredential;
+use crate::token_credentials::{TokenCredential, TokenResponse};
 use azure_sdk_core::errors::AzureError;
 use chrono::{DateTime, Utc};
 use oauth2::AccessToken;
@@ -37,7 +37,7 @@ pub struct AzureCliCredential;
 
 #[async_trait::async_trait]
 impl TokenCredential for AzureCliCredential {
-    async fn get_token(&self, resource: &str) -> Result<Box<AccessToken>, AzureError> {
+    async fn get_token(&self, resource: &str) -> Result<TokenResponse, AzureError> {
         let az_command = Command::new("az")
             .args(&[
                 "account",
@@ -54,13 +54,13 @@ impl TokenCredential for AzureCliCredential {
                 if az_output.status.success() {
                     let output = str::from_utf8(&az_output.stdout).unwrap();
                     let tr = serde_json::from_str::<CliTokenResponse>(output)
-                        .map(|tr| tr.access_token)
+                        .map(|tr| TokenResponse::new(tr.access_token, tr.expires_on))
                         .map_err(|_| {
                             AzureError::GenericErrorWithText(
                                 "Failed to serialize response".to_string(),
                             )
                         })?;
-                    Ok(Box::new(tr))
+                    Ok(tr)
                 } else {
                     let output = str::from_utf8(&az_output.stderr).unwrap();
                     Err(AzureError::GenericErrorWithText(output.to_string()))

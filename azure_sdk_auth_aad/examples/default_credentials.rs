@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let resp = reqwest::Client::new()
         .get(url)
-        .header("Authorization", format!("Bearer {}", res.secret()))
+        .header("Authorization", format!("Bearer {}", res.token.secret()))
         .send()
         .await?
         .text()

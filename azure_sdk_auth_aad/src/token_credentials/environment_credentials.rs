@@ -1,11 +1,12 @@
 use crate::token_credentials::TokenCredential;
 
 use azure_sdk_core::errors::AzureError;
+use chrono::Utc;
 use oauth2::{
     basic::BasicClient, reqwest::async_http_client, AccessToken,
     AsyncClientCredentialsTokenRequest, AuthType, AuthUrl, Scope, TokenResponse, TokenUrl,
 };
-use std::str;
+use std::{str, time::Duration};
 use url::Url;
 
 const AZURE_TENANT_ID_ENV_KEY: &str = "AZURE_TENANT_ID";
@@ -16,7 +17,7 @@ pub struct EnvironmentCredential;
 
 #[async_trait::async_trait]
 impl TokenCredential for EnvironmentCredential {
-    async fn get_token(&self, resource: &str) -> Result<Box<AccessToken>, AzureError> {
+    async fn get_token(&self, resource: &str) -> Result<crate::TokenResponse, AzureError> {
         let tenant_id = std::env::var(AZURE_TENANT_ID_ENV_KEY).map_err(|_| {
             AzureError::GenericErrorWithText(format!(
                 "Missing tenant id set in {} environment variable",
@@ -68,7 +69,16 @@ impl TokenCredential for EnvironmentCredential {
             .add_scope(Scope::new(format!("{}.default", resource)))
             .request_async(async_http_client)
             .await
-            .map(|r| AccessToken::new(r.access_token().secret().to_string()))
+            .map(|r| {
+                crate::TokenResponse::new(
+                    AccessToken::new(r.access_token().secret().to_owned()),
+                    Utc::now()
+                        + chrono::Duration::from_std(
+                            r.expires_in().unwrap_or(Duration::from_secs(0)),
+                        )
+                        .unwrap(),
+                )
+            })
             .map_err(|e| match e {
                 oauth2::RequestTokenError::ServerResponse(s) => AzureError::GenericErrorWithText(
                     s.error_description()
@@ -78,6 +88,6 @@ impl TokenCredential for EnvironmentCredential {
                 _ => AzureError::GenericErrorWithText("OAuth2 error".to_string()),
             })?;
 
-        Ok(Box::new(token_result))
+        Ok(token_result)
     }
 }

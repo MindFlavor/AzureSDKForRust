@@ -1,8 +1,7 @@
 use crate::token_credentials::AzureCliCredential;
-use crate::{token_credentials::TokenCredential, EnvironmentCredential};
+use crate::{token_credentials::TokenCredential, EnvironmentCredential, TokenResponse};
 use azure_sdk_core::errors::AzureError;
 use log::debug;
-use oauth2::AccessToken;
 
 pub struct DefaultCredentialBuilder {
     include_environment_credential: bool,
@@ -63,7 +62,7 @@ impl Default for DefaultCredential {
 
 #[async_trait::async_trait]
 impl TokenCredential for DefaultCredential {
-    async fn get_token(&self, resource: &str) -> Result<Box<AccessToken>, AzureError> {
+    async fn get_token(&self, resource: &str) -> Result<TokenResponse, AzureError> {
         for source in &self.sources {
             let token_res = source.get_token(resource).await;
 

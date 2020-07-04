@@ -1,4 +1,4 @@
-use crate::token_credentials::TokenCredential;
+use crate::{token_credentials::TokenCredential, TokenResponse};
 
 use azure_sdk_core::errors::AzureError;
 use chrono::{DateTime, Utc};
@@ -23,7 +23,7 @@ pub struct ManagedIdentityCredential;
 
 #[async_trait::async_trait]
 impl TokenCredential for ManagedIdentityCredential {
-    async fn get_token(&self, resource: &str) -> Result<Box<AccessToken>, AzureError> {
+    async fn get_token(&self, resource: &str) -> Result<TokenResponse, AzureError> {
         let msi_endpoint = std::env::var(MSI_ENDPOINT_ENV_KEY)
             .unwrap_or("http://169.254.169.254/metadata/identity/oauth2/token".to_owned());
 
@@ -54,6 +54,9 @@ impl TokenCredential for ManagedIdentityCredential {
         let token_response = serde_json::from_str::<MsiTokenResponse>(&res_body)
             .map_err(|_| AzureError::GenericError)?;
 
-        Ok(Box::new(token_response.access_token))
+        Ok(TokenResponse::new(
+            token_response.access_token,
+            token_response.expires_on,
+        ))
     }
 }

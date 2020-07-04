@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .get_token("https://storage.azure.com/")
         .await?;
 
-    let client = client::with_bearer_token(account, bearer_token.secret());
+    let client = client::with_bearer_token(account, bearer_token.token.secret());
 
     trace!("Requesting blob");
 
