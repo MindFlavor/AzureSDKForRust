@@ -172,6 +172,23 @@ pub fn from_connection_string(connection_string: &str) -> Result<KeyClient, Azur
             ConnectionString {
                 account_name: Some(account),
                 sas: Some(sas_token),
+                use_development_storage: Some(true),
+                blob_endpoint: Some(blob_endpoint_url),
+                table_endpoint: Some(table_endpoint_url),
+                ..
+            } => {
+                Ok(KeyClient::new(
+                    account.to_owned(),
+                    String::new(),
+                    Some(get_sas_token_parms(sas_token)),
+                    client,
+                    blob_endpoint_url.to_owned(),
+                    table_endpoint_url.to_owned(),
+                ))
+            }
+            ConnectionString {
+                account_name: Some(account),
+                sas: Some(sas_token),
                 ..
             } => Ok(KeyClient ::new(
                 account.to_owned(),
