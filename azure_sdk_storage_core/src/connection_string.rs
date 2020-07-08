@@ -157,7 +157,7 @@ impl<'a> ConnectionString<'a> {
             .filter(|s| !s.chars().all(char::is_whitespace));
 
         for kv_pair_str in kv_str_pairs {
-            let mut kv = kv_pair_str.trim().split('=');
+            let mut kv = kv_pair_str.trim().splitn(2, '=');
             let k = match kv.next() {
                 Some(k) if k.chars().all(char::is_whitespace) => {
                     return Err(ConnectionStringError::ParsingError {
