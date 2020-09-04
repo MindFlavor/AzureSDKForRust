@@ -35,6 +35,7 @@ percent-encoding	= "2.1"
 env_logger              = "0.7"
 tokio                   = { version = "0.2", features = ["macros"] }
 azure_sdk_auth_aad      = { path = "../azure_sdk_auth_aad" }
+url                     = "2.1"
 
 [features]
 default			= [ "azure_sdk_core" ]
