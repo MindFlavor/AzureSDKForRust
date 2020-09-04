@@ -470,11 +470,8 @@ where
         None => format!(
             "{}/{}/{}",
             t.blob_uri(),
-            percent_encoding::utf8_percent_encode(
-                container_name,
-                percent_encoding::NON_ALPHANUMERIC
-            ),
-            percent_encoding::utf8_percent_encode(blob_name, percent_encoding::NON_ALPHANUMERIC),
+            utf8_percent_encode(container_name, NON_ALPHANUMERIC),
+            utf8_percent_encode(blob_name, NON_ALPHANUMERIC),
         ),
     }
 }
