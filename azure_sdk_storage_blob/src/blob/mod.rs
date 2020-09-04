@@ -27,7 +27,6 @@ use hyper::header;
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::str::FromStr;
-use url::form_urlencoded;
 use xml::Element;
 use xml::Xml::ElementNode;
 
@@ -464,15 +463,21 @@ where
         Some(ref params) => format!(
             "{}/{}/{}?{}",
             t.blob_uri(),
-            form_urlencoded::byte_serialize(container_name.as_bytes()).collect::<String>(),
-            form_urlencoded::byte_serialize(blob_name.as_bytes()).collect::<String>(),
+            percent_encoding::utf8_percent_encode(
+                container_name,
+                percent_encoding::NON_ALPHANUMERIC
+            ),
+            percent_encoding::utf8_percent_encode(blob_name, percent_encoding::NON_ALPHANUMERIC),
             params
         ),
         None => format!(
             "{}/{}/{}",
             t.blob_uri(),
-            form_urlencoded::byte_serialize(container_name.as_bytes()).collect::<String>(),
-            form_urlencoded::byte_serialize(blob_name.as_bytes()).collect::<String>(),
+            percent_encoding::utf8_percent_encode(
+                container_name,
+                percent_encoding::NON_ALPHANUMERIC
+            ),
+            percent_encoding::utf8_percent_encode(blob_name, percent_encoding::NON_ALPHANUMERIC),
         ),
     }
 }
