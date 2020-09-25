@@ -4,7 +4,6 @@ extern crate log;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_core::prelude::*;
 use azure_sdk_storage_queue::prelude::*;
-use std::borrow::Cow;
 use std::error::Error;
 
 #[tokio::main]
@@ -19,9 +18,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     trace!("enumerating queues");
 
-    let response = client.list_queues().execute().await?;
+    let response = client
+        .list_queues()
+        .with_prefix("p")
+        .with_max_results(2)
+        .execute()
+        .await?;
 
-    //println!("response == {:?}", response);
+    println!("response == {:#?}", response);
 
     Ok(())
 }

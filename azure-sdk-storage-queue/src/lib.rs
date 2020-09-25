@@ -24,7 +24,6 @@ pub trait HasStorageClient: Debug + Send + Sync {
 
 pub trait QueueService: HasStorageClient + Debug + Send + Sync {
     fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, Self::Client>;
-    //fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
 }
 
 pub trait WithQueueServiceClient<'a>: Debug + Send + Sync {

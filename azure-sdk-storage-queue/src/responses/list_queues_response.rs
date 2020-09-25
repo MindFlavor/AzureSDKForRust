@@ -9,10 +9,17 @@ use hyper::header::HeaderMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ListQueuesResponse {
-    #[serde(rename = "_rid")]
-    pub rid: String,
-    #[serde(rename = "Documents")]
-    pub documents: Vec<String>,
+    #[serde(rename = "ServiceEndpoint")]
+    pub service_endpoint: String,
+    #[serde(rename = "Prefix")]
+    pub prefix: Option<String>,
+    #[serde(rename = "Marker")]
+    pub marker: Option<String>,
+    #[serde(rename = "MaxResults")]
+    pub max_results: Option<u32>,
+
+    #[serde(rename = "NextMarker")]
+    pub next_marker: Option<String>,
 }
 
 impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListQueuesResponse {
@@ -23,9 +30,20 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListQueuesResponse {
 
         println!("headers == {:?}", headers);
 
-        let received = std::str::from_utf8(body)?;
-        println!("receieved == {}", received);
-        Ok(serde_json::from_slice(body)?)
+        let received = &std::str::from_utf8(body)?[3..];
+        println!("receieved == {:#?}", received);
+        let mut response: Self = serde_xml_rs::from_reader(&body[3..])?;
+
+        // get rid of the ugly Some("") empty string
+        // we use None as Rust dictates to identify
+        // lack of value.
+        if let Some(next_marker) = &response.next_marker {
+            if next_marker == "" {
+                response.next_marker = None;
+            }
+        }
+
+        Ok(response)
     }
 }
 
