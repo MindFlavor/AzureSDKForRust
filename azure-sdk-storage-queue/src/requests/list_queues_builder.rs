@@ -5,13 +5,16 @@ use azure_sdk_core::prelude::*;
 use azure_sdk_storage_core::prelude::*;
 use hyper::StatusCode;
 use std::convert::TryInto;
+use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct ListQueuesBuilder<'a, 'b, C>
+pub struct ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
-    queue_service: &'a dyn QueueService<C>,
+    queue_service: &'a QS,
+    p_c: PhantomData<C>,
     prefix: Option<&'b str>,
     next_marker: Option<&'b str>,
     max_results: Option<u32>,
@@ -19,14 +22,16 @@ where
     timeout: Option<u64>,
 }
 
-impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
     #[inline]
-    pub(crate) fn new(queue_service: &'a dyn QueueService<C>) -> ListQueuesBuilder<'a, 'b, C> {
+    pub(crate) fn new(queue_service: &'a QS) -> ListQueuesBuilder<'a, 'b, C, QS> {
         ListQueuesBuilder {
             queue_service,
+            p_c: PhantomData {},
             prefix: None,
             next_marker: None,
             max_results: None,
@@ -37,9 +42,10 @@ where
 }
 
 //set mandatory no traits methods
-impl<'a, 'b, C> PrefixOption<'b> for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> PrefixOption<'b> for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
     #[inline]
     fn prefix(&self) -> Option<&'b str> {
@@ -47,9 +53,10 @@ where
     }
 }
 
-impl<'a, 'b, C> NextMarkerOption<'b> for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> NextMarkerOption<'b> for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
     #[inline]
     fn next_marker(&self) -> Option<&'b str> {
@@ -57,9 +64,10 @@ where
     }
 }
 
-impl<'a, 'b, C> MaxResultsOption for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> MaxResultsOption for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
     #[inline]
     fn max_results(&self) -> Option<u32> {
@@ -67,9 +75,10 @@ where
     }
 }
 
-impl<'a, 'b, C> IncludeMetadataOption for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> IncludeMetadataOption for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
     #[inline]
     fn include_metadata(&self) -> bool {
@@ -77,9 +86,10 @@ where
     }
 }
 
-impl<'a, 'b, C> TimeoutOption for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> TimeoutOption for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
     #[inline]
     fn timeout(&self) -> Option<u64> {
@@ -87,16 +97,18 @@ where
     }
 }
 
-impl<'a, 'b, C> PrefixSupport<'b> for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> PrefixSupport<'b> for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
-    type O = ListQueuesBuilder<'a, 'b, C>;
+    type O = ListQueuesBuilder<'a, 'b, C, QS>;
 
     #[inline]
     fn with_prefix(self, prefix: &'b str) -> Self::O {
         ListQueuesBuilder {
             queue_service: self.queue_service,
+            p_c: PhantomData {},
             prefix: Some(prefix),
             next_marker: self.next_marker,
             max_results: self.max_results,
@@ -106,16 +118,18 @@ where
     }
 }
 
-impl<'a, 'b, C> NextMarkerSupport<'b> for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> NextMarkerSupport<'b> for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
-    type O = ListQueuesBuilder<'a, 'b, C>;
+    type O = ListQueuesBuilder<'a, 'b, C, QS>;
 
     #[inline]
     fn with_next_marker(self, next_marker: &'b str) -> Self::O {
         ListQueuesBuilder {
             queue_service: self.queue_service,
+            p_c: PhantomData {},
             prefix: self.prefix,
             next_marker: Some(next_marker),
             max_results: self.max_results,
@@ -125,16 +139,18 @@ where
     }
 }
 
-impl<'a, 'b, C> MaxResultsSupport for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> MaxResultsSupport for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
-    type O = ListQueuesBuilder<'a, 'b, C>;
+    type O = ListQueuesBuilder<'a, 'b, C, QS>;
 
     #[inline]
     fn with_max_results(self, max_results: u32) -> Self::O {
         ListQueuesBuilder {
             queue_service: self.queue_service,
+            p_c: PhantomData {},
             prefix: self.prefix,
             next_marker: self.next_marker,
             max_results: Some(max_results),
@@ -144,16 +160,18 @@ where
     }
 }
 
-impl<'a, 'b, C> IncludeMetadataSupport for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> IncludeMetadataSupport for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
-    type O = ListQueuesBuilder<'a, 'b, C>;
+    type O = ListQueuesBuilder<'a, 'b, C, QS>;
 
     #[inline]
     fn with_include_metadata(self) -> Self::O {
         ListQueuesBuilder {
             queue_service: self.queue_service,
+            p_c: PhantomData {},
             prefix: self.prefix,
             next_marker: self.next_marker,
             max_results: self.max_results,
@@ -163,16 +181,18 @@ where
     }
 }
 
-impl<'a, 'b, C> TimeoutSupport for ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> TimeoutSupport for ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
-    type O = ListQueuesBuilder<'a, 'b, C>;
+    type O = ListQueuesBuilder<'a, 'b, C, QS>;
 
     #[inline]
     fn with_timeout(self, timeout: u64) -> Self::O {
         ListQueuesBuilder {
             queue_service: self.queue_service,
+            p_c: PhantomData {},
             prefix: self.prefix,
             next_marker: self.next_marker,
             max_results: self.max_results,
@@ -183,19 +203,21 @@ where
 }
 
 // methods callable regardless
-impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
-    fn queue_service(&self) -> &'a dyn QueueService<C> {
+    fn queue_service(&self) -> &'a QS {
         self.queue_service
     }
 }
 
 // methods callable only when every mandatory field has been filled
-impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
+impl<'a, 'b, C, QS> ListQueuesBuilder<'a, 'b, C, QS>
 where
-    C: Client,
+    C: Client + std::fmt::Debug,
+    QS: QueueService<C> + std::fmt::Debug,
 {
     pub async fn execute(self) -> Result<ListQueuesResponse, AzureError> {
         let mut uri = format!("{}?comp=list", self.queue_service().client().queue_uri());

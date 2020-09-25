@@ -1,5 +1,5 @@
 [package]
-name          = "azure-sdk-storage-queue"
+name          = "azure_sdk_storage_queue"
 version       = "0.1.0"
 description   = "Rust wrappers around Microsoft Azure REST APIs - Azure Storage Queue crate"
 readme        = "README.md"

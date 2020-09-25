@@ -18,6 +18,8 @@ pub struct ListQueuesResponse {
 impl std::convert::TryFrom<&[u8]> for ListQueuesResponse {
     type Error = AzureError;
     fn try_from(body: &[u8]) -> Result<Self, Self::Error> {
+        let received = std::str::from_utf8(body)?;
+        println!("receieved == {}", received);
         Ok(serde_json::from_slice(body)?)
     }
 }

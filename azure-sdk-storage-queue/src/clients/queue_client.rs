@@ -34,7 +34,7 @@ impl<'a, C> QueueService<C> for QueueClient<'a, C>
 where
     C: Client + Clone + Debug,
 {
-    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C> {
+    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C, Self> {
         crate::requests::ListQueuesBuilder::new(self)
     }
 }

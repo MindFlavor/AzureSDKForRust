@@ -11,12 +11,12 @@
 			"std::convert::TryInto"
 	],
 	"inline": true,
-	"extra_types": [ "'a", "'b", "C" ],
-	"extra_wheres": [ "C: Client" ],
+	"extra_types": [ "'a", "'b", "C", "QS" ],
+	"extra_wheres": [ "C: Client + std::fmt::Debug", "QS: QueueService<C> + std::fmt::Debug" ],
 	"constructor_fields": [
 		{
 			"name": "queue_service",
-			"field_type": "&'a dyn QueueService<C>"
+			"field_type": "&'a QS"
 		}
 	],
 	"fields": [

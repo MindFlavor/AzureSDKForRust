@@ -19,7 +19,7 @@ pub use clients::*;
 
 pub trait HasStorageClient<C>: Debug + Send + Sync
 where
-    C: Client + Send + Sync,
+    C: Client + Debug + Send + Sync,
 {
     fn client(&self) -> &C;
 }
@@ -28,7 +28,10 @@ pub trait QueueService<C>: HasStorageClient<C> + Debug + Send + Sync
 where
     C: Client + Debug + Send + Sync,
 {
-    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
+    //    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
+    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C, Self>
+    where
+        Self: Sized;
 }
 
 //*************
