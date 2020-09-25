@@ -486,6 +486,14 @@ pub trait IncludeMetadataSupport {
 
 pub trait IncludeMetadataOption {
     fn include_metadata(&self) -> bool;
+
+    fn to_uri_parameter(&self) -> Option<&'static str> {
+        if self.include_metadata() {
+            Some("include=metadata")
+        } else {
+            None
+        }
+    }
 }
 
 pub trait IncludeCopySupport {
