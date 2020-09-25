@@ -11,7 +11,7 @@ pub struct ListQueuesBuilder<'a, 'b, C>
 where
     C: Client,
 {
-    queue_service: &'a dyn QueueService<C>,
+    queue_service: &'a dyn QueueService<Client = C>,
     prefix: Option<&'b str>,
     next_marker: Option<&'b str>,
     max_results: Option<u32>,
@@ -24,7 +24,9 @@ where
     C: Client,
 {
     #[inline]
-    pub(crate) fn new(queue_service: &'a dyn QueueService<C>) -> ListQueuesBuilder<'a, 'b, C> {
+    pub(crate) fn new(
+        queue_service: &'a dyn QueueService<Client = C>,
+    ) -> ListQueuesBuilder<'a, 'b, C> {
         ListQueuesBuilder {
             queue_service,
             prefix: None,
@@ -209,7 +211,7 @@ where
         let future_response = self.queue_service.client().perform_request(
             &uri,
             &http::Method::GET,
-            &|mut request| request,
+            &|request| request,
             Some(&[]),
         )?;
 

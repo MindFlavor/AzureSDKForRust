@@ -27,42 +27,50 @@ where
     }
 }
 
-impl<'a, C> HasStorageClient<C> for QueueClient<'a, C>
+impl<'a, C> HasStorageClient for QueueClient<'a, C>
 where
     C: Client + Clone + Debug,
 {
+    type Client = C;
+
     fn client<'b>(&'b self) -> &'b C {
         self.client.as_ref()
     }
 }
 
-impl<'a, C> WithQueueServiceClient<'a, C, QueueClient<'a, C>> for C
+impl<'a, C> WithQueueServiceClient<'a> for C
 where
-    C: Client + Debug + Send + Sync + Clone,
+    C: Client + Debug + Send + Sync + Clone + 'a,
 {
-    fn with_queue_service_client(&'a self) -> QueueClient<'a, Self> {
+    type Client = C;
+    type QueueServiceClient = QueueClient<'a, C>;
+
+    fn with_queue_service_client(&'a self) -> Self::QueueServiceClient {
         QueueClient {
             client: Cow::Borrowed(self),
         }
     }
 }
 
-impl<C> IntoQueueServiceClient<C, QueueClient<'_, C>> for C
+impl<C> IntoQueueServiceClient for C
 where
-    C: Client + Debug + Send + Sync + Clone,
+    C: Client + Debug + Send + Sync + Clone + 'static,
 {
-    fn into_queue_service_client(self) -> QueueClient<'static, Self> {
+    type Client = C;
+    type QueueServiceClient = QueueClient<'static, C>;
+
+    fn into_queue_service_client(self) -> Self::QueueServiceClient {
         QueueClient {
             client: Cow::Owned(self),
         }
     }
 }
 
-impl<'a, C> QueueService<C> for QueueClient<'a, C>
+impl<'a, C> QueueService for QueueClient<'a, C>
 where
     C: Client + Clone + Debug,
 {
-    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C> {
+    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, Self::Client> {
         crate::requests::ListQueuesBuilder::new(self)
     }
 }

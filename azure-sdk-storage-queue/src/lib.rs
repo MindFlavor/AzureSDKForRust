@@ -17,35 +17,28 @@ use core::fmt::Debug;
 mod clients;
 pub use clients::*;
 
-pub trait HasStorageClient<C>: Debug + Send + Sync
-where
-    C: Client + Debug + Send + Sync,
-{
-    fn client(&self) -> &C;
+pub trait HasStorageClient: Debug + Send + Sync {
+    type Client: Client + Debug + Send + Sync;
+    fn client(&self) -> &Self::Client;
 }
 
-pub trait QueueService<C>: HasStorageClient<C> + Debug + Send + Sync
-where
-    C: Client + Debug + Send + Sync,
-{
-    //    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
-    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
+pub trait QueueService: HasStorageClient + Debug + Send + Sync {
+    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, Self::Client>;
+    //fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
 }
 
-pub trait WithQueueServiceClient<'a, C, D>: Debug + Send + Sync
-where
-    C: Client + Debug + Send + Sync,
-    D: QueueService<C>,
-{
-    fn with_queue_service_client(&'a self) -> D;
+pub trait WithQueueServiceClient<'a>: Debug + Send + Sync {
+    type Client: Client + Debug + Send + Sync;
+    type QueueServiceClient: QueueService;
+
+    fn with_queue_service_client(&'a self) -> Self::QueueServiceClient;
 }
 
-pub trait IntoQueueServiceClient<C, D>: Debug + Send + Sync
-where
-    C: Client + Debug + Send + Sync,
-    D: QueueService<C>,
-{
-    fn into_queue_service_client(self) -> D;
+pub trait IntoQueueServiceClient: Debug + Send + Sync {
+    type Client: Client + Debug + Send + Sync;
+    type QueueServiceClient: QueueService;
+
+    fn into_queue_service_client(self) -> Self::QueueServiceClient;
 }
 
 //*************

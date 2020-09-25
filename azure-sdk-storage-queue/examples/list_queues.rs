@@ -15,16 +15,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let master_key =
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    let client = client::with_access_key(&account, &master_key);
-
-    let client = azure_sdk_storage_queue::QueueClient::new_owned(client);
-    //let client = clien.
+    let client = client::with_access_key(&account, &master_key).into_queue_service_client();
 
     trace!("enumerating queues");
 
     let response = client.list_queues().execute().await?;
 
-    println!("response == {:?}", response);
+    //println!("response == {:?}", response);
 
     Ok(())
 }
