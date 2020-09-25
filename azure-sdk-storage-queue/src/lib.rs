@@ -29,9 +29,23 @@ where
     C: Client + Debug + Send + Sync,
 {
     //    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
-    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C, Self>
-    where
-        Self: Sized;
+    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
+}
+
+pub trait WithQueueServiceClient<'a, C, D>: Debug + Send + Sync
+where
+    C: Client + Debug + Send + Sync,
+    D: QueueService<C>,
+{
+    fn with_queue_service_client(&'a self) -> D;
+}
+
+pub trait IntoQueueServiceClient<C, D>: Debug + Send + Sync
+where
+    C: Client + Debug + Send + Sync,
+    D: QueueService<C>,
+{
+    fn into_queue_service_client(self) -> D;
 }
 
 //*************

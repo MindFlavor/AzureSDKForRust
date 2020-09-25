@@ -17,7 +17,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let client = client::with_access_key(&account, &master_key);
 
-    let client = azure_sdk_storage_queue::QueueClient::new(Cow::Owned(client));
+    let client = azure_sdk_storage_queue::QueueClient::new_owned(client);
+    //let client = clien.
 
     trace!("enumerating queues");
 

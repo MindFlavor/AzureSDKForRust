@@ -1,1 +1,1 @@
-pub use crate::QueueService;
+pub use crate::{IntoQueueServiceClient, QueueService, WithQueueServiceClient};
