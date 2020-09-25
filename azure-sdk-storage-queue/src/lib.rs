@@ -14,10 +14,21 @@ pub mod requests;
 pub mod responses;
 use azure_sdk_storage_core::Client;
 use core::fmt::Debug;
+mod clients;
+pub use clients::*;
 
-pub trait QueueService<C>: Debug + Send + Sync
+pub trait HasStorageClient<C>: Debug + Send + Sync
 where
-    C: Client,
+    C: Client + Send + Sync,
 {
-    fn list_queues<'a, 'b>(&'a self) -> requests::ListQueuesBuilder<'a, 'b, C>;
+    fn client(&self) -> &C;
 }
+
+pub trait QueueService<C>: HasStorageClient<C> + Debug + Send + Sync
+where
+    C: Client + Debug + Send + Sync,
+{
+    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, C>;
+}
+
+//*************

@@ -11,7 +11,7 @@ pub struct ListQueuesBuilder<'a, 'b, C>
 where
     C: Client,
 {
-    client: &'a C,
+    queue_service: &'a dyn QueueService<C>,
     prefix: Option<&'b str>,
     next_marker: Option<&'b str>,
     max_results: Option<u32>,
@@ -24,9 +24,9 @@ where
     C: Client,
 {
     #[inline]
-    pub(crate) fn new(client: &'a C) -> ListQueuesBuilder<'a, 'b, C> {
+    pub(crate) fn new(queue_service: &'a dyn QueueService<C>) -> ListQueuesBuilder<'a, 'b, C> {
         ListQueuesBuilder {
-            client,
+            queue_service,
             prefix: None,
             next_marker: None,
             max_results: None,
@@ -35,18 +35,6 @@ where
         }
     }
 }
-
-impl<'a, 'b, C> ClientRequired<'a, C> for ListQueuesBuilder<'a, 'b, C>
-where
-    C: Client,
-{
-    #[inline]
-    fn client(&self) -> &'a C {
-        self.client
-    }
-}
-
-//get mandatory no traits methods
 
 //set mandatory no traits methods
 impl<'a, 'b, C> PrefixOption<'b> for ListQueuesBuilder<'a, 'b, C>
@@ -108,7 +96,7 @@ where
     #[inline]
     fn with_prefix(self, prefix: &'b str) -> Self::O {
         ListQueuesBuilder {
-            client: self.client,
+            queue_service: self.queue_service,
             prefix: Some(prefix),
             next_marker: self.next_marker,
             max_results: self.max_results,
@@ -127,7 +115,7 @@ where
     #[inline]
     fn with_next_marker(self, next_marker: &'b str) -> Self::O {
         ListQueuesBuilder {
-            client: self.client,
+            queue_service: self.queue_service,
             prefix: self.prefix,
             next_marker: Some(next_marker),
             max_results: self.max_results,
@@ -146,7 +134,7 @@ where
     #[inline]
     fn with_max_results(self, max_results: u32) -> Self::O {
         ListQueuesBuilder {
-            client: self.client,
+            queue_service: self.queue_service,
             prefix: self.prefix,
             next_marker: self.next_marker,
             max_results: Some(max_results),
@@ -165,7 +153,7 @@ where
     #[inline]
     fn with_include_metadata(self) -> Self::O {
         ListQueuesBuilder {
-            client: self.client,
+            queue_service: self.queue_service,
             prefix: self.prefix,
             next_marker: self.next_marker,
             max_results: self.max_results,
@@ -184,7 +172,7 @@ where
     #[inline]
     fn with_timeout(self, timeout: u64) -> Self::O {
         ListQueuesBuilder {
-            client: self.client,
+            queue_service: self.queue_service,
             prefix: self.prefix,
             next_marker: self.next_marker,
             max_results: self.max_results,
@@ -195,7 +183,14 @@ where
 }
 
 // methods callable regardless
-impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C> where C: Client {}
+impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
+where
+    C: Client,
+{
+    fn queue_service(&self) -> &'a dyn QueueService<C> {
+        self.queue_service
+    }
+}
 
 // methods callable only when every mandatory field has been filled
 impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
@@ -203,7 +198,7 @@ where
     C: Client,
 {
     pub async fn execute(self) -> Result<ListQueuesResponse, AzureError> {
-        let mut uri = format!("{}?comp=list", self.client().queue_uri());
+        let mut uri = format!("{}?comp=list", self.queue_service().client().queue_uri());
 
         if let Some(nm) = IncludeMetadataOption::to_uri_parameter(&self) {
             uri = format!("{}&{}", uri, nm);
@@ -221,7 +216,7 @@ where
             uri = format!("{}&{}", uri, nm);
         }
 
-        let future_response = self.client().perform_request(
+        let future_response = self.queue_service().client().perform_request(
             &uri,
             &http::Method::GET,
             &|mut request| request,

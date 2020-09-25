@@ -15,9 +15,8 @@
 	"extra_wheres": [ "C: Client" ],
 	"constructor_fields": [
 		{
-			"name": "client",
-			"field_type": "&'a C",
-			"trait_get": "ClientRequired<'a, C>"
+			"name": "queue_service",
+			"field_type": "&'a dyn QueueService<C>"
 		}
 	],
 	"fields": [
