@@ -215,9 +215,9 @@ where
             Some(&[]),
         )?;
 
-        let (_headers, body) =
+        let (headers, body) =
             check_status_extract_headers_and_body(future_response, StatusCode::OK).await?;
 
-        (&body as &[u8]).try_into()
+        (&headers, &body as &[u8]).try_into()
     }
 }
