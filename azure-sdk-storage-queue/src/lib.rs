@@ -18,23 +18,23 @@ mod clients;
 pub use clients::*;
 
 pub trait HasStorageClient: Debug + Send + Sync {
-    type Client: Client + Debug + Send + Sync;
-    fn client(&self) -> &Self::Client;
+    type StorageClient: Client;
+    fn storage_client(&self) -> &Self::StorageClient;
 }
 
-pub trait QueueService: HasStorageClient + Debug + Send + Sync {
-    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, Self::Client>;
+pub trait QueueService: HasStorageClient {
+    fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, Self::StorageClient>;
 }
 
-pub trait WithQueueServiceClient<'a>: Debug + Send + Sync {
-    type Client: Client + Debug + Send + Sync;
+pub trait WithQueueServiceClient<'a>: Debug + Send + Sync + Clone {
+    type StorageClient: Client;
     type QueueServiceClient: QueueService;
 
     fn with_queue_service_client(&'a self) -> Self::QueueServiceClient;
 }
 
-pub trait IntoQueueServiceClient: Debug + Send + Sync {
-    type Client: Client + Debug + Send + Sync;
+pub trait IntoQueueServiceClient: Debug + Send + Sync + Clone {
+    type StorageClient: Client;
     type QueueServiceClient: QueueService;
 
     fn into_queue_service_client(self) -> Self::QueueServiceClient;

@@ -11,7 +11,7 @@ pub struct ListQueuesBuilder<'a, 'b, C>
 where
     C: Client,
 {
-    queue_service: &'a dyn QueueService<Client = C>,
+    queue_service: &'a dyn QueueService<StorageClient = C>,
     prefix: Option<&'b str>,
     next_marker: Option<&'b str>,
     max_results: Option<u32>,
@@ -25,7 +25,7 @@ where
 {
     #[inline]
     pub(crate) fn new(
-        queue_service: &'a dyn QueueService<Client = C>,
+        queue_service: &'a dyn QueueService<StorageClient = C>,
     ) -> ListQueuesBuilder<'a, 'b, C> {
         ListQueuesBuilder {
             queue_service,
@@ -187,10 +187,13 @@ where
 // methods callable only when every mandatory field has been filled
 impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
 where
-    C: Client + std::fmt::Debug,
+    C: Client,
 {
     pub async fn execute(self) -> Result<ListQueuesResponse, AzureError> {
-        let mut uri = format!("{}?comp=list", self.queue_service.client().queue_uri());
+        let mut uri = format!(
+            "{}?comp=list",
+            self.queue_service.storage_client().queue_uri()
+        );
 
         if let Some(nm) = IncludeMetadataOption::to_uri_parameter(&self) {
             uri = format!("{}&{}", uri, nm);
@@ -208,7 +211,7 @@ where
             uri = format!("{}&{}", uri, nm);
         }
 
-        let future_response = self.queue_service.client().perform_request(
+        let future_response = self.queue_service.storage_client().perform_request(
             &uri,
             &http::Method::GET,
             &|request| request,

@@ -16,7 +16,7 @@
 	"constructor_fields": [
 		{
 			"name": "queue_service",
-			"field_type": "&'a dyn QueueService<Client=C>"
+			"field_type": "&'a dyn QueueService<StorageClient = C>"
 		}
 	],
 	"fields": [
