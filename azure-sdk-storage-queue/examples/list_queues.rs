@@ -20,7 +20,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let response = client
         .list_queues()
-        .with_prefix("p")
+        .with_prefix("a")
+        .with_include_metadata()
         .with_max_results(2)
         .execute()
         .await?;

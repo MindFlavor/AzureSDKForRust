@@ -18,7 +18,7 @@ where
 {
     type StorageClient = C;
 
-    fn storage_client<'b>(&'b self) -> &'b C {
+    fn storage_client(&self) -> &C {
         self.storage_client.as_ref()
     }
 }

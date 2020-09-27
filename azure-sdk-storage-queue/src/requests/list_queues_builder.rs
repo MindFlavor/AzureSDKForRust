@@ -211,6 +211,8 @@ where
             uri = format!("{}&{}", uri, nm);
         }
 
+        debug!("uri == {}", uri);
+
         let future_response = self.queue_service.storage_client().perform_request(
             &uri,
             &http::Method::GET,
