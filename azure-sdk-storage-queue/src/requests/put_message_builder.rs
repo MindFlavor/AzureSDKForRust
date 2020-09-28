@@ -183,7 +183,7 @@ impl<'a, 'b, C> PutMessageBuilder<'a, 'b, C, Yes>
 where
     C: Client,
 {
-    pub async fn execute(self) -> Result<ListQueuesResponse, AzureError> {
+    pub async fn execute(self) -> Result<PutMessageResponse, AzureError> {
         let mut uri = format!(
             "{}/{}/messages",
             self.queue_name_service.storage_client().queue_uri(),
