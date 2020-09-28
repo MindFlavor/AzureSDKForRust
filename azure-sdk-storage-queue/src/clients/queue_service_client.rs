@@ -27,7 +27,6 @@ impl<'a, C> WithQueueServiceClient<'a> for C
 where
     C: Client + 'a,
 {
-    type StorageClient = C;
     type QueueServiceClient = QueueServiceClient<'a, C>;
 
     fn with_queue_service_client(&'a self) -> Self::QueueServiceClient {
@@ -41,7 +40,6 @@ impl<C> IntoQueueServiceClient for C
 where
     C: Client + 'static,
 {
-    type StorageClient = C;
     type QueueServiceClient = QueueServiceClient<'static, C>;
 
     fn into_queue_service_client(self) -> Self::QueueServiceClient {
