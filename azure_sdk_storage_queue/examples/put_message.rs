@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate log;
+use azure_sdk_core::prelude::*;
 use azure_sdk_storage_core::prelude::*;
 use azure_sdk_storage_queue::prelude::*;
 use std::error::Error;
@@ -23,6 +24,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let response = client
         .with_queue_name_client(&queue_name)
         .put_message()
+        .with_client_request_id("optional correlation token")
         .with_message_body("Azure SDK for Rust rocks!")
         .execute()
         .await?;

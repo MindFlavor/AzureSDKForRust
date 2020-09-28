@@ -21,6 +21,7 @@ where
     visibility_timeout_seconds: u64,
     message_ttl_seconds: u64,
     timeout: Option<u64>,
+    client_request_id: Option<&'a str>,
 }
 
 impl<'a, 'b, C> PutMessageBuilder<'a, 'b, C, No>
@@ -38,6 +39,7 @@ where
             visibility_timeout_seconds: 0,
             message_ttl_seconds: 25200,
             timeout: None,
+            client_request_id: None,
         }
     }
 }
@@ -87,6 +89,18 @@ where
     }
 }
 
+impl<'a, 'b, C, MessageBodySet> ClientRequestIdOption<'a>
+    for PutMessageBuilder<'a, 'b, C, MessageBodySet>
+where
+    MessageBodySet: ToAssign,
+    C: Client,
+{
+    #[inline]
+    fn client_request_id(&self) -> Option<&'a str> {
+        self.client_request_id
+    }
+}
+
 impl<'a, 'b, C> MessageBodySupport<'b> for PutMessageBuilder<'a, 'b, C, No>
 where
     C: Client,
@@ -102,6 +116,7 @@ where
             visibility_timeout_seconds: self.visibility_timeout_seconds,
             message_ttl_seconds: self.message_ttl_seconds,
             timeout: self.timeout,
+            client_request_id: self.client_request_id,
         }
     }
 }
@@ -123,6 +138,7 @@ where
             visibility_timeout_seconds,
             message_ttl_seconds: self.message_ttl_seconds,
             timeout: self.timeout,
+            client_request_id: self.client_request_id,
         }
     }
 }
@@ -143,6 +159,7 @@ where
             visibility_timeout_seconds: self.visibility_timeout_seconds,
             message_ttl_seconds,
             timeout: self.timeout,
+            client_request_id: self.client_request_id,
         }
     }
 }
@@ -163,6 +180,29 @@ where
             visibility_timeout_seconds: self.visibility_timeout_seconds,
             message_ttl_seconds: self.message_ttl_seconds,
             timeout: Some(timeout),
+            client_request_id: self.client_request_id,
+        }
+    }
+}
+
+impl<'a, 'b, C, MessageBodySet> ClientRequestIdSupport<'a>
+    for PutMessageBuilder<'a, 'b, C, MessageBodySet>
+where
+    MessageBodySet: ToAssign,
+    C: Client,
+{
+    type O = PutMessageBuilder<'a, 'b, C, MessageBodySet>;
+
+    #[inline]
+    fn with_client_request_id(self, client_request_id: &'a str) -> Self::O {
+        PutMessageBuilder {
+            queue_name_service: self.queue_name_service,
+            p_message_body: PhantomData {},
+            message_body: self.message_body,
+            visibility_timeout_seconds: self.visibility_timeout_seconds,
+            message_ttl_seconds: self.message_ttl_seconds,
+            timeout: self.timeout,
+            client_request_id: Some(client_request_id),
         }
     }
 }
@@ -213,7 +253,10 @@ where
         let future_response = self.queue_name_service.storage_client().perform_request(
             &uri,
             &http::Method::POST,
-            &|request| request,
+            &|mut request| {
+                request = ClientRequestIdOption::add_header(&self, request);
+                request
+            },
             Some(message.as_bytes()),
         )?;
 

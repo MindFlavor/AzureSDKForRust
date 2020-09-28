@@ -53,6 +53,13 @@
 			"optional": true,
 			"trait_get": "TimeoutOption",
 			"trait_set": "TimeoutSupport"
-		}
+		},
+		{
+                        "name": "client_request_id",
+                        "field_type": "&'a str",
+                        "optional": true,
+                        "trait_get": "ClientRequestIdOption<'a>",
+                        "trait_set": "ClientRequestIdSupport<'a>"
+                }
 	]
 }

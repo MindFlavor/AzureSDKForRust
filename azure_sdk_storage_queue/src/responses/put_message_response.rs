@@ -45,10 +45,10 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for PutMessageResponse {
         let headers = value.0;
         let body = value.1;
 
-        println!("headers == {:?}", headers);
+        debug!("headers == {:?}", headers);
 
         let received = &std::str::from_utf8(body)?[3..];
-        println!("receieved == {:#?}", received);
+        debug!("receieved == {:#?}", received);
         let response: PutMessageResponseInternal = serde_xml_rs::from_reader(&body[3..])?;
 
         let queue_message = QueueMessage {

@@ -944,11 +944,8 @@ pub fn request_id_from_headers(headers: &HeaderMap) -> Result<RequestId, AzureEr
     Ok(Uuid::parse_str(request_id)?)
 }
 
-pub fn client_request_id_from_headers(headers: &HeaderMap) -> Result<RequestId, AzureError> {
-    let client_request_id = headers
-        .get_as_str(CLIENT_REQUEST_ID)
-        .ok_or_else(|| AzureError::HeaderNotFound(CLIENT_REQUEST_ID.to_owned()))?;
-    Ok(Uuid::parse_str(client_request_id)?)
+pub fn client_request_id_from_headers_optional(headers: &HeaderMap) -> Option<String> {
+    headers.get_as_str(CLIENT_REQUEST_ID).map(|s| s.to_owned())
 }
 
 pub fn content_md5_from_headers_optional(
@@ -964,6 +961,7 @@ pub fn content_md5_from_headers_optional(
 #[derive(Debug, Clone)]
 pub struct CommonStorageResponseHeaders {
     pub request_id: RequestId,
+    pub client_request_id: Option<String>,
     pub version: String,
     pub date: DateTime<Utc>,
     pub server: String,
@@ -975,6 +973,7 @@ impl TryFrom<&HeaderMap> for CommonStorageResponseHeaders {
     fn try_from(headers: &HeaderMap) -> Result<Self, Self::Error> {
         Ok(Self {
             request_id: request_id_from_headers(headers)?,
+            client_request_id: client_request_id_from_headers_optional(headers),
             version: version_from_headers(headers)?.to_owned(),
             date: date_from_headers(headers)?,
             server: server_from_headers(headers)?.to_owned(),
