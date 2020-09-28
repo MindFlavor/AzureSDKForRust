@@ -1,7 +1,5 @@
 #[macro_use]
 extern crate log;
-
-use azure_sdk_core::prelude::*;
 use azure_sdk_storage_core::prelude::*;
 use azure_sdk_storage_queue::prelude::*;
 use std::error::Error;

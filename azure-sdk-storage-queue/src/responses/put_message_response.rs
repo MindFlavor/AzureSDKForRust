@@ -1,20 +1,32 @@
-//use crate::from_headers::*;
 use azure_sdk_core::errors::AzureError;
-//use azure_sdk_core::{
-//    continuation_token_from_headers_optional, session_token_from_headers, SessionToken,
-//};
-//use chrono::{DateTime, Utc};
+use azure_sdk_core::{utc_date_from_rfc2822, CommonStorageResponseHeaders};
+use chrono::{DateTime, Utc};
 use hyper::header::HeaderMap;
-//use serde::de::DeserializeOwned;
+use std::convert::TryInto;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct PutMessageResponse {
-    #[serde(rename = "QueueMessage")]
+    pub common_storage_response_headers: CommonStorageResponseHeaders,
     pub queue_message: QueueMessage,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+struct PutMessageResponseInternal {
+    #[serde(rename = "QueueMessage")]
+    pub queue_message: QueueMessageInternal,
+}
+
+#[derive(Debug, Clone)]
 pub struct QueueMessage {
+    pub message_id: String,
+    pub insertion_time: DateTime<Utc>,
+    pub expiration_time: DateTime<Utc>,
+    pub pop_receipt: String,
+    pub time_next_visible: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct QueueMessageInternal {
     #[serde(rename = "MessageId")]
     pub message_id: String,
     #[serde(rename = "InsertionTime")]
@@ -37,20 +49,19 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for PutMessageResponse {
 
         let received = &std::str::from_utf8(body)?[3..];
         println!("receieved == {:#?}", received);
-        let mut response: Self = serde_xml_rs::from_reader(&body[3..])?;
+        let response: PutMessageResponseInternal = serde_xml_rs::from_reader(&body[3..])?;
 
-        Ok(response)
-    }
-}
+        let queue_message = QueueMessage {
+            message_id: response.queue_message.message_id,
+            insertion_time: utc_date_from_rfc2822(&response.queue_message.insertion_time)?,
+            expiration_time: utc_date_from_rfc2822(&response.queue_message.expiration_time)?,
+            pop_receipt: response.queue_message.pop_receipt,
+            time_next_visible: utc_date_from_rfc2822(&response.queue_message.time_next_visible)?,
+        };
 
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn try_parse() {
-        let range = "<?xml version=\"1.0\" encoding=\"utf-8\"?><EnumerationResults ServiceEndpoint=\"https://azureskdforrust.queue.core.windows.net/\"><Prefix>a</Prefix><MaxResults>2</MaxResults><Queues><Queue><Name>azureiscool</Name></Queue><Queue><Name>azurerocks</Name></Queue></Queues><NextMarker /></EnumerationResults>";
-
-        let response: PutMessageResponse = serde_xml_rs::from_str(range).unwrap();
+        Ok(Self {
+            common_storage_response_headers: headers.try_into()?,
+            queue_message,
+        })
     }
 }

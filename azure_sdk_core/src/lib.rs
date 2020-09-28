@@ -36,6 +36,7 @@ use crate::lease::LeaseId;
 use http::request::Builder;
 use http::HeaderMap;
 use std::collections::HashMap;
+use std::convert::TryFrom;
 mod stored_access_policy;
 pub use self::stored_access_policy::{StoredAccessPolicy, StoredAccessPolicyList};
 pub mod prelude;
@@ -943,6 +944,13 @@ pub fn request_id_from_headers(headers: &HeaderMap) -> Result<RequestId, AzureEr
     Ok(Uuid::parse_str(request_id)?)
 }
 
+pub fn client_request_id_from_headers(headers: &HeaderMap) -> Result<RequestId, AzureError> {
+    let client_request_id = headers
+        .get_as_str(CLIENT_REQUEST_ID)
+        .ok_or_else(|| AzureError::HeaderNotFound(CLIENT_REQUEST_ID.to_owned()))?;
+    Ok(Uuid::parse_str(client_request_id)?)
+}
+
 pub fn content_md5_from_headers_optional(
     headers: &HeaderMap,
 ) -> Result<Option<[u8; 16]>, AzureError> {
@@ -950,6 +958,27 @@ pub fn content_md5_from_headers_optional(
         Ok(Some(content_md5_from_headers(headers)?))
     } else {
         Ok(None)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CommonStorageResponseHeaders {
+    pub request_id: RequestId,
+    pub version: String,
+    pub date: DateTime<Utc>,
+    pub server: String,
+}
+
+impl TryFrom<&HeaderMap> for CommonStorageResponseHeaders {
+    type Error = AzureError;
+
+    fn try_from(headers: &HeaderMap) -> Result<Self, Self::Error> {
+        Ok(Self {
+            request_id: request_id_from_headers(headers)?,
+            version: version_from_headers(headers)?.to_owned(),
+            date: date_from_headers(headers)?,
+            server: server_from_headers(headers)?.to_owned(),
+        })
     }
 }
 
@@ -1051,6 +1080,12 @@ pub fn continuation_token_from_headers_optional(
     } else {
         Ok(None)
     }
+}
+
+#[inline]
+pub fn utc_date_from_rfc2822(date: &str) -> Result<DateTime<Utc>, AzureError> {
+    let date = DateTime::parse_from_rfc2822(date)?;
+    Ok(DateTime::from_utc(date.naive_utc(), Utc))
 }
 
 pub fn date_from_headers(headers: &HeaderMap) -> Result<DateTime<Utc>, AzureError> {
