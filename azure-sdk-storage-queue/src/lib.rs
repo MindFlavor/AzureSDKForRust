@@ -12,6 +12,7 @@ extern crate azure_sdk_core;
 pub mod prelude;
 pub mod requests;
 pub mod responses;
+use azure_sdk_core::No;
 use azure_sdk_storage_core::Client;
 use core::fmt::Debug;
 mod clients;
@@ -79,6 +80,8 @@ pub trait IntoQueueServiceClient: Debug + Send + Sync + Clone {
 //*************
 pub trait QueueNameService: HasStorageClient {
     fn queue_name(&self) -> &str;
+
+    fn put_message(&self) -> requests::PutMessageBuilder<'_, '_, Self::StorageClient, No>;
 }
 
 pub trait WithQueueNameClient<'a, 'b>: Debug + Send + Sync + Clone {

@@ -191,7 +191,7 @@ where
         );
 
         uri = format!(
-            "{}&{}",
+            "{}?{}",
             uri,
             VisibilityTimeoutRequired::to_uri_parameter(&self)
         );
@@ -202,15 +202,23 @@ where
 
         debug!("uri == {}", uri);
 
+        // since the format is fixed we just decorate the message with the tags.
+        // This could be made optional in the future and/or more
+        // stringent.
+        let message = format!(
+            "<QueueMessage><MessageText>{}</MessageText></QueueMessage>",
+            self.message_body()
+        );
+
         let future_response = self.queue_name_service.storage_client().perform_request(
             &uri,
-            &http::Method::GET,
+            &http::Method::POST,
             &|request| request,
-            Some(&[]),
+            Some(message.as_bytes()),
         )?;
 
         let (headers, body) =
-            check_status_extract_headers_and_body(future_response, StatusCode::OK).await?;
+            check_status_extract_headers_and_body(future_response, StatusCode::CREATED).await?;
 
         (&headers, &body as &[u8]).try_into()
     }

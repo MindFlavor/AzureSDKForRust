@@ -1,6 +1,7 @@
 use crate::clients::QueueServiceClient;
 use crate::requests;
 use crate::{HasStorageClient, IntoQueueNameClient, QueueNameService, WithQueueNameClient};
+use azure_sdk_core::No;
 use azure_sdk_storage_core::Client;
 use std::borrow::Cow;
 use std::fmt::Debug;
@@ -65,5 +66,9 @@ where
 {
     fn queue_name(&self) -> &str {
         self.queue_name.as_ref()
+    }
+
+    fn put_message(&self) -> requests::PutMessageBuilder<'_, '_, Self::StorageClient, No> {
+        requests::PutMessageBuilder::new(self)
     }
 }
