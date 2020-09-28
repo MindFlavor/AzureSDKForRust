@@ -65,13 +65,13 @@ pub trait QueueService: HasStorageClient + Sync {
     fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, Self::StorageClient>;
 }
 
-pub trait WithQueueServiceClient<'a>: Debug + Send + Sync + Clone {
+pub trait WithQueueServiceClient<'a>: Debug + Send + Sync {
     type QueueServiceClient: QueueService;
 
     fn with_queue_service_client(&'a self) -> Self::QueueServiceClient;
 }
 
-pub trait IntoQueueServiceClient: Debug + Send + Sync + Clone {
+pub trait IntoQueueServiceClient: Debug + Send + Sync {
     type QueueServiceClient: QueueService;
 
     fn into_queue_service_client(self) -> Self::QueueServiceClient;
@@ -84,7 +84,7 @@ pub trait QueueNameService: HasStorageClient {
     fn put_message(&self) -> requests::PutMessageBuilder<'_, '_, Self::StorageClient, No>;
 }
 
-pub trait WithQueueNameClient<'a, 'b>: Debug + Send + Sync + Clone {
+pub trait WithQueueNameClient<'a, 'b>: Debug + Send + Sync {
     type QueueNameClient: QueueNameService;
 
     fn with_queue_name_client<NAME>(&'a self, queue_name: NAME) -> Self::QueueNameClient
@@ -92,7 +92,7 @@ pub trait WithQueueNameClient<'a, 'b>: Debug + Send + Sync + Clone {
         NAME: Into<Cow<'b, str>>;
 }
 
-pub trait IntoQueueNameClient<'b>: Debug + Send + Sync + Clone {
+pub trait IntoQueueNameClient<'b>: Debug + Send + Sync {
     type QueueNameClient: QueueNameService;
 
     fn into_queue_name_client<NAME>(self, queue_name: NAME) -> Self::QueueNameClient

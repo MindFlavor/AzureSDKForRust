@@ -7,14 +7,14 @@ use std::fmt::Debug;
 #[derive(Debug, Clone)]
 pub struct QueueServiceClient<'a, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     pub storage_client: Cow<'a, C>,
 }
 
 impl<'a, C> HasStorageClient for QueueServiceClient<'a, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     type StorageClient = C;
 
@@ -25,7 +25,7 @@ where
 
 impl<'a, C> WithQueueServiceClient<'a> for C
 where
-    C: Client + 'a,
+    C: Client + 'a + Clone,
 {
     type QueueServiceClient = QueueServiceClient<'a, C>;
 
@@ -38,7 +38,7 @@ where
 
 impl<C> IntoQueueServiceClient for C
 where
-    C: Client + 'static,
+    C: Client + 'static + Clone,
 {
     type QueueServiceClient = QueueServiceClient<'static, C>;
 
@@ -51,7 +51,7 @@ where
 
 impl<'a, C> QueueService for QueueServiceClient<'a, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     fn list_queues(&self) -> requests::ListQueuesBuilder<'_, '_, Self::StorageClient> {
         crate::requests::ListQueuesBuilder::new(self)

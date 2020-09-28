@@ -13,7 +13,7 @@ pub trait HttpHeaderAdder {
     fn add_headers(&self, builder: ::http::request::Builder) -> ::http::request::Builder;
 }
 
-pub trait Client: std::fmt::Debug + Send + Sync + Clone {
+pub trait Client: std::fmt::Debug + Send + Sync {
     fn blob_uri(&self) -> &str;
     fn table_uri(&self) -> &str;
     fn queue_uri(&self) -> &str;

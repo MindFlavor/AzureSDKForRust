@@ -9,7 +9,7 @@ use std::fmt::Debug;
 #[derive(Debug, Clone)]
 pub struct QueueNameClient<'a, 'b, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     pub storage_client: Cow<'a, C>,
     pub queue_name: Cow<'b, str>,
@@ -17,7 +17,7 @@ where
 
 impl<'a, 'b, C> HasStorageClient for QueueNameClient<'a, 'b, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     type StorageClient = C;
 
@@ -28,7 +28,7 @@ where
 
 impl<'a, 'b, C> WithQueueNameClient<'a, 'b> for QueueServiceClient<'a, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     type QueueNameClient = QueueNameClient<'a, 'b, C>;
 
@@ -45,7 +45,7 @@ where
 
 impl<'a, 'b, C> IntoQueueNameClient<'b> for QueueServiceClient<'a, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     type QueueNameClient = QueueNameClient<'a, 'b, C>;
 
@@ -62,7 +62,7 @@ where
 
 impl<'a, 'b, C> QueueNameService for QueueNameClient<'a, 'b, C>
 where
-    C: Client,
+    C: Client + Clone,
 {
     fn queue_name(&self) -> &str {
         self.queue_name.as_ref()

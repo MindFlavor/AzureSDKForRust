@@ -8,5 +8,5 @@ members = [
   "azure_sdk_storage_core",
   "azure_sdk_storage_table",
   "azure_sdk_cosmos",
-  "azure-sdk-storage-queue"
+  "azure_sdk_storage_queue"
 ]
