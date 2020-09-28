@@ -533,7 +533,7 @@ pub trait IncludeListOptions:
 
         if self.include_metadata() {
             if !f_first {
-                s.push_str(",");
+                s.push(',');
             }
             s.push_str("metadata");
             f_first = false;
@@ -541,7 +541,7 @@ pub trait IncludeListOptions:
 
         if self.include_uncommitted_blobs() {
             if !f_first {
-                s.push_str(",");
+                s.push(',');
             }
             s.push_str("uncommittedblobs");
             f_first = false;
@@ -549,7 +549,7 @@ pub trait IncludeListOptions:
 
         if self.include_copy() {
             if !f_first {
-                s.push_str(",");
+                s.push(',');
             }
             s.push_str("copy");
             f_first = false;
@@ -557,7 +557,7 @@ pub trait IncludeListOptions:
 
         if self.include_deleted() {
             if !f_first {
-                s.push_str(",");
+                s.push(',');
             }
             s.push_str("deleted");
         }
@@ -1034,10 +1034,8 @@ pub fn content_crc64_from_headers(headers: &HeaderMap) -> Result<[u8; 8], AzureE
 pub fn consistency_from_headers(headers: &HeaderMap) -> Result<Consistency, AzureError> {
     if let Some(content_crc64) = content_crc64_from_headers_optional(headers)? {
         return Ok(Consistency::Crc64(content_crc64));
-    } else {
-        if let Some(content_md5) = content_md5_from_headers_optional(headers)? {
-            return Ok(Consistency::Md5(content_md5));
-        }
+    } else if let Some(content_md5) = content_md5_from_headers_optional(headers)? {
+        return Ok(Consistency::Md5(content_md5));
     }
 
     Err(AzureError::HeadersNotFound(vec![
