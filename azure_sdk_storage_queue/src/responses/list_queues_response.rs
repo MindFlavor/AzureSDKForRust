@@ -1,14 +1,23 @@
-//use crate::from_headers::*;
 use azure_sdk_core::errors::AzureError;
-//use azure_sdk_core::{
-//    continuation_token_from_headers_optional, session_token_from_headers, SessionToken,
-//};
-//use chrono::{DateTime, Utc};
+use azure_sdk_core::CommonStorageResponseHeaders;
 use hyper::header::HeaderMap;
-//use serde::de::DeserializeOwned;
+use std::convert::TryInto;
+
+#[derive(Debug, Clone)]
+pub struct ListQueuesResponse {
+    pub common_storage_response_headers: CommonStorageResponseHeaders,
+    pub service_endpoint: String,
+    pub prefix: Option<String>,
+    pub marker: Option<String>,
+    pub max_results: Option<u32>,
+
+    pub queues: Queues,
+
+    pub next_marker: Option<String>,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ListQueuesResponse {
+struct ListQueuesResponseInternal {
     #[serde(rename = "ServiceEndpoint")]
     pub service_endpoint: String,
     #[serde(rename = "Prefix")]
@@ -49,7 +58,7 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListQueuesResponse {
 
         let received = &std::str::from_utf8(body)?[3..];
         println!("receieved == {:#?}", received);
-        let mut response: Self = serde_xml_rs::from_reader(&body[3..])?;
+        let mut response: ListQueuesResponseInternal = serde_xml_rs::from_reader(&body[3..])?;
 
         // get rid of the ugly Some("") empty string
         // we use None as Rust dictates to identify
@@ -70,7 +79,15 @@ impl std::convert::TryFrom<(&HeaderMap, &[u8])> for ListQueuesResponse {
             }
         });
 
-        Ok(response)
+        Ok(ListQueuesResponse {
+            common_storage_response_headers: headers.try_into()?,
+            service_endpoint: response.service_endpoint,
+            prefix: response.prefix,
+            marker: response.marker,
+            max_results: response.max_results,
+            queues: response.queues,
+            next_marker: response.next_marker,
+        })
     }
 }
 

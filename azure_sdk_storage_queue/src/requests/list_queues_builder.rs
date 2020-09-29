@@ -17,6 +17,7 @@ where
     max_results: Option<u32>,
     include_metadata: bool,
     timeout: Option<u64>,
+    client_request_id: Option<&'a str>,
 }
 
 impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
@@ -34,6 +35,7 @@ where
             max_results: None,
             include_metadata: false,
             timeout: None,
+            client_request_id: None,
         }
     }
 }
@@ -89,6 +91,16 @@ where
     }
 }
 
+impl<'a, 'b, C> ClientRequestIdOption<'a> for ListQueuesBuilder<'a, 'b, C>
+where
+    C: Client,
+{
+    #[inline]
+    fn client_request_id(&self) -> Option<&'a str> {
+        self.client_request_id
+    }
+}
+
 impl<'a, 'b, C> PrefixSupport<'b> for ListQueuesBuilder<'a, 'b, C>
 where
     C: Client,
@@ -104,6 +116,7 @@ where
             max_results: self.max_results,
             include_metadata: self.include_metadata,
             timeout: self.timeout,
+            client_request_id: self.client_request_id,
         }
     }
 }
@@ -123,6 +136,7 @@ where
             max_results: self.max_results,
             include_metadata: self.include_metadata,
             timeout: self.timeout,
+            client_request_id: self.client_request_id,
         }
     }
 }
@@ -142,6 +156,7 @@ where
             max_results: Some(max_results),
             include_metadata: self.include_metadata,
             timeout: self.timeout,
+            client_request_id: self.client_request_id,
         }
     }
 }
@@ -161,6 +176,7 @@ where
             max_results: self.max_results,
             include_metadata: true,
             timeout: self.timeout,
+            client_request_id: self.client_request_id,
         }
     }
 }
@@ -180,7 +196,38 @@ where
             max_results: self.max_results,
             include_metadata: self.include_metadata,
             timeout: Some(timeout),
+            client_request_id: self.client_request_id,
         }
+    }
+}
+
+impl<'a, 'b, C> ClientRequestIdSupport<'a> for ListQueuesBuilder<'a, 'b, C>
+where
+    C: Client,
+{
+    type O = ListQueuesBuilder<'a, 'b, C>;
+
+    #[inline]
+    fn with_client_request_id(self, client_request_id: &'a str) -> Self::O {
+        ListQueuesBuilder {
+            queue_service: self.queue_service,
+            prefix: self.prefix,
+            next_marker: self.next_marker,
+            max_results: self.max_results,
+            include_metadata: self.include_metadata,
+            timeout: self.timeout,
+            client_request_id: Some(client_request_id),
+        }
+    }
+}
+
+// methods callable regardless
+impl<'a, 'b, C> ListQueuesBuilder<'a, 'b, C>
+where
+    C: Client,
+{
+    pub fn queue_service(&self) -> &'a dyn QueueService<StorageClient = C> {
+        self.queue_service
     }
 }
 
@@ -216,7 +263,10 @@ where
         let future_response = self.queue_service.storage_client().perform_request(
             &uri,
             &http::Method::GET,
-            &|request| request,
+            &|mut request| {
+                request = ClientRequestIdOption::add_header(&self, request);
+                request
+            },
             Some(&[]),
         )?;
 
