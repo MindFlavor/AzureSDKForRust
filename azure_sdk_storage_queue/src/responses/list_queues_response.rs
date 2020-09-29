@@ -99,7 +99,7 @@ mod test {
     fn try_parse() {
         let range = "<?xml version=\"1.0\" encoding=\"utf-8\"?><EnumerationResults ServiceEndpoint=\"https://azureskdforrust.queue.core.windows.net/\"><Prefix>a</Prefix><MaxResults>2</MaxResults><Queues><Queue><Name>azureiscool</Name></Queue><Queue><Name>azurerocks</Name></Queue></Queues><NextMarker /></EnumerationResults>";
 
-        let response: ListQueuesResponse = serde_xml_rs::from_str(range).unwrap();
+        let response: ListQueuesResponseInternal = serde_xml_rs::from_str(range).unwrap();
 
         assert_eq!(response.queues.queues.len(), 2);
     }
