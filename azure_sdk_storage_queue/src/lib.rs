@@ -44,8 +44,17 @@ pub trait MessageTTLRequired {
     }
 }
 
+/// Wraps the message like: '\<QueueMessage>\<MessageText>{}\</MessageText>\</QueueMessage>'
+/// as per Azure specification.
+/// See
+/// [https://docs.microsoft.com/en-us/rest/api/storageservices/put-message](https://docs.microsoft.com/en-us/rest/api/storageservices/put-message)
 pub trait MessageBodySupport<'b> {
     type O;
+
+    /// Wraps the message like: '\<QueueMessage>\<MessageText>{}\</MessageText>\</QueueMessage>'
+    /// as per Azure specification.
+    /// See
+    /// [https://docs.microsoft.com/en-us/rest/api/storageservices/put-message](https://docs.microsoft.com/en-us/rest/api/storageservices/put-message)
     fn with_message_body<BODY: Into<Cow<'b, str>>>(self, body: BODY) -> Self::O;
 }
 
